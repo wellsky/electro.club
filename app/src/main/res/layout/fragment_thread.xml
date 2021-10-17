@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <TextView
+        android:id="@+id/emptyText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/empty_posts"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swiperefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id = "@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@id/toolsTop"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:listitem="@layout/post_item"
+            >
+        </androidx.recyclerview.widget.RecyclerView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id = "@+id/toolsTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="top"
+        app:constraint_referenced_ids="content,save,cancelEdition,editMessageTitle"
+        />
+
+    <EditText
+        android:id="@+id/content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/message_text"
+        android:maxLines="6"
+        android:inputType="textMultiLine"
+        android:background="@android:color/transparent"
+        android:padding="@dimen/common_spacing"
+        android:importantForAutofill="no"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/save"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <ImageButton
+        android:id="@+id/save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/common_spacing"
+        android:layout_marginLeft="@dimen/common_spacing"
+        android:layout_marginEnd="@dimen/common_spacing"
+        android:layout_marginRight="@dimen/common_spacing"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/save_description"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/content"
+        app:layout_constraintTop_toTopOf="@+id/content"
+        app:srcCompat="@drawable/ic_baseline_send_24" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/messageTextGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="save,content,toolsTop"
+        />
+
+    <ImageButton
+        android:id="@+id/cancelEdition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/common_spacing"
+        android:layout_marginRight="@dimen/common_spacing"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="@+id/editMessageContent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/editMessageTitle"
+        app:srcCompat="@drawable/ic_baseline_cancel_24" />
+
+    <TextView
+        android:id="@+id/editMessageTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/common_spacing"
+        android:layout_marginLeft="@dimen/common_spacing"
+        android:text="@string/edit_message_title"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/editMessageContent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        />
+
+    <TextView
+        android:id="@+id/editMessageContent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:text="Edit message content"
+        app:layout_constraintBottom_toTopOf="@id/content"
+        app:layout_constraintEnd_toStartOf="@+id/cancelEdition"
+        app:layout_constraintStart_toStartOf="@+id/editMessageTitle"
+        />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/editMessageGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="cancelEdition, editMessageTitle, editMessageContent"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

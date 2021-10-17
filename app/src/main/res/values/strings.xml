@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">electro.club</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">electro.club</string>
+    <string name="nav_header_subtitle">support@electro.club</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_feed">Feed</string>
+    <string name="menu_subscriptions">Subscriptions</string>
+    <string name="menu_map">Map</string>
+    <string name="save_description">Save post</string>
+    <string name="edit_message_title">Edit message</string>
+    <string name="avatar_description">User avatar</string>
+    <string name="more_menu">More actions</string>
+    <string name="share">Share</string>
+    <string name="views">Views</string>
+    <string name="empty_posts">Posts list is empty</string>
+    <string name="message_text">Message text</string>
+</resources>

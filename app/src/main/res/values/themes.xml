@@ -1,0 +1,50 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.Electroclub" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/grey_5</item>
+        <item name="colorPrimaryVariant">@color/grey_7</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/white</item>
+        <item name="colorSecondaryVariant">@color/white</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="Theme.Electroclub.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Electroclub.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.Electroclub.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="OptionsButton" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="icon">@drawable/ic_baseline_more_vert_24</item>
+        <item name="iconTint">?attr/colorControlNormal</item>
+        <item name="android:minWidth">@dimen/icon_button_min_size</item>
+        <item name="android:minHeight">@dimen/icon_button_min_size</item>
+        <item name="android:padding">0dp</item>
+        <item name="iconPadding">0dp</item>
+    </style>
+
+    <style name="ShareButton" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="icon">@drawable/ic_baseline_share_24</item>
+        <item name="iconTint">?attr/colorControlNormal</item>
+        <item name="android:minWidth">@dimen/icon_button_min_size</item>
+        <item name="android:minHeight">@dimen/icon_button_min_size</item>
+        <item name="android:padding">0dp</item>
+    </style>
+
+    <style name="ViewsIcon" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="icon">@drawable/ic_baseline_visibility_24</item>
+        <item name="iconTint">?attr/colorControlNormal</item>
+        <item name="android:minWidth">@dimen/icon_button_min_size</item>
+        <item name="android:minHeight">@dimen/icon_button_min_size</item>
+        <item name="android:padding">0dp</item>
+    </style>
+</resources>
