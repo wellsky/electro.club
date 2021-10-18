@@ -8,7 +8,7 @@
     android:layout_marginBottom="@dimen/common_spacing"
     >
     <ImageView
-        android:id="@+id/avatar"
+        android:id="@+id/authorAvatar"
         android:layout_width="@dimen/avatar_size"
         android:layout_height="@dimen/avatar_size"
         android:contentDescription="@string/avatar_description"
@@ -18,7 +18,7 @@
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
-        android:id="@+id/author"
+        android:id="@+id/authorName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/common_spacing"
@@ -28,7 +28,7 @@
         android:singleLine="true"
         app:layout_constraintBottom_toTopOf="@id/published"
         app:layout_constraintEnd_toStartOf="@id/menu"
-        app:layout_constraintStart_toEndOf="@id/avatar"
+        app:layout_constraintStart_toEndOf="@id/authorAvatar"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="@sample/posts.json/data/author" />
@@ -41,10 +41,10 @@
         android:layout_marginRight="@dimen/common_spacing"
         android:ellipsize="end"
         android:singleLine="true"
-        app:layout_constraintTop_toBottomOf="@id/author"
+        app:layout_constraintTop_toBottomOf="@id/authorName"
         app:layout_constraintBottom_toTopOf="@id/barrier"
         app:layout_constraintEnd_toStartOf="@id/menu"
-        app:layout_constraintStart_toStartOf="@id/author"
+        app:layout_constraintStart_toStartOf="@id/authorName"
         tools:text="@sample/posts.json/data/published"
         />
 
@@ -64,7 +64,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="published, avatar, menu"
+        app:constraint_referenced_ids="published, authorAvatar, menu"
         tools:layout_editor_absoluteX="16dp"
         tools:layout_editor_absoluteY="64dp" />
 
@@ -96,37 +96,4 @@
         app:constraint_referenced_ids="content, attachmentPreview"
         tools:layout_editor_absoluteX="16dp"
         tools:layout_editor_absoluteY="230dp" />
-
-  <com.google.android.material.button.MaterialButton
-        android:id="@+id/share"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/common_spacing"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/share"
-        app:icon="@drawable/ic_baseline_share_24"
-        app:layout_constraintStart_toEndOf="@+id/like"
-        app:layout_constraintTop_toBottomOf="@+id/bottomBarrier"
-        android:layout_marginLeft="@dimen/common_spacing"
-        style="@style/ShareButton"
-        />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/views"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/common_spacing"
-        android:layout_marginRight="4dp"
-        android:layout_marginEnd="4dp"
-
-        tools:text="@sample/posts.json/data/viewsCount"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/share"
-
-        app:srcCompat="@drawable/ic_baseline_visibility_24"
-        android:contentDescription="@string/views"
-        android:layout_marginStart="@dimen/common_spacing"
-
-        style="@style/ViewsIcon"
-        />
 </androidx.constraintlayout.widget.ConstraintLayout>

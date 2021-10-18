@@ -2,43 +2,130 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:padding="@dimen/common_spacing"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:padding="@dimen/fab_margin"
+    android:layout_marginBottom="@dimen/common_spacing"
     >
+    <ImageView
+        android:id="@+id/feedPostAvatar"
+        android:layout_width="@dimen/avatar_size"
+        android:layout_height="@dimen/avatar_size"
+        android:contentDescription="@string/avatar_description"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/barrier"
+        tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
-        android:id="@+id/feedPostTitle"
-        android:layout_width="match_parent"
+        android:id="@+id/feedPostAuthor"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/fab_margin"
-        android:textSize="20sp"
-        android:textStyle="bold"
+        android:layout_marginStart="@dimen/common_spacing"
+        android:layout_marginLeft="@dimen/common_spacing"
+        android:layout_marginEnd="@dimen/common_spacing"
+        android:ellipsize="end"
+        android:singleLine="true"
+        app:layout_constraintBottom_toTopOf="@id/published"
+        app:layout_constraintEnd_toStartOf="@id/menu"
+        app:layout_constraintStart_toEndOf="@id/feedPostAvatar"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="@sample/posts.json/data/author" />
+
+    <TextView
+        android:id="@+id/published"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/common_spacing"
+        android:layout_marginRight="@dimen/common_spacing"
+        android:ellipsize="end"
+        android:singleLine="true"
+        app:layout_constraintTop_toBottomOf="@id/feedPostAuthor"
+        app:layout_constraintBottom_toTopOf="@id/barrier"
+        app:layout_constraintEnd_toStartOf="@id/menu"
+        app:layout_constraintStart_toStartOf="@id/feedPostAuthor"
+        tools:text="@sample/posts.json/data/published"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/more_menu"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/OptionsButton"
+        />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="published, feedPostAvatar, menu"
         tools:layout_editor_absoluteX="16dp"
-        tools:text="asd asd asd">
-    </TextView>
+        tools:layout_editor_absoluteY="64dp" />
 
     <ImageView
         android:id="@+id/feedPostImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/feedPostText"
+        app:layout_constraintTop_toBottomOf="@id/barrier"
+        android:layout_marginTop="@dimen/common_spacing"
+        android:layout_marginBottom="@dimen/common_spacing"
         android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/feedPostTitle"
-        android:layout_marginTop="@dimen/fab_margin"
-        tools:srcCompat="@tools:sample/avatars" />
+        android:background="@color/cardview_dark_background"
+        />
 
     <TextView
         android:id="@+id/feedPostText"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/feedPostImage"
-        android:layout_marginTop="@dimen/fab_margin"
-        tools:text="asd asd asd"
-        >
+        android:layout_marginTop="@dimen/common_spacing"
+        tools:text="@sample/posts.json/data/text" />
 
-    </TextView>
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/bottomBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="feedPostText"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="230dp" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/share"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/common_spacing"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/share"
+        app:icon="@drawable/ic_baseline_share_24"
+        app:layout_constraintTop_toBottomOf="@+id/bottomBarrier"
+        android:layout_marginLeft="@dimen/common_spacing"
+        style="@style/ShareButton"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/views"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/common_spacing"
+        android:layout_marginRight="4dp"
+        android:layout_marginEnd="4dp"
+
+        tools:text="@sample/posts.json/data/viewsCount"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/share"
+
+        app:srcCompat="@drawable/ic_baseline_visibility_24"
+        android:contentDescription="@string/views"
+        android:layout_marginStart="@dimen/common_spacing"
+
+        style="@style/ViewsIcon"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

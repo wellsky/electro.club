@@ -5,5 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ThreadRepository {
     val data: Flow<List<Post>>
-    suspend fun getAll()
+    suspend fun getThreadPosts()
 }

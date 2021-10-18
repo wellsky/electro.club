@@ -6,12 +6,15 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import club.electro.dao.AreaDao
+import club.electro.dao.PostDao
 import ru.netology.nmedia.entity.AreaEntity
+import ru.netology.nmedia.entity.PostEntity
 
 
-@Database(entities = [AreaEntity::class], version = 3, exportSchema = false)
+@Database(entities = [AreaEntity::class, PostEntity::class], version = 7, exportSchema = false)
 //@TypeConverters(Converters::class)
 abstract class AppDb : RoomDatabase() {
+    abstract fun postDao(): PostDao
     abstract fun areaDao(): AreaDao
 
     companion object {

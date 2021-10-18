@@ -16,27 +16,47 @@ class FeedRepositoryInMemoryImpl: FeedRepository {
             listOf (
                 FeedPost(
                     id = 1,
-                    title = "Post 1",
+                    authorName = "Post 1",
+                    authorAvatar = "https://electro.club/data/forum/topics/6324/icon-48.jpg",
                     image = "https://electro.club/data/forum/messages/219561/images/60052-1280.jpg",
-                    text = "Post text 1"
+                    text = "Post text 1",
+                    published = 0,
+                    likes = 1,
+                    views = 15,
+                    comments = 1
                 ),
                 FeedPost(
-                    id = 2,
-                    title = "Title 2",
+                    id = 1,
+                    authorName = "Post 1",
+                    authorAvatar = "https://electro.club/data/forum/topics/6324/icon-48.jpg",
                     image = "https://electro.club/data/users/4216/files/Attachment-1.jpeg",
-                    text = "Post text 2"
+                    text = "Post text 1",
+                    published = 0,
+                    likes = 1,
+                    views = 15,
+                    comments = 1
                 ),
                 FeedPost(
                     id = 3,
-                    title = "Title 3",
+                    authorName = "Post 1",
+                    authorAvatar = "https://electro.club/data/forum/topics/6324/icon-48.jpg",
                     image = "https://electro.club/data/forum/messages/135242/images/41216-1280.jpg",
-                    text = "Post text 3"
+                    text = "Post text 1",
+                    published = 0,
+                    likes = 1,
+                    views = 15,
+                    comments = 1
                 ),
                 FeedPost(
                     id = 4,
-                    title = "Title 4",
+                    authorName = "Post 1",
+                    authorAvatar = "https://electro.club/data/forum/topics/6324/icon-48.jpg",
                     image = "https://electro.club/data/forum/messages/191676/images/54433-1280-h480.jpg",
-                    text = "Post text 4"
+                    text = "Post text 1",
+                    published = 0,
+                    likes = 1,
+                    views = 15,
+                    comments = 1
                 ),
             )
         )

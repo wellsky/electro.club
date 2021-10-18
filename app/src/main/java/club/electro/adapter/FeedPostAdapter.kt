@@ -37,8 +37,22 @@ class FeedPostViewHolder(
 
     fun bind(feedPost: FeedPost) {
         binding.apply {
-            feedPostTitle.text = feedPost.title
+            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
+            val date = java.util.Date(feedPost.published * 1000)
+
+            feedPostAuthor.text = feedPost.authorName
             feedPostText.text = feedPost.text
+            published.text = sdf.format(date).toString()
+
+            if (!feedPost.authorAvatar.isEmpty()) {
+                Glide.with(feedPostAvatar.context)
+                    .load(feedPost.authorAvatar)
+                    .circleCrop()
+                    .timeout(5_000)
+                    .placeholder(R.drawable.ic_loading_100dp)
+                    .error(R.drawable.ic_error_100dp)
+                    .into(feedPostAvatar)
+            }
 
             if (!feedPost.image.isEmpty()) {
                 Glide.with(feedPostImage.context)

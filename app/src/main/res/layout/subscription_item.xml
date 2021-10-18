@@ -10,41 +10,89 @@
 
     <ImageView
         android:id="@+id/areaImage"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
         android:id="@+id/areaName"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@id/areaImage"
         app:layout_constraintStart_toEndOf="@id/areaImage"
         app:layout_constraintLeft_toRightOf="@id/areaImage"
+        app:layout_constraintEnd_toStartOf="@id/areaLastMessageTime"
         android:layout_marginStart="@dimen/fab_margin"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:textColor="@color/black"
         android:textFontWeight="700"
-        tools:text="Название темы"
+        android:ellipsize="end"
+        android:singleLine="true"
+
+        tools:text="Название темы очень длиное которое не умещается в одну строку"
         >
     </TextView>
 
     <TextView
-        android:id="@+id/areaLastMessage"
+        android:id="@+id/areaLastMessageTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/areaName"
+        app:layout_constraintBottom_toBottomOf="@id/areaName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/areaName"
+        android:layout_marginStart="@dimen/fab_margin"
+        android:textColor="@color/black"
+        android:textFontWeight="700"
+        tools:text="12:12"
+        >
+    </TextView>
+
+    <TextView
+        android:id="@+id/areaLastName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@id/areaImage"
         app:layout_constraintStart_toEndOf="@id/areaImage"
         app:layout_constraintLeft_toRightOf="@id/areaImage"
-
+        app:layout_constraintEnd_toStartOf="@id/areaLastMessage"
         android:ellipsize="end"
         android:singleLine="true"
-
         android:layout_marginStart="@dimen/fab_margin"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="4dp"
+        android:textColor="@color/beige"
+        tools:text="Имя пользователя:"
+        >
+    </TextView>
+
+    <TextView
+        android:id="@+id/areaLastMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/areaLastName"
+        app:layout_constraintStart_toEndOf="@id/areaLastName"
+        app:layout_constraintLeft_toRightOf="@id/areaImage"
+        app:layout_constraintEnd_toStartOf="@id/areaUnreadMessagesCount"
+        android:ellipsize="end"
+        android:singleLine="true"
         tools:text="Текст последнего сообщения в теме который должен автоматически обрезаться с точками"
+        >
+    </TextView>
+
+    <TextView
+        android:id="@+id/areaUnreadMessagesCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/areaLastMessage"
+        app:layout_constraintBottom_toBottomOf="@id/areaLastMessage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/areaLastMessage"
+        android:layout_marginStart="@dimen/fab_margin"
+        android:textColor="@color/green"
+        android:textFontWeight="700"
+        tools:text="123"
         >
     </TextView>
 

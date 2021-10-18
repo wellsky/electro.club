@@ -15,6 +15,8 @@ import club.electro.adapter.SubscriptionAreaInteractionListener
 import club.electro.databinding.FragmentSubscriptionsBinding
 import club.electro.dto.FeedPost
 import club.electro.dto.SubscriptionArea
+import club.electro.ui.thread.ThreadFragment.Companion.threadId
+import club.electro.ui.thread.ThreadFragment.Companion.threadName
 
 class SubscriptionsFragment : Fragment() {
 
@@ -40,9 +42,10 @@ class SubscriptionsFragment : Fragment() {
             override fun onClick(area: SubscriptionArea) {
                 findNavController().navigate(
                     R.id.action_nav_subscriptions_to_threadFragment,
-//                    Bundle().apply {
-//                        postId = post.id
-//                    }
+                    Bundle().apply {
+                        threadId = area.object_id
+                        threadName = area.name
+                    }
                 )
             }
         })

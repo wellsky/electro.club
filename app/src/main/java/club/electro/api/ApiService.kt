@@ -2,6 +2,7 @@ package club.electro.api
 
 import club.electro.BuildConfig
 import club.electro.dao.AreaDao
+import club.electro.dto.Post
 import club.electro.dto.SubscriptionArea
 import com.google.gson.annotations.SerializedName
 import okhttp3.OkHttpClient
@@ -41,7 +42,11 @@ val retrofit = Retrofit.Builder()
 interface ApiService {
     @FormUrlEncoded
     @POST("/api")
-    suspend fun getAll (@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiSubscriptionsData>>
+    suspend fun getSubscriptions(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiSubscriptionsData>>
+
+    @FormUrlEncoded
+    @POST("https://electro.club/api/v1")
+    suspend fun getThreadPosts(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiPostsData>>
 }
 
 object Api {
@@ -59,4 +64,8 @@ data class ApiSubscriptionsData (
     val method: String,
     val lastEventTime: String,
     val items: List<SubscriptionArea>
+)
+
+data class ApiPostsData (
+    val messages: List<Post>
 )

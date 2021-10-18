@@ -35,8 +35,15 @@ class SubscriptionAreaViewHolder(
 
     fun bind(area: SubscriptionArea) {
         binding.apply {
+            //val sdf = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            val sdf = java.text.SimpleDateFormat("HH:mm")
+            val date = java.util.Date(area.last_time * 1000)
+
             areaName.text = area.name
             areaLastMessage.text = area.last_text
+            areaLastName.text = area.last_name + ": "
+            areaUnreadMessagesCount.text = area.count.toString()
+            areaLastMessageTime.text = sdf.format(date).toString()
 
             if (!area.image.isEmpty()) {
                 Glide.with(areaImage.context)
