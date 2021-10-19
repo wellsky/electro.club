@@ -55,14 +55,27 @@ class PostViewHolder(
             val imageGetter = ImageGetter(resources, content)
 
             val source = post.content
-            val brStripped = source.replace("<br /></p>", "</p>")
+
+            //val quotes = source.replace(""""#\[quote#""".toRegex(), "QUOTE")
+
+            //val regex = """(red|green|blue)""".toRegex()
+            //val regex = """"quote""".toRegex()
+
+
+            val pattern = """\[quote message=(\d+?)\](.*?)\[\/quote\]"""
+            val quotes = Regex(pattern).replace(source) {
+                val (quoyteMessageId, quoteText) = it.destructured
+                "<blockquote>" + quoteText + "</blockquote>"
+            }
+
+            val brStripped = quotes.replace("<br /></p>", "</p>")
             val pStartStripped = brStripped.replace("<p>", "")
             val pEndStripped = pStartStripped.replace("</p>", "<br>")
 
             val htmlPostText = HtmlCompat.fromHtml(pEndStripped, HtmlCompat.FROM_HTML_MODE_LEGACY, imageGetter, null)
             val trimmedPostText: CharSequence = trim(htmlPostText)
 
-            val result = trimmedPostText//.replace("\\s\\s\\s".toRegex(), "\n\n")
+            val result = trimmedPostText
 
 
 
