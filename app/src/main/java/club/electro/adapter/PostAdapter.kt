@@ -1,5 +1,7 @@
 package club.electro.adapter
 
+import ImageGetter
+import android.content.res.Resources
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,6 +13,7 @@ import club.electro.R
 import club.electro.databinding.PostItemBinding
 import club.electro.dto.Post
 import com.bumptech.glide.Glide
+import club.electro.utils.trim
 
 
 interface PostInteractionListener {
@@ -48,9 +51,25 @@ class PostViewHolder(
             // TODO Вставить изображения в текст поста
             //val imageGetter = HtmlImageGetter(scope, resources, glide, content)
             //val imageGetter = ImageGetter(, content)
+            val resources: Resources = this.root.resources
+            val imageGetter = ImageGetter(resources, content)
 
-            content.setText(HtmlCompat.fromHtml(post.content, HtmlCompat.FROM_HTML_MODE_LEGACY));
+            val source = post.content
+            val brStripped = source.replace("<br /></p>", "</p>")
+            val pStartStripped = brStripped.replace("<p>", "")
+            val pEndStripped = pStartStripped.replace("</p>", "<br>")
+
+            val htmlPostText = HtmlCompat.fromHtml(pEndStripped, HtmlCompat.FROM_HTML_MODE_LEGACY, imageGetter, null)
+            val trimmedPostText: CharSequence = trim(htmlPostText)
+
+            val result = trimmedPostText//.replace("\\s\\s\\s".toRegex(), "\n\n")
+
+
+
+            content.setText(result);
+            content.setClickable(true);
             content.setMovementMethod(LinkMovementMethod.getInstance());
+
 
             if (!post.authorAvatar.isEmpty()) {
                 Glide.with(authorAvatar.context)

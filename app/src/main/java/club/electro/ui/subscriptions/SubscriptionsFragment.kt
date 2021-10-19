@@ -20,7 +20,7 @@ import club.electro.ui.thread.ThreadFragment.Companion.threadName
 
 class SubscriptionsFragment : Fragment() {
 
-    private lateinit var subscriptionsViewModel: SubscriptionsViewModel
+    private lateinit var viewModel: SubscriptionsViewModel
     private var _binding: FragmentSubscriptionsBinding? = null
 
     // This property is only valid between onCreateView and
@@ -32,7 +32,7 @@ class SubscriptionsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        subscriptionsViewModel =
+        viewModel =
             ViewModelProvider(this).get(SubscriptionsViewModel::class.java)
 
         _binding = FragmentSubscriptionsBinding.inflate(inflater, container, false)
@@ -52,9 +52,16 @@ class SubscriptionsFragment : Fragment() {
 
         binding.subscriptionsList.adapter = adapter
 
-        subscriptionsViewModel.data.observe(viewLifecycleOwner, { items ->
+        viewModel.data.observe(viewLifecycleOwner, { items ->
             adapter.submitList(items)
         })
+
+        binding.swiperefresh.setOnRefreshListener {
+            binding.swiperefresh.setRefreshing(false)
+            //binding.progress.isVisible = true
+            //binding.newPostsButton.isVisible = false
+            viewModel.loadPosts()
+        }
 
         return root
     }

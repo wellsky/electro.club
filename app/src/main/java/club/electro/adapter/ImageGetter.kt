@@ -1,4 +1,3 @@
-/*
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -6,13 +5,14 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.text.Html
 import android.widget.TextView
-import com.bumptech.glide.Glide
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+// TODO попробовать переписать, чтобы работал с Glide, а не Picasso ?
+// TODO доработать растяжение изображения до ширины сообщения, а не экрана - 150
 // Class to download Images which extends [Html.ImageGetter]
 class ImageGetter(
     private val res: Resources,
@@ -30,15 +30,6 @@ class ImageGetter(
 
                 // downloading image in bitmap format using [Picasso] Library
                 val bitmap = Picasso.get().load(url).get()
-
-                // TODO загружать bitmap с помощью Glide
-//                val bitmap = Glide
-//                    .with(this)
-//                    .asBitmap()
-//                    .load(url)
-//                    .submit()
-//                    .get();
-
                 val drawable = BitmapDrawable(res, bitmap)
 
                 // To make sure Images don't go out of screen , Setting width less
@@ -79,4 +70,3 @@ class ImageGetter(
     fun getScreenWidth() =
         Resources.getSystem().displayMetrics.widthPixels
 }
-*/

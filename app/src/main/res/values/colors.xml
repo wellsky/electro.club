@@ -12,4 +12,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="green">#3fb549</color>
     <color name="beige">#7e4d00</color>
+
+    <color name="postTextColor">#222222</color>
 </resources>
