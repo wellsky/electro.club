@@ -1,8 +1,8 @@
 package club.electro.dao
 
 import androidx.room.*
+import club.electro.entity.PostEntity
 import kotlinx.coroutines.flow.Flow
-import ru.netology.nmedia.entity.PostEntity
 
 @Dao
 interface PostDao {
@@ -14,4 +14,7 @@ interface PostDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(posts: List<PostEntity>)
+
+    @Query("DELETE FROM PostEntity")
+    suspend fun clear()
 }

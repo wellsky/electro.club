@@ -1,4 +1,4 @@
-package ru.netology.nmedia.entity
+package club.electro.entity
 
 import androidx.room.Embedded
 import androidx.room.Entity

@@ -9,21 +9,6 @@ import club.electro.repository.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-//inline fun <VM : ViewModel> viewModelFactory(crossinline f: () -> VM) =
-//    object : ViewModelProvider.Factory {
-//        override fun <T : ViewModel> create(aClass: Class<T>):T = f() as T
-//    }
-//
-//inline fun <reified T : ViewModel> Fragment.viewModelsFactory(crossinline viewModelInitialization: () -> T): Lazy<T> {
-//    return viewModels {
-//        object : ViewModelProvider.Factory {
-//            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-//                return viewModelInitialization.invoke() as T
-//            }
-//        }
-//    }
-//}
-
 class ThreadViewModel(application: Application, val threadId: Long) : AndroidViewModel(application) {
 
     private val repository: ThreadRepository = ThreadRepositoryServerImpl(application, threadId)
@@ -38,7 +23,7 @@ class ThreadViewModel(application: Application, val threadId: Long) : AndroidVie
 
     fun loadPosts() = viewModelScope.launch {
         try {
-            println("load posts for: " + threadId)
+
             //_dataState.value = FeedModelState(loading = true)
 
             repository.getThreadPosts()

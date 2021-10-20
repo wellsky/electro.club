@@ -1,4 +1,4 @@
-package ru.netology.nmedia.error
+package club.electro.error
 
 sealed class AppError(var code: String): RuntimeException()
 

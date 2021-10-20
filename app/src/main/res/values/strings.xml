@@ -18,4 +18,9 @@
     <string name="views">Views</string>
     <string name="empty_posts">Posts list is empty</string>
     <string name="message_text">Message text</string>
+    <string name="submit_login_form">Sign in</string>
+    <string name="enter_login_data">Enter login and password</string>
+    <string name="error_auth">Authorization error</string>
+    <string name="menu_login">Login</string>
+    <string name="button_signout">Sign out</string>
 </resources>

@@ -47,6 +47,11 @@ interface ApiService {
     @FormUrlEncoded
     @POST("https://electro.club/api/v1")
     suspend fun getThreadPosts(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiPostsData>>
+
+    @FormUrlEncoded
+    @POST("https://electro.club/api/v1")
+    suspend fun signIn(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiAccountData>>
+
 }
 
 object Api {
@@ -68,4 +73,18 @@ data class ApiSubscriptionsData (
 
 data class ApiPostsData (
     val messages: List<Post>
+)
+
+data class ApiAccountData (
+    val user: ApiAccountUserData
+)
+
+data class ApiAccountUserData (
+    val user_token: String,
+    val email: String,
+    val user_id: Long,
+    val nickname: String,
+    val thumbnail: String,
+    val account_created: Long,
+    val last_visit: Long,
 )

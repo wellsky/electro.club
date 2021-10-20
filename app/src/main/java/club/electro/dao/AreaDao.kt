@@ -1,8 +1,8 @@
 package club.electro.dao
 
 import androidx.room.*
+import club.electro.entity.AreaEntity
 import kotlinx.coroutines.flow.Flow
-import ru.netology.nmedia.entity.AreaEntity
 
 @Dao
 interface AreaDao {
@@ -14,6 +14,9 @@ interface AreaDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(areas: List<AreaEntity>)
+
+    @Query("DELETE FROM AreaEntity")
+    suspend fun clear()
 }
 
 //class Converters {

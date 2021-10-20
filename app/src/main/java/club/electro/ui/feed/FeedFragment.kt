@@ -41,10 +41,8 @@ class FeedFragment : Fragment() {
         })
 
         binding.feedPostsList.adapter = adapter
-        println("binding1")
 
         feedViewModel.data.observe(viewLifecycleOwner, { posts ->
-            println("observing")
             adapter.submitList(posts)
         })
 

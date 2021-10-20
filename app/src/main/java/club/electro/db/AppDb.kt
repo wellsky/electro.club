@@ -1,4 +1,4 @@
-package ru.netology.nmedia.db
+package club.electro.db
 
 import android.content.Context
 import androidx.room.Database
@@ -7,8 +7,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import club.electro.dao.AreaDao
 import club.electro.dao.PostDao
-import ru.netology.nmedia.entity.AreaEntity
-import ru.netology.nmedia.entity.PostEntity
+import club.electro.entity.AreaEntity
+import club.electro.entity.PostEntity
 
 
 @Database(entities = [AreaEntity::class, PostEntity::class], version = 7, exportSchema = false)

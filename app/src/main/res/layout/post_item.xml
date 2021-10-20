@@ -75,9 +75,9 @@
         android:layout_marginTop="@dimen/common_spacing"
         android:textColor="@color/postTextColor"
         android:textColorLink="@color/beige"
-        android:textSize="16sp"
+        android:textSize="15sp"
         app:layout_constraintTop_toBottomOf="@id/barrier"
-        app:lineHeight="22dp"
+        app:lineHeight="19dp"
         tools:text="@sample/posts.json/data/text" />
 
     <ImageView

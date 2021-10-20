@@ -13,7 +13,7 @@ import club.electro.R
 import club.electro.databinding.PostItemBinding
 import club.electro.dto.Post
 import com.bumptech.glide.Glide
-import club.electro.utils.trim
+import club.electro.utils.trimWhiteSpaces
 
 
 interface PostInteractionListener {
@@ -73,7 +73,7 @@ class PostViewHolder(
             val pEndStripped = pStartStripped.replace("</p>", "<br>")
 
             val htmlPostText = HtmlCompat.fromHtml(pEndStripped, HtmlCompat.FROM_HTML_MODE_LEGACY, imageGetter, null)
-            val trimmedPostText: CharSequence = trim(htmlPostText)
+            val trimmedPostText: CharSequence = trimWhiteSpaces(htmlPostText)
 
             val result = trimmedPostText
 
