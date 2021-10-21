@@ -5,27 +5,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import club.electro.R
 import club.electro.auth.AppAuth
 import club.electro.databinding.FragmentLoginBinding
+import club.electro.ui.subscriptions.SubscriptionsViewModel
 import club.electro.util.AndroidUtils
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import ru.netology.nmedia.viewmodel.LoginFormState
 import ru.netology.nmedia.viewmodel.LoginViewModel
 import kotlin.coroutines.coroutineContext
 
-
+@ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class LoginFragment : Fragment() {
-    private val viewModel: LoginViewModel by viewModels (
-        ownerProducer = ::requireParentFragment
-    )
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
+//    private val viewModel: LoginViewModel by viewModels (
+//        ownerProducer = ::requireParentFragment
+//    )
+    private lateinit var viewModel : LoginViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

@@ -2,10 +2,9 @@ package club.electro.repository
 
 import android.app.Application
 import club.electro.R
-import club.electro.api.Api
+import club.electro.api.ApiService
 import club.electro.auth.AppAuth
 import club.electro.dao.AreaDao
-import club.electro.db.AppDb
 import club.electro.dto.SubscriptionArea
 import club.electro.entity.AreaEntity
 import club.electro.entity.toDto
@@ -16,13 +15,20 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import java.io.IOException
+import javax.inject.Inject
 
 // TODO - убрать val перед aaplication, когда getString() уже не понадобится
-class SubscriptionsRepositoryServerImpl(val application: Application) : SubscriptionsRepository {
-    private val dao: AreaDao = AppDb.getInstance(context = application).areaDao()
+class SubscriptionsRepositoryServerImpl @Inject constructor(
+        private val application: Application,
+        private val dao: AreaDao,
+        private val appAuth: AppAuth,
+        private val apiService: ApiService
+    ) : SubscriptionsRepository {
+
+    //private val dao: AreaDao = AppDb.getInstance(context = application).areaDao()
     override val data: Flow<List<SubscriptionArea>> = dao.getAll().map(List<AreaEntity>::toDto).flowOn(Dispatchers.Default)
 
-    val appAuth = AppAuth.getInstance()
+    //val appAuth = AppAuth.getInstance()
 
     override suspend fun getAll() {
         try {
@@ -31,7 +37,7 @@ class SubscriptionsRepositoryServerImpl(val application: Application) : Subscrip
             params["user_token"] = appAuth.myToken()
             params["method"] = "whatsUp"
             params["lastEventTime"] = "0"
-            val response = Api.service.getSubscriptions(params)
+            val response = apiService.getSubscriptions(params)
 
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())

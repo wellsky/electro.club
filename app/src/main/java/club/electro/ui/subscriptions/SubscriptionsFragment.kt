@@ -17,7 +17,12 @@ import club.electro.dto.FeedPost
 import club.electro.dto.SubscriptionArea
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadName
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+
+@ExperimentalCoroutinesApi
+@AndroidEntryPoint
 class SubscriptionsFragment : Fragment() {
 
     private lateinit var viewModel: SubscriptionsViewModel

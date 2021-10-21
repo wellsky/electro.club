@@ -38,14 +38,15 @@ class ThreadFragment : Fragment() {
         }
 
         threadId?.let {
-            viewModel = ThreadViewModel(
-                requireActivity().getApplication(),
-                threadId
-            )
+            viewModel.loadPosts(it)
+//            viewModel = ThreadViewModel(
+//                requireActivity().getApplication(),
+//                threadId
+//            )
         }
 
 
-        viewModel.loadPosts()
+//        viewModel.loadPosts()
 
         _binding = FragmentThreadBinding.inflate(inflater, container, false)
         val root: View = binding.root

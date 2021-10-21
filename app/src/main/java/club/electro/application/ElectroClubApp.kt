@@ -10,24 +10,23 @@ import kotlinx.coroutines.launch
 
 
 @HiltAndroidApp
-class ElectroClubApp: Application() {
-    private val appScope = CoroutineScope(Dispatchers.Default)
-
+class ElectroClubApp : Application() {
+//    private val appScope = CoroutineScope(Dispatchers.Default)
+//
     override fun onCreate() {
         super.onCreate()
-        setupAuth()
 
-//        val prefs = getSharedPreferences("auth", Context.MODE_PRIVATE)
-//        println("Shared prefs auth:")
-//        println(prefs.getLong("id", 0))
-//        println(prefs.getString("token", null))
-//        println(prefs.getString("name", null))
-//        println(prefs.getString("avatar", null))
+        val prefs = getSharedPreferences("auth", Context.MODE_PRIVATE)
+        println("Shared prefs auth:")
+        println(prefs.getLong("id", 0))
+        println(prefs.getString("token", null))
+        println(prefs.getString("name", null))
+        println(prefs.getString("avatar", null))
     }
 
-    private fun setupAuth() {
-        appScope.launch {
-            AppAuth.initApp(this@ElectroClubApp)
-        }
-    }
+//    private fun setupAuth() {
+//        appScope.launch {
+//            AppAuth.initApp(this@ElectroClubApp)
+//        }
+//    }
 }

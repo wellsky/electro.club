@@ -15,26 +15,19 @@ import javax.inject.Inject
 @HiltViewModel
 @ExperimentalCoroutinesApi
 class ThreadViewModel @Inject constructor (
-    private val threadId: Long,
-    private val repository: ThreadRepository
+        private val repository: ThreadRepository
     ): ViewModel() {
 
     //private val repository: ThreadRepository = ThreadRepositoryServerImpl(threadId)
 
     val data = repository.data.asLiveData(Dispatchers.Default)
-//
-//    var threadId: Long = 0
 
-//    init {
-//        loadPosts()
-//    }
-
-    fun loadPosts() = viewModelScope.launch {
+    fun loadPosts(threadId: Long) = viewModelScope.launch {
         try {
 
             //_dataState.value = FeedModelState(loading = true)
 
-            repository.getThreadPosts()
+            repository.getThreadPosts(threadId)
 
             //_dataState.value = FeedModelState()
         } catch (e: Exception) {
