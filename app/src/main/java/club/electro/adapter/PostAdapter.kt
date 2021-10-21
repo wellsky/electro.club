@@ -1,10 +1,15 @@
 package club.electro.adapter
 
 import ImageGetter
+import QuoteSpanClass
 import android.content.res.Resources
+import android.text.Spannable
 import android.text.method.LinkMovementMethod
+import android.text.style.QuoteSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getColor
 import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -68,7 +73,13 @@ class PostViewHolder(
                 "<blockquote>" + quoteText + "</blockquote>"
             }
 
-            val brStripped = quotes.replace("<br /></p>", "</p>")
+            val pattern1 = """<img class="emojione".*?alt="(.*?)"[^\>]+>"""
+            val emojies = Regex(pattern1).replace(quotes) {
+                val (emojieChar) = it.destructured
+                emojieChar
+            }
+
+            val brStripped = emojies.replace("<br /></p>", "</p>")
             val pStartStripped = brStripped.replace("<p>", "")
             val pEndStripped = pStartStripped.replace("</p>", "<br>")
 
@@ -77,7 +88,7 @@ class PostViewHolder(
 
             val result = trimmedPostText
 
-
+            replaceQuoteSpans(result as Spannable)
 
             content.setText(result);
             content.setClickable(true);
@@ -95,6 +106,32 @@ class PostViewHolder(
             }
         }
     }
+
+    private fun replaceQuoteSpans(spannable: Spannable)
+    {
+        val quoteSpans: Array<QuoteSpan> =
+            spannable.getSpans(0, spannable.length - 1, QuoteSpan::class.java)
+
+        for (quoteSpan in quoteSpans)
+        {
+            val start: Int = spannable.getSpanStart(quoteSpan)
+            val end: Int = spannable.getSpanEnd(quoteSpan)
+            val flags: Int = spannable.getSpanFlags(quoteSpan)
+            spannable.removeSpan(quoteSpan)
+            spannable.setSpan(
+                QuoteSpanClass(
+                    // background color
+                    getColor(binding.root.context, R.color.postQuoteColor),
+                    // strip color
+                    getColor(binding.root.context, R.color.postQuoteStripColor),
+                    // strip width
+                    10F, 30F
+                ),
+                start, end, flags
+            )
+        }
+    }
+
 }
 
 class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
