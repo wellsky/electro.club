@@ -1,3 +1,5 @@
+package club.electro.repository
+
 import android.app.Application
 import club.electro.R
 import club.electro.api.Api

@@ -16,17 +16,20 @@ import kotlinx.coroutines.flow.map
 import java.io.IOException
 import club.electro.error.*
 import kotlinx.coroutines.flow.flowOn
+import javax.inject.Inject
 
 // TODO - убрать val перед aaplication, когда getString() уже не понадобится
-class ThreadRepositoryServerImpl(
-            val application: Application,
-            val threadId: Long
+class ThreadRepositoryServerImpl @Inject constructor (
+            private val threadId: Long,
+            private val application: Application,
+            private val dao: PostDao,
+            private val appAuth: AppAuth
         ) : ThreadRepository {
-    private val dao: PostDao = AppDb.getInstance(context = application).postDao()
+    //private val dao: PostDao = AppDb.getInstance(context = application).postDao()
 
     override var data: Flow<List<Post>> = dao.getAll(threadId).map(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
 
-    val appAuth = AppAuth.getInstance()
+    //val appAuth = AppAuth.getInstance()
 
     override suspend fun getThreadPosts() {
         try {

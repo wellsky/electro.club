@@ -6,12 +6,20 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import club.electro.repository.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ThreadViewModel(application: Application, val threadId: Long) : AndroidViewModel(application) {
+@HiltViewModel
+@ExperimentalCoroutinesApi
+class ThreadViewModel @Inject constructor (
+    private val threadId: Long,
+    private val repository: ThreadRepository
+    ): ViewModel() {
 
-    private val repository: ThreadRepository = ThreadRepositoryServerImpl(application, threadId)
+    //private val repository: ThreadRepository = ThreadRepositoryServerImpl(threadId)
 
     val data = repository.data.asLiveData(Dispatchers.Default)
 //

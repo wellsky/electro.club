@@ -3,10 +3,13 @@ package club.electro.application
 import android.app.Application
 import android.content.Context
 import club.electro.auth.AppAuth
+import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+
+@HiltAndroidApp
 class ElectroClubApp: Application() {
     private val appScope = CoroutineScope(Dispatchers.Default)
 
