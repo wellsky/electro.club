@@ -5,13 +5,14 @@ import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
+import club.electro.application.ElectroClubApp
 import club.electro.repository.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ThreadViewModel(application: Application, val threadId: Long) : AndroidViewModel(application) {
 
-    private val repository: ThreadRepository = ThreadRepositoryServerImpl(application, threadId)
+    private val repository: ThreadRepository = ThreadRepositoryServerImpl((application as ElectroClubApp).diContainer, threadId)
 
     val data = repository.data.asLiveData(Dispatchers.Default)
 //
