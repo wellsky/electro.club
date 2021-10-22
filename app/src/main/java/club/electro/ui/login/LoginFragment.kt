@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import club.electro.R
 import club.electro.auth.AppAuth
 import club.electro.databinding.FragmentLoginBinding
@@ -14,18 +13,13 @@ import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.viewmodel.LoginFormState
 import ru.netology.nmedia.viewmodel.LoginViewModel
-import kotlin.coroutines.coroutineContext
+import androidx.fragment.app.activityViewModels
 
 
 class LoginFragment : Fragment() {
     private val viewModel: LoginViewModel by viewModels (
         ownerProducer = ::requireParentFragment
     )
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,7 +29,10 @@ class LoginFragment : Fragment() {
 
         binding.submit.setOnClickListener {
             AndroidUtils.hideKeyboard(requireView())
-            viewModel.signIn(binding.login.text.toString(), binding.password.text.toString())
+            viewModel.signIn(
+                binding.login.editText?.text.toString().trim(),
+                binding.password.editText?.text.toString().trim()
+            )
         }
 
         binding.logout.setOnClickListener {

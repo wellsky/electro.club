@@ -7,9 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import club.electro.application.ElectroClubApp
-import club.electro.auth.AppAuth
 import club.electro.repository.AccountRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
@@ -25,7 +23,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     //val appAuth = application.diContainer //AppAuth.getInstance()
     val appAuth = (application as ElectroClubApp).diContainer.appAuth
-
 
     private val repository: AccountRepository = AccountRepositoryServerImpl((application as ElectroClubApp).diContainer)
 

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/headerView"
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
     android:background="@drawable/side_nav_bar"
@@ -14,14 +15,16 @@
     >
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="86dp"
-        android:layout_height="90dp"
+        android:id="@+id/accountAvatar"
+        android:layout_width="82dp"
+        android:layout_height="86dp"
         android:contentDescription="@string/nav_header_desc"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:layout_marginTop="10dp"
         app:srcCompat="@drawable/electro_club_icon" />
 
     <TextView
+        android:id="@+id/textLine1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
@@ -29,8 +32,16 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/textLine2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/nav_header_subtitle" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/navHeaderGroup"
+        android:clickable="true"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        app:constraint_referenced_ids="accountAvatar, textLine1, textLine2" />
+
 </LinearLayout>

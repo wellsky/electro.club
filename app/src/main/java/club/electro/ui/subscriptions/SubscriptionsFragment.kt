@@ -8,12 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import club.electro.R
-import club.electro.adapter.FeedPostAdapter
-import club.electro.adapter.OnFeedPostInteractionListener
 import club.electro.adapter.SubscriptionAreaAdapter
 import club.electro.adapter.SubscriptionAreaInteractionListener
 import club.electro.databinding.FragmentSubscriptionsBinding
-import club.electro.dto.FeedPost
 import club.electro.dto.SubscriptionArea
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadName

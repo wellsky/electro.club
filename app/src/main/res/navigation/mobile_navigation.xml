@@ -35,4 +35,7 @@
         android:id="@+id/nav_login"
         android:name="LoginFragment"
         android:label="LoginFragment" />
+    <action
+        android:id="@+id/action_global_nav_login"
+        app:destination="@id/nav_login" />
 </navigation>

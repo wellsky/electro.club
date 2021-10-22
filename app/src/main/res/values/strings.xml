@@ -3,7 +3,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">electro.club</string>
-    <string name="nav_header_subtitle">support@electro.club</string>
+    <string name="nav_header_subtitle">Click to sign in...</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
@@ -19,8 +19,9 @@
     <string name="empty_posts">Posts list is empty</string>
     <string name="message_text">Message text</string>
     <string name="submit_login_form">Sign in</string>
-    <string name="enter_login_data">Enter login and password</string>
+    <string name="enter_login_data">Sign in to electro.club</string>
     <string name="error_auth">Authorization error</string>
-    <string name="menu_login">Login</string>
     <string name="button_signout">Sign out</string>
+    <string name="enter_login_hint">Login...</string>
+    <string name="enter_password_hint">Password...</string>
 </resources>

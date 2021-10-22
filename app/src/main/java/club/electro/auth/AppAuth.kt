@@ -1,6 +1,8 @@
 package club.electro.auth
 
 import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,6 +39,7 @@ class AppAuth private constructor(context: Context) {
     }
 
     val authStateFlow: StateFlow<AuthState> = _authStateFlow.asStateFlow()
+    val authState: LiveData<AuthState> = authStateFlow.asLiveData()
 
     fun myId(): Long {
         return authStateFlow.value.id
@@ -64,6 +67,8 @@ class AppAuth private constructor(context: Context) {
             putString(nameKey, name)
             putString(avatarKey, avatar)
             apply()
+
+            //authState.value = _authStateFlow.value
         }
 
         sendPushToken()

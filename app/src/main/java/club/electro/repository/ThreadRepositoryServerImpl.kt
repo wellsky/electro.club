@@ -20,12 +20,13 @@ import kotlinx.coroutines.flow.flowOn
 
 // TODO - убрать val перед aaplication, когда getString() уже не понадобится
 class ThreadRepositoryServerImpl(
-            val diContainer: DependencyContainer,
+            diContainer: DependencyContainer,
             val threadId: Long
         ) : ThreadRepository {
 
     private val dao = diContainer.appDb.postDao()
     private val resources = diContainer.context.resources
+    private val apiService = diContainer.apiService
 
     override var data: Flow<List<Post>> = dao.getAll(threadId).map(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
 
@@ -40,15 +41,13 @@ class ThreadRepositoryServerImpl(
             params["threadType"] = "1"
             params["threadId"] = threadId.toString()
 
-            val response = Api.service.getThreadPosts(params)
+            val response = apiService.getThreadPosts(params)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
             dao.insert(body.data.messages.toEntity())
-            data = dao.getAll(threadId).map(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
         } catch (e: IOException) {
-            //println(e.message.toString())
             throw NetworkError
         } catch (e: Exception) {
             throw UnknownError
