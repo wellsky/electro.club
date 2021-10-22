@@ -27,7 +27,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     val appAuth = (application as ElectroClubApp).diContainer.appAuth
 
 
-    private val repository: AccountRepository = AccountRepositoryServerImpl(application)
+    private val repository: AccountRepository = AccountRepositoryServerImpl((application as ElectroClubApp).diContainer)
 
     init {
         if (appAuth.myId() == 0L) {

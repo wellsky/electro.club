@@ -5,16 +5,20 @@ import club.electro.auth.AppAuth
 import club.electro.dao.AreaDao
 import club.electro.dao.PostDao
 import club.electro.db.AppDb
+import club.electro.di.DependencyContainer
 import club.electro.error.ApiError
 import club.electro.repository.AccountRepository
 
-class AccountRepositoryServerImpl(val application: Application): AccountRepository {
-    private val postDao: PostDao = AppDb.getInstance(context = application).postDao()
-    private val areaDao: AreaDao = AppDb.getInstance(context = application).areaDao()
+class AccountRepositoryServerImpl(diContainer: DependencyContainer): AccountRepository {
+    //private val postDao: PostDao = AppDb.getInstance(context = application).postDao()
+    //private val areaDao: AreaDao = AppDb.getInstance(context = application).areaDao()
+    private val postDao = diContainer.appDb.postDao()
+    private val areaDao = diContainer.appDb.areaDao()
+    private val resources = diContainer.context.resources
 
     override suspend fun signIn(login: String, password: String): Boolean {
         val params = HashMap<String?, String?>()
-        params["access_token"] = application.getString(R.string.electro_club_access_token)
+        params["access_token"] = resources.getString(R.string.electro_club_access_token)
         params["method"] = "login"
         params["email"] = login
         params["password"] = password

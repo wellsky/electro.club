@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.map
 import java.io.IOException
 
 // TODO - убрать val перед aaplication, когда getString() уже не понадобится
-class SubscriptionsRepositoryServerImpl(val diContainer: DependencyContainer) : SubscriptionsRepository {
+class SubscriptionsRepositoryServerImpl(diContainer: DependencyContainer) : SubscriptionsRepository {
 
     val appDb = diContainer.appDb
     val apiService = diContainer.apiService

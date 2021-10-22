@@ -6,6 +6,7 @@ import club.electro.api.Api
 import club.electro.auth.AppAuth
 import club.electro.dao.PostDao
 import club.electro.db.AppDb
+import club.electro.di.DependencyContainer
 import club.electro.dto.Post
 import club.electro.entity.PostEntity
 import club.electro.entity.toDto
@@ -19,10 +20,12 @@ import kotlinx.coroutines.flow.flowOn
 
 // TODO - убрать val перед aaplication, когда getString() уже не понадобится
 class ThreadRepositoryServerImpl(
-            val application: Application,
+            val diContainer: DependencyContainer,
             val threadId: Long
         ) : ThreadRepository {
-    private val dao: PostDao = AppDb.getInstance(context = application).postDao()
+
+    private val dao = diContainer.appDb.postDao()
+    private val resources = diContainer.context.resources
 
     override var data: Flow<List<Post>> = dao.getAll(threadId).map(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
 
@@ -31,7 +34,7 @@ class ThreadRepositoryServerImpl(
     override suspend fun getThreadPosts() {
         try {
             val params = HashMap<String?, String?>()
-            params["access_token"] = application.getString(R.string.electro_club_access_token)
+            params["access_token"] = resources.getString(R.string.electro_club_access_token)
             params["user_token"] = appAuth.myToken()
             params["method"] = "getPosts"
             params["threadType"] = "1"
