@@ -10,16 +10,14 @@ import club.electro.entity.PostEntity
 import club.electro.entity.toDto
 import club.electro.entity.toEntity
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import java.io.IOException
 import club.electro.error.*
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 // TODO - убрать val перед aaplication, когда getString() уже не понадобится
 class ThreadRepositoryServerImpl @Inject constructor (
-            //private val threadId: Long,
+            private val threadId: Long,
             private val application: Application,
             private val dao: PostDao,
             private val appAuth: AppAuth,
@@ -27,8 +25,12 @@ class ThreadRepositoryServerImpl @Inject constructor (
         ) : ThreadRepository {
     //private val dao: PostDao = AppDb.getInstance(context = application).postDao()
 
-    // override var data: Flow<List<Post>> = dao.getAll(threadId).map(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
-    override lateinit var data: Flow<List<Post>>
+    override val data: Flow<List<Post>> = dao.getAll(threadId).map(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
+
+    //override lateinit var data: Flow<List<Post>>
+    //override val data = _data.asStateFlow()
+
+
 
     //val appAuth = AppAuth.getInstance()
 
@@ -47,7 +49,12 @@ class ThreadRepositoryServerImpl @Inject constructor (
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
             dao.insert(body.data.messages.toEntity())
-            data = dao.getAll(threadId).map(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
+            //println("dd1")
+            //data = dao.getAll(threadId).map(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
+
+
+
+            //println("dd2")
         } catch (e: IOException) {
             //println(e.message.toString())
             throw NetworkError

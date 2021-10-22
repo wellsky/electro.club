@@ -18,8 +18,7 @@ import ru.netology.nmedia.viewmodel.LoginFormState
 import ru.netology.nmedia.viewmodel.LoginViewModel
 import kotlin.coroutines.coroutineContext
 
-@ExperimentalCoroutinesApi
-@AndroidEntryPoint
+
 class LoginFragment : Fragment() {
 //    private val viewModel: LoginViewModel by viewModels (
 //        ownerProducer = ::requireParentFragment

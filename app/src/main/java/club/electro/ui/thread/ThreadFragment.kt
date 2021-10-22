@@ -11,16 +11,24 @@ import club.electro.databinding.FragmentThreadBinding
 import club.electro.dto.Post
 import club.electro.utils.LongArg
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.viewModels
 import club.electro.util.StringArg
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class ThreadFragment : Fragment() {
     companion object {
         var Bundle.threadId: Long by LongArg
         var Bundle.threadName: String? by StringArg
     }
 
-    private lateinit var viewModel: ThreadViewModel
+//    @Inject
+//    lateinit var viewModel: ThreadViewModel
+    private val viewModel: ThreadViewModel by viewModels(
+        ownerProducer = ::requireParentFragment,
+    )
+
     private var _binding: FragmentThreadBinding? = null
 
     private val binding get() = _binding!!
@@ -52,8 +60,7 @@ class ThreadFragment : Fragment() {
         val root: View = binding.root
 
         val adapter = PostAdapter(object : PostInteractionListener {
-            override fun onClick(post: Post) {
-
+                override fun onClick(post: Post) {
             }
         })
 
@@ -65,10 +72,4 @@ class ThreadFragment : Fragment() {
 
         return root
     }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        //viewModel = ViewModelProvider(this).get(ThreadViewModel::class.java)
-    }
-
 }
