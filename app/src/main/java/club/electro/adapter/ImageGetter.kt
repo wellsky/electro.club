@@ -34,16 +34,16 @@ class ImageGetter(
 
                 // To make sure Images don't go out of screen , Setting width less
                 // than screen width, You can change image size if you want
-                val width = getScreenWidth() - 150
+                val width = getScreenWidth() - 100
 
                 // Images may stretch out if you will only resize width,
                 // hence resize height to according to aspect ratio
                 val aspectRatio: Float =
                     (drawable.intrinsicWidth.toFloat()) / (drawable.intrinsicHeight.toFloat())
                 val height = width / aspectRatio
-                drawable.setBounds(10, 20, width, height.toInt())
+                drawable.setBounds(0, 20, width, height.toInt())
                 holder.setDrawable(drawable)
-                holder.setBounds(10, 20, width, height.toInt())
+                holder.setBounds(0, 20, width, height.toInt())
                 withContext(Dispatchers.Main) {
                     htmlTextView.text = htmlTextView.text
                 }

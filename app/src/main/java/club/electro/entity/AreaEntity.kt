@@ -9,7 +9,7 @@ import club.electro.dto.SubscriptionArea
 data class AreaEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
-    val type: Int,
+    val type: Byte,
     val object_id: Long,
     val name: String,
     val image: String,

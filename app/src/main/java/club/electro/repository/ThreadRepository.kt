@@ -6,4 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface ThreadRepository {
     val data: Flow<List<Post>>
     suspend fun getThreadPosts()
+    suspend fun checkForUpdates()
+
+    fun stop()
 }

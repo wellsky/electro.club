@@ -8,30 +8,17 @@ import androidx.lifecycle.*
 import club.electro.application.ElectroClubApp
 import club.electro.repository.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
-class ThreadViewModel(application: Application, val threadId: Long) : AndroidViewModel(application) {
+class ThreadViewModel(application: Application, val threadType: Byte, val threadId: Long) : AndroidViewModel(application) {
 
-    private val repository: ThreadRepository = ThreadRepositoryServerImpl((application as ElectroClubApp).diContainer, threadId)
+    private val repository: ThreadRepository = ThreadRepositoryServerImpl((application as ElectroClubApp).diContainer, threadType, threadId)
 
     val data = repository.data.asLiveData(Dispatchers.Default)
-//
-//    var threadId: Long = 0
 
-//    init {
-//        loadPosts()
-//    }
-
-    fun loadPosts() = viewModelScope.launch {
-        try {
-
-            //_dataState.value = FeedModelState(loading = true)
-
-            repository.getThreadPosts()
-
-            //_dataState.value = FeedModelState()
-        } catch (e: Exception) {
-            //_dataState.value = FeedModelState(error = true)
-        }
+    fun stop() {
+        repository.stop()
     }
 }

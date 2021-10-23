@@ -8,6 +8,7 @@ import club.electro.dto.Post
 data class PostEntity(
     @PrimaryKey(autoGenerate = false)
     val id: Long,
+    val threadType: Byte,
     val threadId: Long,
     val authorId: Long,
     val authorName: String,
@@ -20,6 +21,7 @@ data class PostEntity(
 ) {
     fun toDto() = Post(
         id = id,
+        threadType = threadType,
         threadId = threadId,
         authorId = authorId,
         authorName = authorName,
@@ -34,6 +36,7 @@ data class PostEntity(
         fun fromDto(dto: Post) =
             PostEntity(
                 id = dto.id,
+                threadType = dto.threadType,
                 threadId = dto.threadId,
                 authorId = dto.authorId,
                 authorName = dto.authorName,

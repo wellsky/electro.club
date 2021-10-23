@@ -12,7 +12,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 
-const val BASE_URL = "https://srv1.electro.club"
+const val BASE_SERVER_URL = "https://electro.club/api/v1/"
+const val UPDATES_SERVER_URL = "https://srv1.electro.club/api/"
 
 val logging = HttpLoggingInterceptor().apply {
     if (BuildConfig.DEBUG) {
@@ -35,23 +36,26 @@ val okhttp = OkHttpClient.Builder()
 
 val retrofit = Retrofit.Builder()
     .addConverterFactory(GsonConverterFactory.create())
-    .baseUrl(BASE_URL)
+    .baseUrl(BASE_SERVER_URL)
     .client(okhttp)
     .build()
 
 interface ApiService {
     @FormUrlEncoded
-    @POST("/api")
+    @POST(UPDATES_SERVER_URL)
     suspend fun getSubscriptions(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiSubscriptionsData>>
 
     @FormUrlEncoded
-    @POST("https://electro.club/api/v1")
+    @POST(BASE_SERVER_URL)
     suspend fun getThreadPosts(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiPostsData>>
 
     @FormUrlEncoded
-    @POST("https://electro.club/api/v1")
+    @POST(BASE_SERVER_URL)
     suspend fun signIn(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiAccountData>>
 
+    @FormUrlEncoded
+    @POST(UPDATES_SERVER_URL)
+    suspend fun getAreaModifiedTime(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiAreaLastUpdateTime>>
 }
 
 object Api {
@@ -87,4 +91,8 @@ data class ApiAccountUserData (
     val thumbnail: String,
     val account_created: Long,
     val last_visit: Long,
+)
+
+data class ApiAreaLastUpdateTime (
+    val time: Long,
 )

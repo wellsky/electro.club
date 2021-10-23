@@ -2,6 +2,7 @@ package club.electro.dto
 
 data class Post (
     val id: Long,
+    val threadType: Byte,
     val threadId: Long,
     val authorId: Long,
     val authorName: String,

@@ -10,12 +10,14 @@ import club.electro.adapter.PostInteractionListener
 import club.electro.databinding.FragmentThreadBinding
 import club.electro.dto.Post
 import club.electro.utils.LongArg
+import club.electro.utils.ByteArg
 import androidx.appcompat.app.AppCompatActivity
 import club.electro.util.StringArg
 
 
 class ThreadFragment : Fragment() {
     companion object {
+        var Bundle.threadType: Byte by ByteArg
         var Bundle.threadId: Long by LongArg
         var Bundle.threadName: String? by StringArg
     }
@@ -29,6 +31,7 @@ class ThreadFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val threadType = arguments?.threadType
         val threadId = arguments?.threadId
         val threadName = arguments?.threadName
 
@@ -37,15 +40,14 @@ class ThreadFragment : Fragment() {
             (activity as AppCompatActivity?)!!.supportActionBar!!.title = it
         }
 
-        threadId?.let {
-            viewModel = ThreadViewModel(
-                requireActivity().getApplication(),
-                threadId
-            )
-        }
 
+        viewModel = ThreadViewModel(
+            requireActivity().getApplication(),
+            threadType!!,
+            threadId!!
+        )
 
-        viewModel.loadPosts()
+        //viewModel.loadPosts()
 
         _binding = FragmentThreadBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -60,14 +62,14 @@ class ThreadFragment : Fragment() {
 
         viewModel.data.observe(viewLifecycleOwner, { items ->
             adapter.submitList(items)
+            binding.postsList.smoothScrollToPosition(0);
         })
 
         return root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        //viewModel = ViewModelProvider(this).get(ThreadViewModel::class.java)
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.stop()
     }
-
 }

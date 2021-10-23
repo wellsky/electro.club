@@ -14,6 +14,7 @@ import club.electro.databinding.FragmentSubscriptionsBinding
 import club.electro.dto.SubscriptionArea
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadName
+import club.electro.ui.thread.ThreadFragment.Companion.threadType
 
 class SubscriptionsFragment : Fragment() {
 
@@ -40,6 +41,7 @@ class SubscriptionsFragment : Fragment() {
                 findNavController().navigate(
                     R.id.action_nav_subscriptions_to_threadFragment,
                     Bundle().apply {
+                        threadType = area.type
                         threadId = area.object_id
                         threadName = area.name
                     }

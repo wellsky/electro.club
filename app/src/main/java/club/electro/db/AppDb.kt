@@ -11,7 +11,7 @@ import club.electro.entity.AreaEntity
 import club.electro.entity.PostEntity
 
 
-@Database(entities = [AreaEntity::class, PostEntity::class], version = 7, exportSchema = false)
+@Database(entities = [AreaEntity::class, PostEntity::class], version = 10, exportSchema = false)
 //@TypeConverters(Converters::class)
 abstract class AppDb : RoomDatabase() {
     abstract fun postDao(): PostDao
