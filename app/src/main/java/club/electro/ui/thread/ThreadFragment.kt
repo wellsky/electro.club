@@ -62,12 +62,23 @@ class ThreadFragment : Fragment() {
         binding.postsList.adapter = adapter
 
         viewModel.data.observe(viewLifecycleOwner, { items ->
+            val newPostPublished = if (!adapter.currentList.isEmpty()) {
+                val oldLastPost: Post = adapter.currentList.first()
+                val newLastPost: Post = items.first()
+                !oldLastPost.equals(newLastPost)
+            } else {
+                !items.isEmpty()
+            }
+
             adapter.submitList(items)
-            if (binding.postsList.scrollState === RecyclerView.SCROLL_STATE_IDLE) {
-                if (getCurrentItem() == 0) {
-                    binding.postsList.smoothScrollToPosition(0);
-                } else {
-                    //TODO Внизу появились новые сообщения
+
+            if (newPostPublished) {
+                if (binding.postsList.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
+                    if (getFocusedItem() == 0) {
+                        binding.postsList.smoothScrollToPosition(0);
+                    } else {
+                        //TODO Внизу появились новые сообщения
+                    }
                 }
             }
         })
@@ -78,7 +89,7 @@ class ThreadFragment : Fragment() {
     /**
      * Возвращает порядковый номер поста, на котором находится фокус
      */
-    fun getCurrentItem(): Int {
+    fun getFocusedItem(): Int {
         return (binding.postsList.getLayoutManager() as LinearLayoutManager)
         .findFirstVisibleItemPosition()
     }

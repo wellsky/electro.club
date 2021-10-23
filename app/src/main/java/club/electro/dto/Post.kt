@@ -12,4 +12,12 @@ data class Post (
     val likes: Int = 0,
     val views: Int = 0,
     //val ownedByMe: Boolean = false,
-)
+) {
+    override fun equals(other: Any?): Boolean{
+        if (this === other) return true
+        if (other?.javaClass != javaClass) return false
+
+        other as Post
+        return (this.id == other.id)
+    }
+}
