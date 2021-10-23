@@ -2,6 +2,7 @@ package club.electro.api
 
 import club.electro.BuildConfig
 import club.electro.dao.AreaDao
+import club.electro.dto.MapMarker
 import club.electro.dto.Post
 import club.electro.dto.SubscriptionArea
 import com.google.gson.annotations.SerializedName
@@ -22,7 +23,7 @@ val logging = HttpLoggingInterceptor().apply {
 }
 
 val okhttp = OkHttpClient.Builder()
-//    .addInterceptor(logging)
+      .addInterceptor(logging)
 //    .addInterceptor { chain ->
 //        AppAuth.getInstance().authStateFlow.value.token?.let { token ->
 //            val newRequest = chain.request().newBuilder()
@@ -56,6 +57,11 @@ interface ApiService {
     @FormUrlEncoded
     @POST(UPDATES_SERVER_URL)
     suspend fun getAreaModifiedTime(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiAreaLastUpdateTime>>
+
+    @FormUrlEncoded
+    @POST(BASE_SERVER_URL)
+    suspend fun getMapObjects(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiMapObjects>>
+
 }
 
 object Api {
@@ -91,6 +97,10 @@ data class ApiAccountUserData (
     val thumbnail: String,
     val account_created: Long,
     val last_visit: Long,
+)
+
+data class ApiMapObjects(
+    val mapObjects: List<MapMarker>
 )
 
 data class ApiAreaLastUpdateTime (

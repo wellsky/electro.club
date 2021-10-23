@@ -48,6 +48,8 @@ class ThreadFragment : Fragment() {
             threadId!!
         )
 
+        viewModel.loadPosts()
+
         _binding = FragmentThreadBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
@@ -61,10 +63,12 @@ class ThreadFragment : Fragment() {
 
         viewModel.data.observe(viewLifecycleOwner, { items ->
             adapter.submitList(items)
-            if (getCurrentItem() == 0) {
-                binding.postsList.smoothScrollToPosition(0);
-            } else {
-                //TODO Внизу появились новые сообщения
+            if (binding.postsList.scrollState === RecyclerView.SCROLL_STATE_IDLE) {
+                if (getCurrentItem() == 0) {
+                    binding.postsList.smoothScrollToPosition(0);
+                } else {
+                    //TODO Внизу появились новые сообщения
+                }
             }
         })
 
@@ -79,6 +83,9 @@ class ThreadFragment : Fragment() {
         .findFirstVisibleItemPosition()
     }
 
+    /**
+     * Необходимо остановить корутину в репозитории, которая опрашивает сервер об обновлениях в текущем thread
+     */
     override fun onDestroy() {
         super.onDestroy()
         viewModel.stop()

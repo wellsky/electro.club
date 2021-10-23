@@ -18,6 +18,14 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
 
     val data = repository.data.asLiveData(Dispatchers.Default)
 
+    fun loadPosts() = viewModelScope.launch {
+        try {
+            repository.getThreadPosts()
+        } catch (e: Exception) {
+            //_dataState.value = FeedModelState(error = true)
+        }
+    }
+
     fun stop() {
         repository.stop()
     }

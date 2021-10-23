@@ -42,6 +42,7 @@ class ThreadRepositoryServerImpl(
 
     override suspend fun getThreadPosts() {
         try {
+            //println("Loading posts from server")
             val params = HashMap<String?, String?>()
             params["access_token"] = resources.getString(R.string.electro_club_access_token)
             params["user_token"] = appAuth.myToken()
@@ -83,7 +84,7 @@ class ThreadRepositoryServerImpl(
             val newTime = body.data.time
 
             if (newTime > lastUpdateTime) {
-                getThreadPosts()
+                if (lastUpdateTime != 0L) getThreadPosts()
                 lastUpdateTime = newTime
             }
             //println("lastUpdate: " + lastUpdateTime + ", newTime: " + newTime)

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import club.electro.R
@@ -13,10 +14,15 @@ import club.electro.databinding.FragmentMapBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import ru.netology.nmedia.viewmodel.LoginViewModel
 
 class MapFragment : Fragment() {
+    private val viewModel: MapViewModel by viewModels (
+        ownerProducer = ::requireParentFragment
+    )
 
     private val callback = OnMapReadyCallback { googleMap ->
         /**
@@ -37,9 +43,19 @@ class MapFragment : Fragment() {
          * install it inside the SupportMapFragment. This method will only be triggered once the
          * user has installed Google Play services and returned to the app.
          */
+        viewModel.getAll()
+
         val sydney = LatLng(-34.0, 151.0)
         googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+
+        viewModel.data.observe(viewLifecycleOwner) {
+            val icon = BitmapDescriptorFactory.fromResource(R.drawable.socket);
+            it.forEach {
+                val marker = LatLng(it.lat, it.lng)
+                googleMap.addMarker(MarkerOptions().position(marker).title("Marker").icon(icon))
+            }
+        }
     }
 
     override fun onCreateView(
