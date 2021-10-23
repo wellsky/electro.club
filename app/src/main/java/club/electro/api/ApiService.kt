@@ -22,7 +22,7 @@ val logging = HttpLoggingInterceptor().apply {
 }
 
 val okhttp = OkHttpClient.Builder()
-    .addInterceptor(logging)
+//    .addInterceptor(logging)
 //    .addInterceptor { chain ->
 //        AppAuth.getInstance().authStateFlow.value.token?.let { token ->
 //            val newRequest = chain.request().newBuilder()

@@ -79,7 +79,9 @@ class PostViewHolder(
                 emojieChar
             }
 
-            val brStripped = emojies.replace("<br /></p>", "</p>")
+            val fullUrlToSrcAdded = emojies.replace("src=\"/data/", "src=\"https://electro.club/data/")
+
+            val brStripped = fullUrlToSrcAdded.replace("<br /></p>", "</p>")
             val pStartStripped = brStripped.replace("<p>", "")
             val pEndStripped = pStartStripped.replace("</p>", "<br>")
 

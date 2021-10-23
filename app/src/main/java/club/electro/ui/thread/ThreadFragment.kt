@@ -12,8 +12,9 @@ import club.electro.dto.Post
 import club.electro.utils.LongArg
 import club.electro.utils.ByteArg
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
 import club.electro.util.StringArg
-
+import androidx.recyclerview.widget.LinearLayoutManager
 
 class ThreadFragment : Fragment() {
     companion object {
@@ -47,8 +48,6 @@ class ThreadFragment : Fragment() {
             threadId!!
         )
 
-        //viewModel.loadPosts()
-
         _binding = FragmentThreadBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
@@ -62,10 +61,22 @@ class ThreadFragment : Fragment() {
 
         viewModel.data.observe(viewLifecycleOwner, { items ->
             adapter.submitList(items)
-            binding.postsList.smoothScrollToPosition(0);
+            if (getCurrentItem() == 0) {
+                binding.postsList.smoothScrollToPosition(0);
+            } else {
+                //TODO Внизу появились новые сообщения
+            }
         })
 
         return root
+    }
+
+    /**
+     * Возвращает порядковый номер поста, на котором находится фокус
+     */
+    fun getCurrentItem(): Int {
+        return (binding.postsList.getLayoutManager() as LinearLayoutManager)
+        .findFirstVisibleItemPosition()
     }
 
     override fun onDestroy() {
@@ -73,3 +84,14 @@ class ThreadFragment : Fragment() {
         viewModel.stop()
     }
 }
+
+
+//      Перехват изменения состояния скроллинга
+//        binding.postsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+//            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+//                super.onScrollStateChanged(recyclerView, newState)
+//                if (newState === RecyclerView.SCROLL_STATE_IDLE) {
+//                    println(getCurrentItem())
+//                }
+//            }
+//        })
