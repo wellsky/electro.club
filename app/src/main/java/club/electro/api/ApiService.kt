@@ -23,7 +23,7 @@ val logging = HttpLoggingInterceptor().apply {
 }
 
 val okhttp = OkHttpClient.Builder()
-//      .addInterceptor(logging)
+      .addInterceptor(logging)
 //    .addInterceptor { chain ->
 //        AppAuth.getInstance().authStateFlow.value.token?.let { token ->
 //            val newRequest = chain.request().newBuilder()
@@ -61,6 +61,10 @@ interface ApiService {
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
     suspend fun getMapObjects(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiMapObjects>>
+
+    @FormUrlEncoded
+    @POST(BASE_SERVER_URL)
+    suspend fun savePost(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiMapObjects>>
 
 }
 

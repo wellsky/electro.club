@@ -13,7 +13,7 @@ import club.electro.entity.MapMarkerEntity
 import club.electro.entity.PostEntity
 
 
-@Database(entities = [AreaEntity::class, PostEntity::class, MapMarkerEntity::class], version = 11, exportSchema = false)
+@Database(entities = [AreaEntity::class, PostEntity::class, MapMarkerEntity::class], version = 12, exportSchema = false)
 //@TypeConverters(Converters::class)
 abstract class AppDb : RoomDatabase() {
     abstract fun postDao(): PostDao

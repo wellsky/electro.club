@@ -40,7 +40,7 @@ class SubscriptionsRepositoryServerImpl(diContainer: DependencyContainer) : Subs
             params["access_token"] = resources.getString(R.string.electro_club_access_token)
             params["user_token"] = appAuth.myToken()
             params["method"] = "whatsUp"
-            params["lastEventTime"] = "0"
+            params["last_event_time"] = "0"
             val response = apiService.getSubscriptions(params)
 
             if (!response.isSuccessful) {

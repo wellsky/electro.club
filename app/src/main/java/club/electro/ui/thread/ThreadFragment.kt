@@ -12,9 +12,13 @@ import club.electro.dto.Post
 import club.electro.utils.LongArg
 import club.electro.utils.ByteArg
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import club.electro.util.StringArg
 import androidx.recyclerview.widget.LinearLayoutManager
+import club.electro.R
+import club.electro.util.AndroidUtils
+import com.google.android.material.snackbar.Snackbar
 
 class ThreadFragment : Fragment() {
     companion object {
@@ -62,14 +66,16 @@ class ThreadFragment : Fragment() {
         binding.postsList.adapter = adapter
 
         viewModel.data.observe(viewLifecycleOwner, { items ->
-            val newPostPublished = if (!adapter.currentList.isEmpty()) {
+            println("OBSERVED")
+            val newPostPublished: Boolean = if (!adapter.currentList.isEmpty()) {
                 val oldLastPost: Post = adapter.currentList.first()
                 val newLastPost: Post = items.first()
-                !oldLastPost.equals(newLastPost)
+                (oldLastPost.id != newLastPost.id)
             } else {
                 !items.isEmpty()
             }
 
+            println("SUBMIT")
             adapter.submitList(items)
 
             if (newPostPublished) {
@@ -81,7 +87,54 @@ class ThreadFragment : Fragment() {
                     }
                 }
             }
+            println("FINISH")
         })
+
+
+        viewModel.editorPost.observe(viewLifecycleOwner) {
+            /*
+            if (it.id != 0L) {
+                with (binding.content) {
+                    requestFocus()
+                    setText(it.content)
+                }
+                binding.editMessageGroup.visibility = View.VISIBLE
+                binding.editMessageContent.text = it.content
+            }
+            */
+        }
+
+        binding.editorPostSave.setOnClickListener {
+            with (binding.editorPostContent) {
+                if (text.isNullOrBlank()) {
+                    Snackbar.make(binding.root, R.string.error_empty_post, Snackbar.LENGTH_LONG)
+                        .show()
+                    return@setOnClickListener
+                }
+                viewModel.changeEditorPostContent(text.toString())
+                viewModel.saveEditorPost()
+
+                setText("")
+                clearFocus()
+                AndroidUtils.hideKeyboard(it)
+            }
+            //binding.editMessageGroup.visibility = View.GONE
+        }
+
+//        binding.cancelEdition.setOnClickListener {
+//            with(binding.content) {
+//                viewModel.cancelEdit()
+//                setText("")
+//                clearFocus()
+//                AndroidUtils.hideKeyboard(it)
+//            }
+//            binding.editMessageGroup.visibility = View.GONE
+//        }
+//
+//        binding.postEditorButton.setOnClickListener {
+//            editPostLauncher.launch(null)
+//        }
+
 
         return root
     }
@@ -102,7 +155,6 @@ class ThreadFragment : Fragment() {
         viewModel.stop()
     }
 }
-
 
 //      Перехват изменения состояния скроллинга
 //        binding.postsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {

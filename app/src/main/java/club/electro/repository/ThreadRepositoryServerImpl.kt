@@ -47,8 +47,8 @@ class ThreadRepositoryServerImpl(
             params["access_token"] = resources.getString(R.string.electro_club_access_token)
             params["user_token"] = appAuth.myToken()
             params["method"] = "getPosts"
-            params["threadType"] = threadType.toString()
-            params["threadId"] = threadId.toString()
+            params["thread_type"] = threadType.toString()
+            params["thread_id"] = threadId.toString()
 
             val response = apiService.getThreadPosts(params)
             if (!response.isSuccessful) {
@@ -56,6 +56,31 @@ class ThreadRepositoryServerImpl(
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
             dao.insert(body.data.messages.toEntity())
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun savePost(post: Post) {
+        try {
+            val params = HashMap<String?, String?>()
+            params["access_token"] = resources.getString(R.string.electro_club_access_token)
+            params["user_token"] = appAuth.myToken()
+            params["method"] = "savePost"
+            params["thread_type"] = threadType.toString()
+            params["thread_id"] = threadId.toString()
+            params["post_id"] = post.id.toString()
+            params["post_content"] = post.content
+
+            val response = apiService.savePost(params)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            //dao.insert(PostEntity.fromDto(body))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -84,6 +109,7 @@ class ThreadRepositoryServerImpl(
             val newTime = body.data.time
 
             if (newTime > lastUpdateTime) {
+                println("NEW TIME")
                 if (lastUpdateTime != 0L) getThreadPosts()
                 lastUpdateTime = newTime
             }
