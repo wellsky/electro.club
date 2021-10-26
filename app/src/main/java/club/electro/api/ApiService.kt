@@ -4,6 +4,7 @@ import club.electro.BuildConfig
 import club.electro.dao.AreaDao
 import club.electro.dto.MapMarker
 import club.electro.dto.Post
+import club.electro.dto.PushToken
 import club.electro.dto.SubscriptionArea
 import com.google.gson.annotations.SerializedName
 import okhttp3.OkHttpClient
@@ -66,6 +67,9 @@ interface ApiService {
     @POST(BASE_SERVER_URL)
     suspend fun savePost(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiMapObjects>>
 
+    @FormUrlEncoded
+    @POST(BASE_SERVER_URL)
+    suspend fun setPushToken(@FieldMap params: HashMap<String?, String?>): Response<Unit>
 }
 
 object Api {

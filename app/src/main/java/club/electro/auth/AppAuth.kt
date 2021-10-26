@@ -3,14 +3,20 @@ package club.electro.auth
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
+import club.electro.R
+import club.electro.di.DependencyContainer
+import club.electro.dto.PushToken
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.launch
 
-class AppAuth private constructor(context: Context) {
+class AppAuth private constructor(context: Context, diContainer: DependencyContainer) {
     private val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
     private val idKey = "id"
     private val tokenKey = "token"
@@ -18,6 +24,9 @@ class AppAuth private constructor(context: Context) {
     private val avatarKey = "avatar"
 
     private val _authStateFlow: MutableStateFlow<AuthState>
+
+    private val resources = diContainer.context.resources
+    private val apiService = diContainer.apiService
 
     init {
         val id = prefs.getLong(idKey, 0)
@@ -34,7 +43,6 @@ class AppAuth private constructor(context: Context) {
         } else {
             _authStateFlow = MutableStateFlow(AuthState(id, token, name, avatar))
         }
-
         sendPushToken()
     }
 
@@ -70,7 +78,6 @@ class AppAuth private constructor(context: Context) {
 
             //authState.value = _authStateFlow.value
         }
-
         sendPushToken()
     }
 
@@ -87,9 +94,14 @@ class AppAuth private constructor(context: Context) {
     fun sendPushToken(token: String? = null) {
         CoroutineScope(Dispatchers.Default).launch {
             try {
-// TODO добавить отправку пуш-токена при авторизации
-//                val pushToken = PushToken(token ?: Firebase.messaging.token.await())
-//                UsersApi.service.save(pushToken)
+                val pushToken = PushToken(token ?: Firebase.messaging.token.await())
+
+                val params = HashMap<String?, String?>()
+                params["access_token"] = resources.getString(R.string.electro_club_access_token)
+                params["user_token"] = myToken()
+                params["method"] = "setPushToken"
+                params["push_token"] = pushToken.token
+                apiService.setPushToken(params)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -106,11 +118,11 @@ class AppAuth private constructor(context: Context) {
             )
         }
 
-        fun initApp(context: Context): AppAuth = instance ?: synchronized(this) {
-            instance ?: buildAuth(context).also { instance = it }
+        fun initApp(context: Context, diContainer: DependencyContainer): AppAuth = instance ?: synchronized(this) {
+            instance ?: buildAuth(context, diContainer).also { instance = it }
         }
 
-        private fun buildAuth(context: Context): AppAuth = AppAuth(context)
+        private fun buildAuth(context: Context, diContainer: DependencyContainer): AppAuth = AppAuth(context, diContainer)
     }
 }
 

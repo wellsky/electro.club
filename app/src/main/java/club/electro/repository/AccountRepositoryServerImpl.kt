@@ -33,7 +33,7 @@ class AccountRepositoryServerImpl(diContainer: DependencyContainer): AccountRepo
     }
 
     override suspend fun signOut() {
-        postDao.clear()
-        areaDao.clear()
+        postDao.clearAll()
+        areaDao.clearAll()
     }
 }

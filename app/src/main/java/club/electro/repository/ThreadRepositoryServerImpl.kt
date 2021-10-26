@@ -12,13 +12,10 @@ import club.electro.dto.Post
 import club.electro.entity.PostEntity
 import club.electro.entity.toDto
 import club.electro.entity.toEntity
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import java.io.IOException
 import club.electro.error.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 
 // TODO - убрать val перед aaplication, когда getString() уже не понадобится
 class ThreadRepositoryServerImpl(
@@ -32,7 +29,7 @@ class ThreadRepositoryServerImpl(
     private val apiService = diContainer.apiService
     private val appAuth = diContainer.appAuth
 
-    override var data: Flow<List<Post>> = dao.getAll(threadType, threadId).map(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
+    override var data: Flow<List<Post>> = dao.flowThreadByPublshedDESC(threadType, threadId).map(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
 
     private var lastUpdateTime: Long = 0
 
@@ -55,12 +52,40 @@ class ThreadRepositoryServerImpl(
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(body.data.messages.toEntity())
+
+            //clearCurrentPosts()
+
+            val currentMessages = dao.getAllList(threadType, threadId).toDto()
+
+            if (currentMessages.isEmpty()) {
+                dao.insert(body.data.messages.toEntity())
+            } else {
+                val first = currentMessages.first()
+                val last = currentMessages.last()
+
+                dao.clearAndInsert(body.data.messages.toEntity(), threadType, threadId, first.published, last.published)
+            }
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
             throw UnknownError
         }
+    }
+
+    // TODO перенести в пагинацию с правильными first и last
+    suspend fun clearCurrentPosts() {
+        val currentMessages = dao.getAllList(threadType, threadId).toDto()
+
+        println("clear " + threadType + " : " + threadId)
+        println(currentMessages)
+
+        val first = currentMessages.first()
+        val last = currentMessages.last()
+
+        println(first.published)
+        println(last.published)
+
+        dao.clearThreadPeriod(threadType, threadId, first.published, last.published)
     }
 
     override suspend fun savePost(post: Post) {
@@ -109,7 +134,6 @@ class ThreadRepositoryServerImpl(
             val newTime = body.data.time
 
             if (newTime > lastUpdateTime) {
-                println("NEW TIME")
                 if (lastUpdateTime != 0L) getThreadPosts()
                 lastUpdateTime = newTime
             }

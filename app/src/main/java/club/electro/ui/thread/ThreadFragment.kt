@@ -66,16 +66,14 @@ class ThreadFragment : Fragment() {
         binding.postsList.adapter = adapter
 
         viewModel.data.observe(viewLifecycleOwner, { items ->
-            println("OBSERVED")
-            val newPostPublished: Boolean = if (!adapter.currentList.isEmpty()) {
+            val newPostPublished: Boolean = if (!adapter.currentList.isEmpty() && !items.isEmpty()) {
                 val oldLastPost: Post = adapter.currentList.first()
                 val newLastPost: Post = items.first()
-                (oldLastPost.id != newLastPost.id)
+                (newLastPost.published > oldLastPost.published)
             } else {
                 !items.isEmpty()
             }
 
-            println("SUBMIT")
             adapter.submitList(items)
 
             if (newPostPublished) {
@@ -87,7 +85,6 @@ class ThreadFragment : Fragment() {
                     }
                 }
             }
-            println("FINISH")
         })
 
 

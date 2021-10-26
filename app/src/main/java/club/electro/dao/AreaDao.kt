@@ -16,7 +16,7 @@ interface AreaDao {
     suspend fun insert(areas: List<AreaEntity>)
 
     @Query("DELETE FROM AreaEntity")
-    suspend fun clear()
+    suspend fun clearAll()
 }
 
 //class Converters {

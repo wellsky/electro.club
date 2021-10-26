@@ -4,6 +4,10 @@ plugins {
     id 'org.jetbrains.kotlin.kapt'
 }
 
+if (project.file('google-services.json').exists()) {
+    apply plugin: 'com.google.gms.google-services'
+}
+
 android {
     compileSdk 30
 
@@ -42,6 +46,7 @@ def retrofit_version = "2.9.0"
 def retrofitgson_version = "2.9.0"
 def okhttp_version = "4.9.1"
 def okhttploggin_version = "4.9.1"
+def coroutines_version = "1.5.1"
 
 dependencies {
     implementation 'androidx.core:core-ktx:1.6.0'
@@ -61,6 +66,11 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttploggin_version"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutines_version"
+
+    implementation platform('com.google.firebase:firebase-bom:26.7.0')
+    implementation 'com.google.firebase:firebase-messaging-ktx'
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

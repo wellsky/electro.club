@@ -9,5 +9,5 @@ import club.electro.db.AppDb
 class DependencyContainer(val context: Context) {
     val appDb = AppDb.getInstance(context = context)
     val apiService: ApiService = Api.service
-    val appAuth: AppAuth = AppAuth.initApp(context)
+    val appAuth: AppAuth = AppAuth.initApp(context, this)
 }
