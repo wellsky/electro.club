@@ -2,16 +2,26 @@ package club.electro.service
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.TaskStackBuilder
 import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.navigation.NavDeepLinkBuilder
+import club.electro.MainActivity
 import club.electro.R
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import club.electro.auth.AppAuth
+import club.electro.ui.thread.ThreadFragment
+import club.electro.ui.thread.ThreadFragment.Companion.threadId
+import club.electro.ui.thread.ThreadFragment.Companion.threadName
+import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import kotlin.random.Random
 
 class FCMService : FirebaseMessagingService() {
@@ -51,6 +61,22 @@ class FCMService : FirebaseMessagingService() {
                 val data = gson.fromJson(message.data[content], PostNotification::class.java)
                 println("Author: " + data.authorName);
 
+                // Create an Intent for the activity you want to start
+                // val resultIntent = Intent(this, ThreadFragment::class.java)
+
+                // https://stackoverflow.com/questions/26608627/how-to-open-fragment-page-when-pressed-a-notification-in-android
+                val resultPendingIntent = NavDeepLinkBuilder(this)
+                    .setComponentName(MainActivity::class.java)
+                    .setGraph(R.navigation.mobile_navigation)
+                    .setDestination(R.id.threadFragment)
+                    .setArguments(Bundle().apply {
+                        threadType = data.threadType
+                        threadId = data.threadId
+                        threadName = "Thread"
+                    })
+                    .createPendingIntent()
+
+
                 val notification = NotificationCompat.Builder(this, channelId)
                     .setSmallIcon(R.drawable.electro_club_icon)
                     .setContentTitle(
@@ -63,6 +89,8 @@ class FCMService : FirebaseMessagingService() {
                     .setStyle(NotificationCompat.BigTextStyle()
                         .bigText(data.postContent))
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setContentIntent(resultPendingIntent)
+                    .setAutoCancel(true)
                     .build()
 
                 NotificationManagerCompat.from(this)

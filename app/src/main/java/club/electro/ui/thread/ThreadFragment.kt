@@ -13,9 +13,11 @@ import club.electro.utils.LongArg
 import club.electro.utils.ByteArg
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import club.electro.util.StringArg
 import androidx.recyclerview.widget.LinearLayoutManager
+import club.electro.MainViewModel
 import club.electro.R
 import club.electro.util.AndroidUtils
 import com.google.android.material.snackbar.Snackbar
@@ -32,18 +34,29 @@ class ThreadFragment : Fragment() {
 
     private val binding get() = _binding!!
 
+    private var threadName: String? = null
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        activity?.run {
+            val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+            mainViewModel.updateActionBarTitle(threadName?: "Unknown thread")
+        } ?: throw Throwable("invalid activity")
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val threadType = arguments?.threadType
         val threadId = arguments?.threadId
-        val threadName = arguments?.threadName
+        threadName = arguments?.threadName
 
         // TODO явно есть более красивый способ
-        threadName?.let {
-            (activity as AppCompatActivity?)!!.supportActionBar!!.title = it
-        }
+//        threadName?.let {
+//            (activity as AppCompatActivity?)!!.supportActionBar!!.title = it
+//        }
 
 
         viewModel = ThreadViewModel(

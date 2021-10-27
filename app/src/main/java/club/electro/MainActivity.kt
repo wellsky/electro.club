@@ -18,11 +18,16 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelProvider
 import club.electro.application.ElectroClubApp
 import club.electro.databinding.ActivityMainBinding
+import club.electro.ui.subscriptions.SubscriptionsViewModel
 import com.bumptech.glide.Glide
 
 class MainActivity : AppCompatActivity() {
+//class MainActivity : FragmentActivity() {
+    private lateinit var viewModel: MainViewModel
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
@@ -87,6 +92,12 @@ class MainActivity : AppCompatActivity() {
                 textLine1.setText(R.string.nav_header_title)
                 textLine2.setText(R.string.nav_header_subtitle)
             }
+        })
+
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+
+        viewModel.title.observe(this, {
+            supportActionBar?.title = it
         })
     }
 

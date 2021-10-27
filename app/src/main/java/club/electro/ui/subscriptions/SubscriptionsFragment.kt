@@ -30,8 +30,7 @@ class SubscriptionsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewModel =
-            ViewModelProvider(this).get(SubscriptionsViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(SubscriptionsViewModel::class.java)
 
         _binding = FragmentSubscriptionsBinding.inflate(inflater, container, false)
         val root: View = binding.root
