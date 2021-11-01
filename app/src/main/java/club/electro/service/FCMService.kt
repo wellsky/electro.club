@@ -28,6 +28,9 @@ import kotlin.random.Random
 
 class FCMService : FirebaseMessagingService() {
     private val ACTION_THREAD_POST = "newThreadPost"
+    private val ACTION_ANSWER = "newAnswer"
+    private val ACTION_QUOTE = "newQuote"
+    private val ACTION_MENTION = "newMention"
     private val ACTION_PERSONAL_MESSAGE = "newPersonalMessage"
 
     private val recipientId = "recipientId"
@@ -51,6 +54,10 @@ class FCMService : FirebaseMessagingService() {
         }
     }
 
+    override fun onNewToken(token: String) {
+        AppAuth.getInstance().sendPushToken(token)
+    }
+
     override fun onMessageReceived(message: RemoteMessage) {
         //println("Message invoked " + Gson().toJson(message))
 
@@ -69,11 +76,6 @@ class FCMService : FirebaseMessagingService() {
             }
         }
     }
-
-    override fun onNewToken(token: String) {
-        AppAuth.getInstance().sendPushToken(token)
-    }
-
 
     private fun handleNewMessage(message: RemoteMessage) {
         val action = message.data.get(action)
@@ -149,8 +151,6 @@ class FCMService : FirebaseMessagingService() {
         }
     }
 }
-
-
 
 data class PostNotification (
     val recipientId: Long,

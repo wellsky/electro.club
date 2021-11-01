@@ -30,7 +30,11 @@
         android:id="@+id/threadFragment"
         android:name="club.electro.ui.thread.ThreadFragment"
         android:label="fragment_thread"
-        tools:layout="@layout/fragment_thread" />
+        tools:layout="@layout/fragment_thread" >
+        <action
+            android:id="@+id/action_threadFragment_to_userProfileFragment"
+            app:destination="@id/userProfileFragment" />
+    </fragment>
     <fragment
         android:id="@+id/nav_login"
         android:name="LoginFragment"
@@ -38,4 +42,8 @@
     <action
         android:id="@+id/action_global_nav_login"
         app:destination="@id/nav_login" />
+    <fragment
+        android:id="@+id/userProfileFragment"
+        android:name="club.electro.ui.user.UserProfileFragment"
+        android:label="UserProfileFragment" />
 </navigation>

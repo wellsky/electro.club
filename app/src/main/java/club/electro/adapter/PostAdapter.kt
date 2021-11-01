@@ -3,6 +3,7 @@ package club.electro.adapter
 import ImageGetter
 import QuoteSpanClass
 import android.content.res.Resources
+import android.os.Bundle
 import android.text.Spannable
 import android.text.method.LinkMovementMethod
 import android.text.style.QuoteSpan
@@ -11,18 +12,23 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.text.HtmlCompat
+import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import club.electro.R
 import club.electro.databinding.PostItemBinding
 import club.electro.dto.Post
+import club.electro.ui.thread.ThreadFragment.Companion.threadId
+import club.electro.ui.thread.ThreadFragment.Companion.threadName
+import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import com.bumptech.glide.Glide
 import club.electro.utils.trimWhiteSpaces
 
 
 interface PostInteractionListener {
-    fun onClick(post: Post) {}
+    fun onAvatarClick(post: Post) {}
 }
 
 class PostAdapter(
@@ -52,6 +58,10 @@ class PostViewHolder(
 
             authorName.text = post.authorName
             published.text = sdf.format(date).toString()
+
+            authorAvatar.setOnClickListener {
+                onInteractionListener.onAvatarClick(post)
+            }
 
             // TODO Вставить изображения в текст поста
             //val imageGetter = HtmlImageGetter(scope, resources, glide, content)

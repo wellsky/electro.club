@@ -16,4 +16,7 @@
     <color name="postTextColor">#222222</color>
     <color name="postQuoteColor">#f1f1f1</color>
     <color name="postQuoteStripColor">#999999</color>
+
+    <color name="startOrange">#f7a307</color>
+    <color name="endOrange">#ee711c</color>
 </resources>

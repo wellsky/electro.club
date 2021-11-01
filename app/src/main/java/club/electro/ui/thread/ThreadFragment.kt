@@ -14,6 +14,8 @@ import club.electro.utils.ByteArg
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import club.electro.util.StringArg
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -42,7 +44,7 @@ class ThreadFragment : Fragment() {
         activity?.run {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
             mainViewModel.updateActionBarTitle(threadName?: "Unknown thread")
-        } ?: throw Throwable("invalid activity")
+        } ?: throw Throwable("Invalid activity")
     }
 
     override fun onCreateView(
@@ -71,8 +73,10 @@ class ThreadFragment : Fragment() {
         val root: View = binding.root
 
         val adapter = PostAdapter(object : PostInteractionListener {
-            override fun onClick(post: Post) {
-
+            override fun onAvatarClick(post: Post) {
+                findNavController().navigate(
+                    R.id.action_threadFragment_to_userProfileFragment
+                )
             }
         })
 
@@ -160,8 +164,8 @@ class ThreadFragment : Fragment() {
     /**
      * Необходимо остановить корутину в репозитории, которая опрашивает сервер об обновлениях в текущем thread
      */
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         viewModel.stop()
     }
 }
