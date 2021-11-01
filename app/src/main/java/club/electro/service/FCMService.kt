@@ -2,13 +2,10 @@ package club.electro.service
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.TaskStackBuilder
 import android.content.Context
-import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.navigation.NavDeepLinkBuilder
@@ -18,23 +15,27 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import club.electro.auth.AppAuth
-import club.electro.ui.thread.ThreadFragment
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadName
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
+import club.electro.utils.GetCircleBitmap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import java.io.IOException
+import java.net.URL
 import kotlin.random.Random
 
 class FCMService : FirebaseMessagingService() {
-    val ACTION_LIKE = "LIKE"
-    val ACTION_POST = "POST"
+    private val ACTION_THREAD_POST = "newThreadPost"
+    private val ACTION_PERSONAL_MESSAGE = "newPersonalMessage"
 
+    private val recipientId = "recipientId"
     private val action = "action"
     private val content = "content"
     private val channelId = "remote"
 
     private val gson = Gson()
-
-    private val actionNewThreadPost = "newThreadPost"
 
     override fun onCreate() {
         super.onCreate()
@@ -51,18 +52,35 @@ class FCMService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-//        println("message invoked " + Gson().toJson(message))
-//        println("Action: " + message.data.get("action"))
-//
+        //println("Message invoked " + Gson().toJson(message))
+
+        val recipient = message.data.get(recipientId)
+        val currenUserId = AppAuth.getInstance().myId()
+
+        recipient?.let {
+            if (it.toLong() == currenUserId) {
+                try {
+                    handleNewMessage(message)
+                } catch (e: Exception) {
+                    println("Error: " + e.message.toString())
+                }
+            } else {
+                AppAuth.getInstance().sendPushToken()
+            }
+        }
+    }
+
+    override fun onNewToken(token: String) {
+        AppAuth.getInstance().sendPushToken(token)
+    }
+
+
+    private fun handleNewMessage(message: RemoteMessage) {
         val action = message.data.get(action)
 
         when (action) {
-            actionNewThreadPost -> {
+            ACTION_PERSONAL_MESSAGE, ACTION_THREAD_POST -> {
                 val data = gson.fromJson(message.data[content], PostNotification::class.java)
-                println("Author: " + data.authorName);
-
-                // Create an Intent for the activity you want to start
-                // val resultIntent = Intent(this, ThreadFragment::class.java)
 
                 // https://stackoverflow.com/questions/26608627/how-to-open-fragment-page-when-pressed-a-notification-in-android
                 val resultPendingIntent = NavDeepLinkBuilder(this)
@@ -76,123 +94,68 @@ class FCMService : FirebaseMessagingService() {
                     })
                     .createPendingIntent()
 
-
-                val notification = NotificationCompat.Builder(this, channelId)
-                    .setSmallIcon(R.drawable.electro_club_icon)
-                    .setContentTitle(
-                        getString(
-                            R.string.notification_user_posted,
-                            data.authorName
-                        )
-                    )
-                    .setContentText(data.postContent)
-                    .setStyle(NotificationCompat.BigTextStyle()
-                        .bigText(data.postContent))
+                val notificationBuilder = NotificationCompat.Builder(this, channelId)
+                    .setSmallIcon(R.drawable.electro_club_icon_grey_64)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setContentIntent(resultPendingIntent)
                     .setAutoCancel(true)
-                    .build()
 
+                if (action.equals(ACTION_PERSONAL_MESSAGE)) {
+                    notificationBuilder
+                        .setContentTitle(
+                            getString(
+                                R.string.notification_personal_message,
+                                data.authorName
+                            )
+                        )
+                        .setContentText(data.postContent)
+                        .setStyle(NotificationCompat.BigTextStyle()
+                        .bigText(data.postContent))
+                }
+
+                if (action.equals(ACTION_THREAD_POST)) {
+                    notificationBuilder
+                        .setContentTitle(data.threadName)
+                        .setContentText(data.authorName + ": " + data.postContent)
+                        .setStyle(NotificationCompat.BigTextStyle()
+                        .bigText(data.authorName + ": " + data.postContent))
+
+                }
+
+                applyImageUrl(notificationBuilder, data.threadImage)
+                val notification = notificationBuilder.build()
                 NotificationManagerCompat.from(this)
                     .notify(Random.nextInt(100_000), notification)
             }
         }
-
-//        val notification = NotificationCompat.Builder(this, channelId)
-//            .setSmallIcon(R.drawable.electro_club_icon)
-//            .setContentText(data.authorName)
-//            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//            .build()
-//        NotificationManagerCompat.from(this)
-//            .notify(Random.nextInt(100_000), notification)
-
-//        message.data[action]?.let {
-//            when (it) {
-//                ACTION_LIKE -> handleLike(gson.fromJson(message.data[content], LikeNotification::class.java))
-//                ACTION_POST -> handlePost(gson.fromJson(message.data[content], PostNotification::class.java))
-//                else -> println("Unrecognizable notification received")
-//            }
-//        }
-
-//          handleRecipientData(gson.fromJson(message.data[content], RecipientData::class.java))
-
-
-//        if (message.data[recipientId] == 0) {
-//            AppAuth.getInstance().sendPushToken()
-//        }
     }
 
-    override fun onNewToken(token: String) {
-        AppAuth.getInstance().sendPushToken(token)
+    fun applyImageUrl(
+        builder: NotificationCompat.Builder,
+        imageUrl: String
+    ) = runBlocking {
+        val url = URL(imageUrl)
+
+        withContext(Dispatchers.IO) {
+            try {
+                val input = url.openStream()
+                BitmapFactory.decodeStream(input)
+            } catch (e: IOException) {
+                null
+            }
+        }?.let { bitmap ->
+            val roundedBitmap = GetCircleBitmap.make(bitmap)
+            builder.setLargeIcon(roundedBitmap)
+        }
     }
-
-//    private fun handleRecipientData(data: RecipientData) {
-//        println("Handled: " + data.recipientId)
-//        when (data.recipientId) {
-//            null -> {
-//                showSimpleMessage(data.content)
-//            }
-//
-//            AppAuth.getInstance().myId() -> {
-//                showSimpleMessage(data.content)
-//            }
-//
-//            else -> {
-//                AppAuth.getInstance().sendPushToken()
-//            }
-//        }
-//    }
-//
-//    private fun showSimpleMessage(text: String) {
-//        val notification = NotificationCompat.Builder(this, channelId)
-//            .setSmallIcon(R.drawable.ic_notification)
-//            .setContentText(text)
-//            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//            .build()
-//        NotificationManagerCompat.from(this)
-//            .notify(Random.nextInt(100_000), notification)
-//    }
-
-//    private fun handlePost(content: PostNotification) {
-//        val notification = NotificationCompat.Builder(this, channelId)
-//            .setSmallIcon(R.drawable.ic_notification)
-//            .setContentTitle(
-//                getString(
-//                    R.string.notification_user_posted,
-//                    content.userName
-//                )
-//            )
-//            .setContentText(content.postContent)
-//            .setStyle(NotificationCompat.BigTextStyle()
-//                .bigText(content.postContent))
-//            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//            .build()
-//
-//        NotificationManagerCompat.from(this)
-//            .notify(Random.nextInt(100_000), notification)
-//    }
-//
-//    private fun handleLike(content: LikeNotification) {
-//        val notification = NotificationCompat.Builder(this, channelId)
-//            .setSmallIcon(R.drawable.ic_notification)
-//            .setContentTitle(
-//                getString(
-//                    R.string.notification_user_liked,
-//                    content.userName,
-//                    content.postAuthor,
-//                )
-//            )
-//            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//            .build()
-//
-//        NotificationManagerCompat.from(this)
-//            .notify(Random.nextInt(100_000), notification)
-//    }
 }
 
 
 
 data class PostNotification (
+    val recipientId: Long,
+    val threadName: String,
+    val threadImage: String,
     val authorName: String,
     val postContent: String,
     val threadType: Byte,

@@ -2,12 +2,9 @@ package club.electro
 
 import android.os.Bundle
 import android.view.Menu
-import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -18,11 +15,9 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import club.electro.application.ElectroClubApp
 import club.electro.databinding.ActivityMainBinding
-import club.electro.ui.subscriptions.SubscriptionsViewModel
 import com.bumptech.glide.Glide
 
 class MainActivity : AppCompatActivity() {
@@ -88,7 +83,7 @@ class MainActivity : AppCompatActivity() {
                 textLine1.setText(it.name)
                 textLine2.setText("My default transport")
             } else {
-                headerImage.setImageResource(R.drawable.electro_club_icon)
+                headerImage.setImageResource(R.drawable.electro_club_icon_white_256)
                 textLine1.setText(R.string.nav_header_title)
                 textLine2.setText(R.string.nav_header_subtitle)
             }

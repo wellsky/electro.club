@@ -25,7 +25,8 @@
     <string name="enter_login_hint">Login...</string>
     <string name="enter_password_hint">Password...</string>
     <string name="error_empty_post">Can not save empty post</string>
-    <string name="notification_user_posted">%1$s published new post</string>
+    <string name="notification_thread_post">%1$s published new post</string>
+    <string name="notification_personal_message">%1$s sent you a personal message</string>
     <string name="channel_remote_name">New posts in threads</string>
     <string name="channel_remote_description">New posts in threads</string>
 </resources>
