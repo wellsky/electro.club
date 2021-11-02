@@ -3,6 +3,7 @@ package club.electro.repository
 import android.app.Application
 import androidx.lifecycle.viewModelScope
 import club.electro.R
+import club.electro.adapter.PostTextPreparator
 import club.electro.api.Api
 import club.electro.auth.AppAuth
 import club.electro.dao.PostDao
@@ -29,12 +30,37 @@ class ThreadRepositoryServerImpl(
     private val apiService = diContainer.apiService
     private val appAuth = diContainer.appAuth
 
-    override var data: Flow<List<Post>> = dao.flowThreadByPublshedDESC(threadType, threadId).map(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
+
+//    override var data: Flow<List<Post>> = dao.flowThreadByPublshedDESC(threadType, threadId).map(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
+
+    override var data: Flow<List<Post>> = dao.flowThreadByPublshedDESC(threadType, threadId).map {
+        it.map {
+            val post = it.toDto()
+
+            val preparedContent: String = PostTextPreparator(post.content)
+                .setPostRepository(this)
+                .prepareAll()
+                .get()
+
+            val preparedPost = post.copy(content = preparedContent)
+            preparedPost
+        }
+    }.flowOn(Dispatchers.Default)
+
+    //(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
 
     private var lastUpdateTime: Long = 0
 
     private val updaterJob = CoroutineScope(Dispatchers.Default).launch {
         checkForUpdates()
+    }
+
+    override fun getLocalPostById(id: Long): Post? {
+        GlobalScope.async {
+            // TODO загрузить пост с сервера
+        }
+
+        return dao.getPostById(id)?.toDto()
     }
 
     override suspend fun getThreadPosts() {

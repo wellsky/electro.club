@@ -12,6 +12,9 @@ interface PostDao {
     @Query("SELECT * FROM PostEntity WHERE threadType = :threadType AND threadId = :threadId ORDER BY published")
     suspend fun getAllList(threadType: Byte, threadId: Long): List<PostEntity>
 
+    @Query("SELECT * FROM PostEntity WHERE id = :id")
+    fun getPostById(id: Long): PostEntity
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(post: PostEntity)
 

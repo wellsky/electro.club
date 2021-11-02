@@ -2,6 +2,7 @@ package club.electro.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -42,8 +43,10 @@ class SubscriptionAreaViewHolder(
             areaName.text = area.name
             areaLastMessage.text = area.last_text
             areaLastName.text = area.last_name + ": "
-            areaUnreadMessagesCount.text = area.count.toString()
             areaLastMessageTime.text = sdf.format(date).toString()
+
+            areaUnreadMessagesCount.isVisible = (area.count > 0)
+            areaUnreadMessagesCount.text = area.count.toString()
 
             if (!area.image.isEmpty()) {
                 Glide.with(areaImage.context)

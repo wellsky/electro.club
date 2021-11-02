@@ -5,9 +5,12 @@ import kotlinx.coroutines.flow.Flow
 
 interface ThreadRepository {
     val data: Flow<List<Post>>
+
     suspend fun getThreadPosts()
     suspend fun savePost(post: Post)
-
     suspend fun checkForUpdates()
+
+    fun getLocalPostById(id: Long): Post?
+
     fun stop()
 }

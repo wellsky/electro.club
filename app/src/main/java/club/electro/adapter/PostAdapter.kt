@@ -76,26 +76,12 @@ class PostViewHolder(
             //val regex = """(red|green|blue)""".toRegex()
             //val regex = """"quote""".toRegex()
 
+//            val prepared = PostTextPreparator(source)
+//                .prepareQuotes()
+//                .prepareEmojies()
+//                .get()
 
-            val pattern = """\[quote message=(\d+?)\](.*?)\[\/quote\]"""
-            val quotes = Regex(pattern).replace(source) {
-                val (quoyteMessageId, quoteText) = it.destructured
-                "<blockquote>" + quoteText + "</blockquote>"
-            }
-
-            val pattern1 = """<img class="emojione".*?alt="(.*?)"[^\>]+>"""
-            val emojies = Regex(pattern1).replace(quotes) {
-                val (emojieChar) = it.destructured
-                emojieChar
-            }
-
-            val fullUrlToSrcAdded = emojies.replace("src=\"/data/", "src=\"https://electro.club/data/")
-
-            val brStripped = fullUrlToSrcAdded.replace("<br /></p>", "</p>")
-            val pStartStripped = brStripped.replace("<p>", "")
-            val pEndStripped = pStartStripped.replace("</p>", "<br>")
-
-            val htmlPostText = HtmlCompat.fromHtml(pEndStripped, HtmlCompat.FROM_HTML_MODE_LEGACY, imageGetter, null)
+            val htmlPostText = HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY, imageGetter, null)
             val trimmedPostText: CharSequence = trimWhiteSpaces(htmlPostText)
 
             val result = trimmedPostText
