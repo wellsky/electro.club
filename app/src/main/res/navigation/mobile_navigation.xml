@@ -45,5 +45,9 @@
     <fragment
         android:id="@+id/userProfileFragment"
         android:name="club.electro.ui.user.UserProfileFragment"
-        android:label="UserProfileFragment" />
+        android:label="UserProfileFragment" >
+        <action
+            android:id="@+id/action_userProfileFragment_to_threadFragment"
+            app:destination="@id/threadFragment" />
+    </fragment>
 </navigation>

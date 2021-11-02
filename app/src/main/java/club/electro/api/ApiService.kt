@@ -2,10 +2,7 @@ package club.electro.api
 
 import club.electro.BuildConfig
 import club.electro.dao.AreaDao
-import club.electro.dto.MapMarker
-import club.electro.dto.Post
-import club.electro.dto.PushToken
-import club.electro.dto.SubscriptionArea
+import club.electro.dto.*
 import com.google.gson.annotations.SerializedName
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -70,6 +67,11 @@ interface ApiService {
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
     suspend fun setPushToken(@FieldMap params: HashMap<String?, String?>): Response<Unit>
+
+    @FormUrlEncoded
+    @POST(BASE_SERVER_URL)
+    suspend fun getUserProfile(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiUserProfile>>
+
 }
 
 object Api {
@@ -114,3 +116,29 @@ data class ApiMapObjects(
 data class ApiAreaLastUpdateTime (
     val time: Long,
 )
+
+data class ApiUserProfile (
+    val user: ApiUserProfileData
+)
+
+data class ApiUserProfileData (
+    val user_id: Long,
+    val nickname: String,
+    val thumbnail: String,
+    val account_created: Long,
+    val last_visit: Long,
+    val messages: Int,
+    val rating: Int,
+    val primaryTransport: UserPrimaryTransport?,
+    val myChat: ThreadLink?
+) {
+    fun toDto() = User (
+        id = user_id,
+        name = nickname,
+        avatar = thumbnail,
+        messages = messages,
+        rating = rating,
+        primaryTransport = primaryTransport,
+        myChat = myChat
+    )
+}

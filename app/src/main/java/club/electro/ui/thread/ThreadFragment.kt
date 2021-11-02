@@ -21,6 +21,10 @@ import club.electro.util.StringArg
 import androidx.recyclerview.widget.LinearLayoutManager
 import club.electro.MainViewModel
 import club.electro.R
+import club.electro.ui.thread.ThreadFragment.Companion.threadId
+import club.electro.ui.thread.ThreadFragment.Companion.threadName
+import club.electro.ui.thread.ThreadFragment.Companion.threadType
+import club.electro.ui.user.UserProfileFragment.Companion.userId
 import club.electro.util.AndroidUtils
 import com.google.android.material.snackbar.Snackbar
 
@@ -75,7 +79,10 @@ class ThreadFragment : Fragment() {
         val adapter = PostAdapter(object : PostInteractionListener {
             override fun onAvatarClick(post: Post) {
                 findNavController().navigate(
-                    R.id.action_threadFragment_to_userProfileFragment
+                    R.id.action_threadFragment_to_userProfileFragment,
+                    Bundle().apply {
+                        userId = post.authorId
+                    }
                 )
             }
         })

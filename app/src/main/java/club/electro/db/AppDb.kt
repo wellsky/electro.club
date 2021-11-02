@@ -8,17 +8,17 @@ import androidx.room.TypeConverters
 import club.electro.dao.AreaDao
 import club.electro.dao.MapMarkerDao
 import club.electro.dao.PostDao
-import club.electro.entity.AreaEntity
-import club.electro.entity.MapMarkerEntity
-import club.electro.entity.PostEntity
+import club.electro.dao.UserDao
+import club.electro.entity.*
 
 
-@Database(entities = [AreaEntity::class, PostEntity::class, MapMarkerEntity::class], version = 12, exportSchema = false)
-//@TypeConverters(Converters::class)
+@Database(entities = [AreaEntity::class, PostEntity::class, MapMarkerEntity::class, UserEntity::class], version = 3, exportSchema = false)
+@TypeConverters(DBTypeConverters::class)
 abstract class AppDb : RoomDatabase() {
     abstract fun postDao(): PostDao
     abstract fun areaDao(): AreaDao
     abstract fun mapMarkerDao(): MapMarkerDao
+    abstract fun userDao(): UserDao
 
     companion object {
         @Volatile
