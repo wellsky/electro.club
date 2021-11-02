@@ -1,16 +1,9 @@
 package club.electro.repository
 
-import android.app.Application
-import androidx.lifecycle.viewModelScope
 import club.electro.R
 import club.electro.adapter.PostTextPreparator
-import club.electro.api.Api
-import club.electro.auth.AppAuth
-import club.electro.dao.PostDao
-import club.electro.db.AppDb
 import club.electro.di.DependencyContainer
 import club.electro.dto.Post
-import club.electro.entity.PostEntity
 import club.electro.entity.toDto
 import club.electro.entity.toEntity
 import java.io.IOException
@@ -18,7 +11,6 @@ import club.electro.error.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
-// TODO - убрать val перед aaplication, когда getString() уже не понадобится
 class ThreadRepositoryServerImpl(
             diContainer: DependencyContainer,
             val threadType: Byte,
@@ -47,19 +39,14 @@ class ThreadRepositoryServerImpl(
         }
     }.flowOn(Dispatchers.Default)
 
-    //(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
-
     private var lastUpdateTime: Long = 0
 
-    private val updaterJob = CoroutineScope(Dispatchers.Default).launch {
-        checkForUpdates()
-    }
+    private val updaterJob = startCheckUpdates()
 
     override fun getLocalPostById(id: Long): Post? {
         GlobalScope.async {
-            // TODO загрузить пост с сервера
+            // TODO загрузить пост с сервера и вынести функцию в репозиторий PostRepository
         }
-
         return dao.getPostById(id)?.toDto()
     }
 
@@ -79,8 +66,6 @@ class ThreadRepositoryServerImpl(
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
 
-            //clearCurrentPosts()
-
             val currentMessages = dao.getAllList(threadType, threadId).toDto()
 
             if (currentMessages.isEmpty()) {
@@ -96,22 +81,6 @@ class ThreadRepositoryServerImpl(
         } catch (e: Exception) {
             throw UnknownError
         }
-    }
-
-    // TODO перенести в пагинацию с правильными first и last
-    suspend fun clearCurrentPosts() {
-        val currentMessages = dao.getAllList(threadType, threadId).toDto()
-
-        println("clear " + threadType + " : " + threadId)
-        println(currentMessages)
-
-        val first = currentMessages.first()
-        val last = currentMessages.last()
-
-        println(first.published)
-        println(last.published)
-
-        dao.clearThreadPeriod(threadType, threadId, first.published, last.published)
     }
 
     override suspend fun savePost(post: Post) {
@@ -167,7 +136,14 @@ class ThreadRepositoryServerImpl(
         }
     }
 
-    override fun stop() {
+    override fun startCheckUpdates(): Job {
+        val job = CoroutineScope(Dispatchers.Default).launch {
+            checkForUpdates()
+        }
+        return job
+    }
+
+    override fun stopCheckUpdates() {
         updaterJob.cancel()
     }
 }

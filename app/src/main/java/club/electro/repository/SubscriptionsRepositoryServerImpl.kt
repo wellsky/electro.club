@@ -1,13 +1,7 @@
 package club.electro.repository
 
-import android.app.Application
 import club.electro.R
-import club.electro.api.Api
-import club.electro.api.ApiService
-import club.electro.application.ElectroClubApp
-import club.electro.auth.AppAuth
 import club.electro.dao.AreaDao
-import club.electro.db.AppDb
 import club.electro.di.DependencyContainer
 import club.electro.dto.SubscriptionArea
 import club.electro.entity.AreaEntity
@@ -20,9 +14,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 
-// TODO - убрать val перед aaplication, когда getString() уже не понадобится
 class SubscriptionsRepositoryServerImpl(diContainer: DependencyContainer) : SubscriptionsRepository {
-
     val appDb = diContainer.appDb
     val apiService = diContainer.apiService
     val appAuth = diContainer.appAuth
@@ -30,9 +22,6 @@ class SubscriptionsRepositoryServerImpl(diContainer: DependencyContainer) : Subs
 
     private val dao: AreaDao = appDb.areaDao()
     override val data: Flow<List<SubscriptionArea>> = dao.getAll().map(List<AreaEntity>::toDto).flowOn(Dispatchers.Default)
-
-    //val appAuth = AppAuth.getInstance()
-
 
     override suspend fun getAll() {
         try {

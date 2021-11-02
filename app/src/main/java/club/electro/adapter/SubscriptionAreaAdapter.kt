@@ -2,6 +2,7 @@ package club.electro.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -36,12 +37,11 @@ class SubscriptionAreaViewHolder(
 
     fun bind(area: SubscriptionArea) {
         binding.apply {
-            //val sdf = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
             val sdf = java.text.SimpleDateFormat("HH:mm")
             val date = java.util.Date(area.last_time * 1000)
 
             areaName.text = area.name
-            areaLastMessage.text = area.last_text
+            areaLastMessage.text = HtmlCompat.fromHtml(area.last_text, HtmlCompat.FROM_HTML_MODE_LEGACY)
             areaLastName.text = area.last_name + ": "
             areaLastMessageTime.text = sdf.format(date).toString()
 

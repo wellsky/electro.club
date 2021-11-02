@@ -1,10 +1,13 @@
 package club.electro.api
 
 import club.electro.BuildConfig
+import club.electro.auth.AppAuth
 import club.electro.dao.AreaDao
 import club.electro.dto.*
 import com.google.gson.annotations.SerializedName
+import okhttp3.MediaType
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -21,17 +24,8 @@ val logging = HttpLoggingInterceptor().apply {
 }
 
 val okhttp = OkHttpClient.Builder()
-      .addInterceptor(logging)
-//    .addInterceptor { chain ->
-//        AppAuth.getInstance().authStateFlow.value.token?.let { token ->
-//            val newRequest = chain.request().newBuilder()
-//                .addHeader("Authorization", token)
-//                .build()
-//            return@addInterceptor chain.proceed(newRequest)
-//        }
-//        chain.proceed(chain.request())
-//    }
-    .build()
+        .addInterceptor(logging)
+        .build()
 
 val retrofit = Retrofit.Builder()
     .addConverterFactory(GsonConverterFactory.create())

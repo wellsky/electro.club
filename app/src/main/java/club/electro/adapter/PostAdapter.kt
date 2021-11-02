@@ -63,23 +63,10 @@ class PostViewHolder(
                 onInteractionListener.onAvatarClick(post)
             }
 
-            // TODO Вставить изображения в текст поста
-            //val imageGetter = HtmlImageGetter(scope, resources, glide, content)
-            //val imageGetter = ImageGetter(, content)
             val resources: Resources = this.root.resources
             val imageGetter = ImageGetter(resources, content)
 
             val source = post.content
-
-            //val quotes = source.replace(""""#\[quote#""".toRegex(), "QUOTE")
-
-            //val regex = """(red|green|blue)""".toRegex()
-            //val regex = """"quote""".toRegex()
-
-//            val prepared = PostTextPreparator(source)
-//                .prepareQuotes()
-//                .prepareEmojies()
-//                .get()
 
             val htmlPostText = HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY, imageGetter, null)
             val trimmedPostText: CharSequence = trimWhiteSpaces(htmlPostText)

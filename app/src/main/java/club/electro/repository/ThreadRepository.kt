@@ -1,6 +1,7 @@
 package club.electro.repository
 
 import club.electro.dto.Post
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
 interface ThreadRepository {
@@ -12,5 +13,6 @@ interface ThreadRepository {
 
     fun getLocalPostById(id: Long): Post?
 
-    fun stop()
+    fun startCheckUpdates(): Job
+    fun stopCheckUpdates()
 }

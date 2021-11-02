@@ -25,16 +25,25 @@
 
                 <ImageView
                     android:id="@+id/avatar"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
                     android:layout_gravity="left"
                     android:src="@drawable/electro_club_icon_white_256" />
+
+                <ImageView
+                    android:id="@+id/transportImage"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="-30dp"
+                    android:layout_marginTop="50dp"
+                    android:src="@drawable/electro_club_icon_white_256"
+                    />
 
                 <LinearLayout
                     android:layout_width="200dp"
                     android:layout_height="100dp"
-                    android:layout_marginLeft="30dp"
-                    android:layout_marginTop="15dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="5dp"
                     android:orientation="vertical">
 
                     <TextView

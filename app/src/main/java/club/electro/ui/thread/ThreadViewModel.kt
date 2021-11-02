@@ -52,7 +52,7 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
     }
 
     fun stop() {
-        repository.stop()
+        repository.stopCheckUpdates()
     }
 }
 

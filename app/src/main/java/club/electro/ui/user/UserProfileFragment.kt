@@ -58,8 +58,17 @@ class UserProfileFragment : Fragment() {
                 messages.text = user.messages.toString()
                 rating.text = user.rating.toString()
 
-                user.primaryTransport?.let {
-                    transport.text = it.name
+                user.primaryTransport?.let { primaryTransport ->
+                    transport.text = primaryTransport.name
+                    primaryTransport.image?.let {
+                        Glide.with(transportImage.context)
+                            .load(it)
+                            .circleCrop()
+                            .timeout(5_000)
+                            .placeholder(R.drawable.ic_loading_100dp)
+                            .error(R.drawable.ic_error_100dp)
+                            .into(transportImage)
+                    }
                 }
 
                 user.avatar?.let {
