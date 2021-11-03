@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="@dimen/fab_margin"
+    android:paddingLeft="10dp"
     android:paddingRight="@dimen/fab_margin"
     android:paddingTop="8dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -28,8 +28,9 @@
         app:layout_constraintEnd_toStartOf="@id/areaLastMessageTime"
         android:layout_marginStart="@dimen/fab_margin"
         android:layout_marginTop="4dp"
-        android:textColor="@color/black"
+        android:textColor="@color/grey_26"
         android:textStyle="bold"
+        android:textSize="16sp"
         android:ellipsize="end"
         android:singleLine="true"
 
@@ -46,7 +47,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/areaName"
         android:layout_marginStart="@dimen/fab_margin"
-        android:textColor="@color/black"
+        android:textColor="@color/grey_7"
         android:textFontWeight="700"
         tools:text="12:12"
         >
@@ -79,6 +80,7 @@
         app:layout_constraintEnd_toStartOf="@id/areaUnreadMessagesCount"
         android:ellipsize="end"
         android:singleLine="true"
+        android:textColor="@color/grey_7"
         tools:text="Текст последнего сообщения в теме который должен автоматически обрезаться с точками"
         >
     </TextView>
@@ -95,6 +97,7 @@
         android:textColor="@color/white"
         android:background="@drawable/subscriptions_newmessages_bg"
         android:minWidth="24dp"
+        android:textStyle="bold"
         android:textAlignment="center"
         tools:text="123"
         >
@@ -104,7 +107,7 @@
         android:id="@+id/panelLine"
         android:layout_width="wrap_content"
         android:layout_height="1dp"
-        android:background="@color/grey_d"
+        android:background="@color/grey_f6"
         app:layout_constraintTop_toBottomOf="@id/areaImage"
         app:layout_constraintStart_toEndOf="@id/areaImage"
         android:layout_marginTop="8dp"

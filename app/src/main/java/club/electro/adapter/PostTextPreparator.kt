@@ -19,7 +19,7 @@ class PostTextPreparator(val source: String) {
     fun prepareAll(): PostTextPreparator {
         prepareQuotes()
         prepareEmojies()
-        prepareNotTaggedUrls()
+        prepareImagesOnNewLine()
 
         prepareBasicTags()
         prepareRelativeUrls()
@@ -89,13 +89,11 @@ class PostTextPreparator(val source: String) {
     }
 
 
-    fun prepareNotTaggedUrls() : PostTextPreparator {
-        val pattern = """(?i)<a\s+[^>]*>[^<]*</a>|(https?|ftp)://(?:-\.)?([^\s/?.#-]+\.?)+(/\S*)?"""
+    fun prepareImagesOnNewLine() : PostTextPreparator {
+        var newText = text
+        newText = newText.replace("<img", "<br><img")
 
-        val result = Regex(pattern).replace(text) {
-            if (it.groupValues[1].isNullOrEmpty()) it.value else "<a href=\"${it.value}\">${it.value}</a>"
-        }
-        text = result
+        text = newText
         return this
     }
 }

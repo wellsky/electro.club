@@ -5,13 +5,19 @@ import QuoteSpanClass
 import android.content.res.Resources
 import android.os.Bundle
 import android.text.Spannable
+import android.text.SpannableString
+import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import android.text.style.QuoteSpan
+import android.text.style.URLSpan
+import android.text.util.Linkify
+import android.text.util.Linkify.ALL
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.text.HtmlCompat
+import androidx.core.text.util.LinkifyCompat
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DiffUtil
@@ -25,6 +31,7 @@ import club.electro.ui.thread.ThreadFragment.Companion.threadName
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import com.bumptech.glide.Glide
 import club.electro.utils.trimWhiteSpaces
+import java.util.logging.Level.ALL
 
 
 interface PostInteractionListener {
@@ -63,23 +70,6 @@ class PostViewHolder(
                 onInteractionListener.onAvatarClick(post)
             }
 
-            val resources: Resources = this.root.resources
-            val imageGetter = ImageGetter(resources, content)
-
-            val source = post.content
-
-            val htmlPostText = HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY, imageGetter, null)
-            val trimmedPostText: CharSequence = trimWhiteSpaces(htmlPostText)
-
-            val result = trimmedPostText
-
-            replaceQuoteSpans(result as Spannable)
-
-            content.setText(result);
-            content.setClickable(true);
-            content.setMovementMethod(LinkMovementMethod.getInstance());
-
-
             if (!post.authorAvatar.isEmpty()) {
                 Glide.with(authorAvatar.context)
                     .load(post.authorAvatar)
@@ -89,6 +79,38 @@ class PostViewHolder(
                     .error(R.drawable.ic_error_100dp)
                     .into(authorAvatar)
             }
+
+            val resources: Resources = this.root.resources
+            val imageGetter = ImageGetter(resources, content)
+
+            //the string to add links to
+            val htmlString = post.content
+
+            //Initial span from HtmlCompat will link anchor tags
+            val htmlSpan = HtmlCompat.fromHtml(htmlString, HtmlCompat.FROM_HTML_MODE_LEGACY, imageGetter, null) as Spannable
+
+            //save anchor links for later
+            val anchorTagSpans = htmlSpan.getSpans(0, htmlSpan.length, URLSpan::class.java)
+
+            //add first span to TextView
+            content.text = htmlSpan
+
+            //Linkify will now make urls clickable but overwrite our anchor links
+            Linkify.addLinks(content, Linkify.ALL)
+            content.movementMethod = LinkMovementMethod.getInstance()
+            content.linksClickable = true
+
+            //we will add back the anchor links here
+            val restoreAnchorsSpan = SpannableString(content.text)
+            for (span in anchorTagSpans) {
+                restoreAnchorsSpan.setSpan(span, htmlSpan.getSpanStart(span), htmlSpan.getSpanEnd(span), Spanned.SPAN_INCLUSIVE_INCLUSIVE)
+            }
+
+            val trimmedPostText: CharSequence = trimWhiteSpaces(restoreAnchorsSpan)
+            val result = trimmedPostText
+            replaceQuoteSpans(result as Spannable)
+
+            content.setText(result);
         }
     }
 
