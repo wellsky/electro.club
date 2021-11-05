@@ -9,6 +9,7 @@ interface ThreadRepository {
 
     suspend fun getThreadPosts()
     suspend fun savePost(post: Post)
+
     suspend fun removePost(post: Post)
     suspend fun checkForUpdates()
 

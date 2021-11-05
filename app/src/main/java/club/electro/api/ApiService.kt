@@ -56,7 +56,7 @@ interface ApiService {
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
-    suspend fun savePost(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiMapObjects>>
+    suspend fun savePost(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiSavedPost>>
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
@@ -117,6 +117,10 @@ data class ApiAreaLastUpdateTime (
 
 data class ApiUserProfile (
     val user: ApiUserProfileData
+)
+
+data class ApiSavedPost (
+    val message: Post
 )
 
 data class ApiUserProfileData (

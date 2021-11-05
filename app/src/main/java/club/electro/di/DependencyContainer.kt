@@ -2,6 +2,7 @@ package club.electro.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.work.WorkManager
 import club.electro.api.Api
 import club.electro.api.ApiService
 import club.electro.auth.AppAuth
@@ -13,7 +14,14 @@ class DependencyContainer private constructor(val context: Context) {
     val appDb = AppDb.getInstance(context = context)
     val apiService: ApiService = Api.service
     val appAuth: AppAuth = AppAuth.initApp(context, this)
+
     val postRepository: PostRepository = PostRepositoryServerImpl(this)
+    val workManager = WorkManager.getInstance(context)
+
+    init {
+        // TODO криво реализованная взаимная инъекция
+        postRepository.setupWorkManager(workManager)
+    }
 
     companion object {
         @Volatile

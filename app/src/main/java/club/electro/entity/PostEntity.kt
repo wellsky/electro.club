@@ -1,13 +1,16 @@
 package club.electro.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import club.electro.dto.Post
 
 @Entity
 data class PostEntity(
-    @PrimaryKey(autoGenerate = false)
+    @PrimaryKey(autoGenerate = true)
+    val localId: Long,
     val id: Long,
+    val status: Byte,
     val threadType: Byte,
     val threadId: Long,
     val authorId: Long,
@@ -23,6 +26,7 @@ data class PostEntity(
 ) {
     fun toDto() = Post(
         id = id,
+        status = status,
         threadType = threadType,
         threadId = threadId,
         authorId = authorId,
@@ -39,7 +43,9 @@ data class PostEntity(
     companion object {
         fun fromDto(dto: Post) =
             PostEntity(
+                localId = 0,
                 id = dto.id,
+                status = dto.status,
                 threadType = dto.threadType,
                 threadId = dto.threadId,
                 authorId = dto.authorId,

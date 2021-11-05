@@ -78,6 +78,7 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
 
 private val emptyPost = Post(
     id = 0L,
+    status = 0,
     threadType = 0,
     threadId = 0,
     authorId = 0,

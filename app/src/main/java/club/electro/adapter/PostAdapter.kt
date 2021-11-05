@@ -3,7 +3,9 @@ package club.electro.adapter
 import ImageGetter
 import QuoteSpanClass
 import android.content.res.Resources
+import android.graphics.Color
 import android.os.Bundle
+import android.provider.Settings.Global.getString
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
@@ -19,6 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.text.HtmlCompat
 import androidx.core.text.util.LinkifyCompat
+import androidx.core.view.isVisible
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DiffUtil
@@ -67,17 +70,34 @@ class PostViewHolder(
 
     fun bind(post: Post) {
         binding.apply {
-            //val sdf = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
-            //println("Inflating post: " + post.id)
-
             val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
             val date = java.util.Date(post.published * 1000)
 
             authorName.text = post.authorName
-            published.text = sdf.format(date).toString()
+
 
             authorAvatar.setOnClickListener {
                 onInteractionListener.onAvatarClicked(post)
+            }
+
+            menu.isVisible = false
+            content.setTextColor(getColor(this.root.context, R.color.postInactiveTextColor))
+
+            when(post.status) {
+                Post.STATUS_CREATED_LOCAL -> {
+                    published.setText(R.string.post_status_publishing)
+                }
+                Post.STATUS_SAVING_LOCAL -> {
+                    published.setText(R.string.post_status_saving)
+                }
+                Post.STATUS_REMOVING_LOCAL -> {
+                    published.setText(R.string.post_status_removing)
+                }
+                Post.STATUS_PUBLISHED -> {
+                    published.setText(sdf.format(date).toString())
+                    content.setTextColor(getColor(this.root.context, R.color.postTextColor))
+                    menu.isVisible = true
+                }
             }
 
             if (!post.authorAvatar.isEmpty()) {

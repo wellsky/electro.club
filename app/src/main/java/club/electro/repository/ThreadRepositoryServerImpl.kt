@@ -1,5 +1,6 @@
 package club.electro.repository
 
+import androidx.work.*
 import club.electro.R
 import club.electro.adapter.PostTextPreparator
 import club.electro.di.DependencyContainer
@@ -9,6 +10,7 @@ import club.electro.entity.toDto
 import club.electro.entity.toEntity
 import java.io.IOException
 import club.electro.error.*
+import club.electro.workers.SavePostWorker
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -22,7 +24,7 @@ class ThreadRepositoryServerImpl(
     private val resources = diContainer.context.resources
     private val apiService = diContainer.apiService
     private val appAuth = diContainer.appAuth
-
+    private val postRepository = diContainer.postRepository
 
 //    override var data: Flow<List<Post>> = dao.flowThreadByPublshedDESC(threadType, threadId).map(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
 
@@ -68,6 +70,15 @@ class ThreadRepositoryServerImpl(
                 val first = currentMessages.first()
                 val last = currentMessages.last()
 
+                // TODO перенести в пагинатор. Период для удаления сообщений брать из запроса, а не ответа.
+//                val last = body.data.messages.first()
+//                val first = body.data.messages.last()
+//                val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
+//                val date1 = java.util.Date(first.published * 1000)
+//                val date2 = java.util.Date(last.published * 1000)
+//                println("first: " + sdf.format(date1).toString())
+//                println("last: " + sdf.format(date2).toString())
+
                 dao.clearAndInsert(body.data.messages.toEntity(), threadType, threadId, first.published, last.published)
             }
         } catch (e: IOException) {
@@ -78,52 +89,36 @@ class ThreadRepositoryServerImpl(
     }
 
     override suspend fun savePost(post: Post) {
-        try {
-            val params = HashMap<String?, String?>()
-            params["access_token"] = resources.getString(R.string.electro_club_access_token)
-            params["user_token"] = appAuth.myToken()
-            params["method"] = "savePost"
-            params["thread_type"] = threadType.toString()
-            params["thread_id"] = threadId.toString()
-            params["post_id"] = post.id.toString()
-            params["post_content"] = post.content
-
-            val response = apiService.savePost(params)
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
-            }
-
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            //dao.insert(PostEntity.fromDto(body))
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
+        val newPost = post.copy(
+            threadId = threadId,
+            threadType = threadType,
+        )
+        postRepository.savePost(newPost)
     }
 
     override suspend fun removePost(post: Post) {
-        try {
-            val params = HashMap<String?, String?>()
-            params["access_token"] = resources.getString(R.string.electro_club_access_token)
-            params["user_token"] = appAuth.myToken()
-            params["method"] = "removePost"
-            params["thread_type"] = threadType.toString()
-            params["thread_id"] = threadId.toString()
-            params["post_id"] = post.id.toString()
-
-            val response = apiService.removePost(params)
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
-            }
-
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            //dao.insert(PostEntity.fromDto(body))
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
+        postRepository.removePost(post)
+//        try {
+//            val params = HashMap<String?, String?>()
+//            params["access_token"] = resources.getString(R.string.electro_club_access_token)
+//            params["user_token"] = appAuth.myToken()
+//            params["method"] = "removePost"
+//            params["thread_type"] = threadType.toString()
+//            params["thread_id"] = threadId.toString()
+//            params["post_id"] = post.id.toString()
+//
+//            val response = apiService.removePost(params)
+//            if (!response.isSuccessful) {
+//                throw ApiError(response.code(), response.message())
+//            }
+//
+//            val body = response.body() ?: throw ApiError(response.code(), response.message())
+//            //dao.insert(PostEntity.fromDto(body))
+//        } catch (e: IOException) {
+//            throw NetworkError
+//        } catch (e: Exception) {
+//            throw UnknownError
+//        }
     }
 
     override suspend fun checkForUpdates()  {

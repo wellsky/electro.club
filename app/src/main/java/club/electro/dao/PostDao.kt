@@ -1,6 +1,7 @@
 package club.electro.dao
 
 import androidx.room.*
+import club.electro.dto.Post
 import club.electro.entity.PostEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -15,8 +16,11 @@ interface PostDao {
     @Query("SELECT * FROM PostEntity WHERE id = :id")
     suspend fun getPostById(id: Long): PostEntity
 
+    @Query("SELECT * FROM PostEntity WHERE localId = :id")
+    suspend fun getPostByLocalId(id: Long): PostEntity
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(post: PostEntity)
+    suspend fun insert(post: PostEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(posts: List<PostEntity>)
@@ -24,7 +28,7 @@ interface PostDao {
     @Query("DELETE FROM PostEntity")
     suspend fun clearAll()
 
-    @Query("DELETE FROM PostEntity WHERE threadType = :threadType AND threadId = :threadId AND published >= :from AND published <= :to")
+    @Query("DELETE FROM PostEntity WHERE (status = ${club.electro.dto.Post.STATUS_PUBLISHED} OR status = ${club.electro.dto.Post.STATUS_REMOVING_LOCAL}) AND threadType = :threadType AND threadId = :threadId AND published >= :from AND published <= :to")
     suspend fun clearThreadPeriod(threadType: Byte, threadId: Long, from: Long, to: Long)
 
     @Transaction
