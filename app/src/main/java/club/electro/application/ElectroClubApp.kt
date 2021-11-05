@@ -15,7 +15,7 @@ class ElectroClubApp: Application() {
 
     override fun onCreate() {
         super.onCreate()
-        diContainer = DependencyContainer(this)
+        diContainer = DependencyContainer.initContainer(this)
 
         val prefs = getSharedPreferences("auth", Context.MODE_PRIVATE)
         println("Shared prefs auth:")

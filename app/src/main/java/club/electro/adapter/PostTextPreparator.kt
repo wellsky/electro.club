@@ -1,22 +1,21 @@
 package club.electro.adapter
 
-import club.electro.entity.PostEntity
+import club.electro.di.DependencyContainer
+import club.electro.repository.PostRepository
 import club.electro.repository.ThreadRepository
+import kotlinx.coroutines.runBlocking
 
-class PostTextPreparator(val source: String) {
+class PostTextPreparator(source: String) {
     var text = source
-    lateinit var repository: ThreadRepository
+
+    val diContainer = DependencyContainer.getInstance()
+    val repository: PostRepository = diContainer.postRepository
 
     fun get(): String {
         return text
     }
 
-    fun setPostRepository(repo: ThreadRepository): PostTextPreparator {
-        repository = repo
-        return this
-    }
-
-    fun prepareAll(): PostTextPreparator {
+    suspend fun prepareAll(): PostTextPreparator {
         prepareQuotes()
         prepareEmojies()
         prepareImagesOnNewLine()
@@ -37,6 +36,15 @@ class PostTextPreparator(val source: String) {
         return this
     }
 
+    fun preparePlainText(): PostTextPreparator {
+        var newText = text
+        newText = newText.replace("<br>", "\n")
+        newText = newText.replace("<br />", "\n")
+
+        text = newText
+        return this
+    }
+
     fun prepareRelativeUrls(): PostTextPreparator {
         var newText = text
         newText = newText.replace("src=\"/data/", "src=\"https://electro.club/data/")
@@ -48,14 +56,16 @@ class PostTextPreparator(val source: String) {
     /**
      * Заменяет тэги [quote messge=<id>]<text>[/quote] на цитату
      */
-    fun prepareQuotes(): PostTextPreparator {
+    suspend fun prepareQuotes(): PostTextPreparator {
         val pattern = """\[quote message=(\d+?)\](.*?)\[\/quote\]"""
 
         val result = Regex(pattern).replace(text) {
-            val (quotedMessageId, quoteText) = it.destructured
-            val sourceMessage = repository.getLocalPostById(quotedMessageId.toLong())
-            val author = ("<strong>" + sourceMessage?.authorName ?: "?") + "</strong>: "
-            "<blockquote>" +author + quoteText + "</blockquote>"
+            runBlocking {
+                val (quotedMessageId, quoteText) = it.destructured
+                val sourceMessage = repository.getLocalPostById(quotedMessageId.toLong())
+                val author = ("<strong>" + sourceMessage?.authorName ?: "?") + "</strong>: "
+                "<blockquote>" + author + quoteText + "</blockquote>"
+            }
         }
 
 //        val lamda: (it: MatchResult) -> CharSequence = {

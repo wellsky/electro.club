@@ -19,7 +19,10 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
 
     val data = repository.data.asLiveData(Dispatchers.Default)
 
-    val editorPost = MutableLiveData(emptyPost)
+
+    val editorPost = MutableLiveData(emptyPost) // Пост, который в данный момент в текстовом редакторе
+    val editedPost = MutableLiveData(emptyPost) // Исходный пост, который в данный момент редактируется
+    val answerToPost = MutableLiveData(emptyPost) // Пост, на который в данный момент пишется ответ
 
     fun loadPosts() = viewModelScope.launch {
         try {
@@ -48,6 +51,23 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
                 }
             }
         }
+        editedPost.value = emptyPost
+        editorPost.value = emptyPost
+    }
+
+    fun removePost(post: Post) {
+        viewModelScope.launch {
+            repository.removePost(post)
+        }
+    }
+
+    fun startEditPost(post: Post) {
+        editedPost.value = post
+        editorPost.value = post
+    }
+
+    fun cancelEditPost() {
+        editedPost.value = emptyPost
         editorPost.value = emptyPost
     }
 

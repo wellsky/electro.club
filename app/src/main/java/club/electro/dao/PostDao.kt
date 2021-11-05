@@ -13,7 +13,7 @@ interface PostDao {
     suspend fun getAllList(threadType: Byte, threadId: Long): List<PostEntity>
 
     @Query("SELECT * FROM PostEntity WHERE id = :id")
-    fun getPostById(id: Long): PostEntity
+    suspend fun getPostById(id: Long): PostEntity
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(post: PostEntity)

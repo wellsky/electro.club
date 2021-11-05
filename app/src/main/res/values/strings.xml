@@ -121,4 +121,7 @@
     <string name="start_chat">START CHAT</string>
     <string name="profile_messages">Messages</string>
     <string name="profile_rating">Rating</string>
+    <string name="post_menu_answer">Answer</string>
+    <string name="post_menu_edit">Edit</string>
+    <string name="post_menu_remove">Remove</string>
 </resources>

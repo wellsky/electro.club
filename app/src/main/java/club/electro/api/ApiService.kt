@@ -60,6 +60,10 @@ interface ApiService {
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
+    suspend fun removePost(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<Unit>>
+
+    @FormUrlEncoded
+    @POST(BASE_SERVER_URL)
     suspend fun setPushToken(@FieldMap params: HashMap<String?, String?>): Response<Unit>
 
     @FormUrlEncoded

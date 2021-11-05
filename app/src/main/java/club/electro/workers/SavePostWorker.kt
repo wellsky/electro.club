@@ -15,7 +15,7 @@ class SavePostWorker(
     }
 
     override suspend fun doWork(): Result {
-        val diContainer: DependencyContainer = DependencyContainer(applicationContext)
+        val diContainer: DependencyContainer = DependencyContainer.getInstance()
 
         val id = inputData.getLong(postKey, 0L)
         if (id == 0L) {

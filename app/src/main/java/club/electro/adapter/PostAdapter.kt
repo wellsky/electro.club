@@ -14,6 +14,7 @@ import android.text.util.Linkify
 import android.text.util.Linkify.ALL
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.text.HtmlCompat
@@ -31,11 +32,18 @@ import club.electro.ui.thread.ThreadFragment.Companion.threadName
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import com.bumptech.glide.Glide
 import club.electro.utils.trimWhiteSpaces
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.logging.Level.ALL
 
 
 interface PostInteractionListener {
-    fun onAvatarClick(post: Post) {}
+    fun onAnswerClicked(post: Post) {}
+    fun onEditClicked(post: Post) {}
+    fun onRemoveClicked(post: Post) {}
+    fun onAvatarClicked(post: Post) {}
 }
 
 class PostAdapter(
@@ -60,6 +68,8 @@ class PostViewHolder(
     fun bind(post: Post) {
         binding.apply {
             //val sdf = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            //println("Inflating post: " + post.id)
+
             val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
             val date = java.util.Date(post.published * 1000)
 
@@ -67,7 +77,7 @@ class PostViewHolder(
             published.text = sdf.format(date).toString()
 
             authorAvatar.setOnClickListener {
-                onInteractionListener.onAvatarClick(post)
+                onInteractionListener.onAvatarClicked(post)
             }
 
             if (!post.authorAvatar.isEmpty()) {
@@ -80,14 +90,49 @@ class PostViewHolder(
                     .into(authorAvatar)
             }
 
+            menu.setOnClickListener { it ->
+                PopupMenu(it.context, it).apply {
+                    inflate(R.menu.post_options)
+                    this.getMenu().findItem(R.id.menu_edit).setVisible(post.canEdit)
+                    this.getMenu().findItem(R.id.menu_remove).setVisible(post.canRemove)
+
+                    setOnMenuItemClickListener { menuItem ->
+                        when (menuItem.itemId) {
+                            R.id.menu_answer -> {
+                                onInteractionListener.onAnswerClicked(post)
+                                true
+                            }
+                            R.id.menu_edit -> {
+                                onInteractionListener.onEditClicked(post)
+                                true
+                            }
+                            R.id.menu_remove -> {
+                                onInteractionListener.onRemoveClicked(post)
+                                true
+                            }
+
+                            else -> false
+                        }
+                    }
+                }.show()
+            }
+
             val resources: Resources = this.root.resources
+
+
+            val preparedContent = post.preparedContent
             val imageGetter = ImageGetter(resources, content)
 
             //the string to add links to
-            val htmlString = post.content
+            //val htmlString = post.content
 
             //Initial span from HtmlCompat will link anchor tags
-            val htmlSpan = HtmlCompat.fromHtml(htmlString, HtmlCompat.FROM_HTML_MODE_LEGACY, imageGetter, null) as Spannable
+            val htmlSpan = HtmlCompat.fromHtml(
+                preparedContent,
+                HtmlCompat.FROM_HTML_MODE_LEGACY,
+                imageGetter,
+                null
+            ) as Spannable
 
             //save anchor links for later
             val anchorTagSpans = htmlSpan.getSpans(0, htmlSpan.length, URLSpan::class.java)
@@ -97,13 +142,18 @@ class PostViewHolder(
 
             //Linkify will now make urls clickable but overwrite our anchor links
             Linkify.addLinks(content, Linkify.ALL)
-            content.movementMethod = LinkMovementMethod.getInstance()
+            //content.movementMethod = LinkMovementMethod.getInstance()
             content.linksClickable = true
 
             //we will add back the anchor links here
             val restoreAnchorsSpan = SpannableString(content.text)
             for (span in anchorTagSpans) {
-                restoreAnchorsSpan.setSpan(span, htmlSpan.getSpanStart(span), htmlSpan.getSpanEnd(span), Spanned.SPAN_INCLUSIVE_INCLUSIVE)
+                restoreAnchorsSpan.setSpan(
+                    span,
+                    htmlSpan.getSpanStart(span),
+                    htmlSpan.getSpanEnd(span),
+                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
+                )
             }
 
             val trimmedPostText: CharSequence = trimWhiteSpaces(restoreAnchorsSpan)
@@ -114,8 +164,7 @@ class PostViewHolder(
         }
     }
 
-    private fun replaceQuoteSpans(spannable: Spannable)
-    {
+    private fun replaceQuoteSpans(spannable: Spannable) {
         val quoteSpans: Array<QuoteSpan> =
             spannable.getSpans(0, spannable.length - 1, QuoteSpan::class.java)
 

@@ -17,7 +17,9 @@ data class PostEntity(
     val published: Long,
     val likes: Int = 0,
     val views: Int = 0,
-    //val ownedByMe: Boolean = false,
+
+    val canEdit: Boolean = false,
+    val canRemove: Boolean = false
 ) {
     fun toDto() = Post(
         id = id,
@@ -29,7 +31,9 @@ data class PostEntity(
         content = content,
         published = published,
         likes = likes,
-        views = views
+        views = views,
+        canEdit = canEdit,
+        canRemove = canRemove
     )
 
     companion object {
@@ -44,7 +48,9 @@ data class PostEntity(
                 content = dto.content,
                 published = dto.published,
                 likes = dto.likes,
-                views = dto.views
+                views = dto.views,
+                canEdit = dto.canEdit,
+                canRemove = dto.canRemove
             )
     }
 }

@@ -4,6 +4,7 @@ import club.electro.R
 import club.electro.adapter.PostTextPreparator
 import club.electro.di.DependencyContainer
 import club.electro.dto.Post
+import club.electro.entity.PostEntity
 import club.electro.entity.toDto
 import club.electro.entity.toEntity
 import java.io.IOException
@@ -27,14 +28,14 @@ class ThreadRepositoryServerImpl(
 
     override var data: Flow<List<Post>> = dao.flowThreadByPublshedDESC(threadType, threadId).map {
         it.map {
+            //println("Preparing post " + it.id)
             val post = it.toDto()
 
             val preparedContent: String = PostTextPreparator(post.content)
-                .setPostRepository(this)
                 .prepareAll()
                 .get()
 
-            val preparedPost = post.copy(content = preparedContent)
+            val preparedPost = post.copy(preparedContent = preparedContent)
             preparedPost
         }
     }.flowOn(Dispatchers.Default)
@@ -42,13 +43,6 @@ class ThreadRepositoryServerImpl(
     private var lastUpdateTime: Long = 0
 
     private val updaterJob = startCheckUpdates()
-
-    override fun getLocalPostById(id: Long): Post? {
-        GlobalScope.async {
-            // TODO загрузить пост с сервера и вынести функцию в репозиторий PostRepository
-        }
-        return dao.getPostById(id)?.toDto()
-    }
 
     override suspend fun getThreadPosts() {
         try {
@@ -95,6 +89,30 @@ class ThreadRepositoryServerImpl(
             params["post_content"] = post.content
 
             val response = apiService.savePost(params)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            //dao.insert(PostEntity.fromDto(body))
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun removePost(post: Post) {
+        try {
+            val params = HashMap<String?, String?>()
+            params["access_token"] = resources.getString(R.string.electro_club_access_token)
+            params["user_token"] = appAuth.myToken()
+            params["method"] = "removePost"
+            params["thread_type"] = threadType.toString()
+            params["thread_id"] = threadId.toString()
+            params["post_id"] = post.id.toString()
+
+            val response = apiService.removePost(params)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }

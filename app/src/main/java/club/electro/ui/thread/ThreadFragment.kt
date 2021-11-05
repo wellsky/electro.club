@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import club.electro.adapter.PostAdapter
 import club.electro.adapter.PostInteractionListener
 import club.electro.databinding.FragmentThreadBinding
@@ -12,6 +13,7 @@ import club.electro.dto.Post
 import club.electro.utils.LongArg
 import club.electro.utils.ByteArg
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
@@ -21,6 +23,7 @@ import club.electro.util.StringArg
 import androidx.recyclerview.widget.LinearLayoutManager
 import club.electro.MainViewModel
 import club.electro.R
+import club.electro.adapter.PostTextPreparator
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadName
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
@@ -76,8 +79,34 @@ class ThreadFragment : Fragment() {
         _binding = FragmentThreadBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        //val context1 = requireContext()
+
         val adapter = PostAdapter(object : PostInteractionListener {
-            override fun onAvatarClick(post: Post) {
+            override fun onEditClicked(post: Post) {
+                viewModel.startEditPost(post)
+            }
+
+            override fun onRemoveClicked(post: Post) {
+                val builder = AlertDialog.Builder(requireContext())
+                builder.setMessage("Are you sure you want to Delete?")
+                    .setCancelable(false)
+                    .setPositiveButton("Yes") { dialog, id ->
+                    viewModel.removePost(post)
+                    // Delete selected note from database
+                        //var dbManager = DbManager(this.context!!)
+                        //val selectionArgs = arrayOf(myNote.nodeID.toString())
+                        //dbManager.delete("ID=?", selectionArgs)
+                        //LoadQuery("%")
+                    }
+                    .setNegativeButton("No") { dialog, id ->
+                        // Dismiss the dialog
+                        dialog.dismiss()
+                    }
+                val alert = builder.create()
+                alert.show()
+            }
+
+            override fun onAvatarClicked(post: Post) {
                 findNavController().navigate(
                     R.id.action_threadFragment_to_userProfileFragment,
                     Bundle().apply {
@@ -111,18 +140,26 @@ class ThreadFragment : Fragment() {
             }
         })
 
-
         viewModel.editorPost.observe(viewLifecycleOwner) {
-            /*
-            if (it.id != 0L) {
-                with (binding.content) {
-                    requestFocus()
-                    setText(it.content)
-                }
-                binding.editMessageGroup.visibility = View.VISIBLE
-                binding.editMessageContent.text = it.content
+            with (binding.editorPostContent) {
+                requestFocus()
+                //setText(HtmlCompat.fromHtml(it.content, HtmlCompat.FROM_HTML_MODE_LEGACY))
+                val editorText = PostTextPreparator(it.content)
+                    .prepareBasicTags()
+                    .prepareEmojies()
+                    .preparePlainText()
+                    .get()
+                setText(editorText)
             }
-            */
+        }
+
+        viewModel.editedPost.observe(viewLifecycleOwner) {
+            if (it.id != 0L) {
+                binding.editedPostGroup.visibility = View.VISIBLE
+                binding.editedPostContent.text = it.content
+            } else {
+                binding.editedPostGroup.visibility = View.GONE
+            }
         }
 
         binding.editorPostSave.setOnClickListener {
@@ -141,6 +178,18 @@ class ThreadFragment : Fragment() {
             }
             //binding.editMessageGroup.visibility = View.GONE
         }
+
+        binding.cancelEdit.setOnClickListener {
+            viewModel.cancelEditPost()
+            with (binding.editorPostContent) {
+                setText("")
+                clearFocus()
+                AndroidUtils.hideKeyboard(it)
+            }
+        }
+
+
+
 
 //        binding.cancelEdition.setOnClickListener {
 //            with(binding.content) {
