@@ -35,6 +35,10 @@ val retrofit = Retrofit.Builder()
 
 interface ApiService {
     @FormUrlEncoded
+    @POST(BASE_SERVER_URL)
+    suspend fun getFeedPosts(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiFeedPostsData>>
+
+    @FormUrlEncoded
     @POST(UPDATES_SERVER_URL)
     suspend fun getSubscriptions(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiSubscriptionsData>>
 
@@ -91,6 +95,10 @@ data class ApiSubscriptionsData (
 
 data class ApiPostsData (
     val messages: List<Post>
+)
+
+data class ApiFeedPostsData (
+    val messages: List<FeedPost>
 )
 
 data class ApiAccountData (

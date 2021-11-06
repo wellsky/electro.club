@@ -40,32 +40,32 @@ class FeedPostViewHolder(
             val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
             val date = java.util.Date(feedPost.published * 1000)
 
-            feedPostAuthor.text = feedPost.authorName
-            feedPostText.text = feedPost.text
+            channelName.text = feedPost.channelName
+            content.text = feedPost.content
             published.text = sdf.format(date).toString()
 
-            if (!feedPost.authorAvatar.isEmpty()) {
-                Glide.with(feedPostAvatar.context)
-                    .load(feedPost.authorAvatar)
+            if (!feedPost.channelAvatar.isEmpty()) {
+                Glide.with(channelAvatar.context)
+                    .load(feedPost.channelAvatar)
                     .circleCrop()
                     .timeout(5_000)
                     .placeholder(R.drawable.ic_loading_100dp)
                     .error(R.drawable.ic_error_100dp)
-                    .into(feedPostAvatar)
+                    .into(channelAvatar)
             }
 
             if (!feedPost.image.isEmpty()) {
-                Glide.with(feedPostImage.context)
+                Glide.with(titleImage.context)
                     .load(feedPost.image)
                     .timeout(5_000)
                     .placeholder(R.drawable.ic_loading_100dp)
                     .error(R.drawable.ic_error_100dp)
-                    .into(feedPostImage)
+                    .into(titleImage)
             }
 
 
 
-            feedPostImage.setOnClickListener {
+            titleImage.setOnClickListener {
                 //onInteractionListener.onLike(post, like.isChecked) // В этой строке isChecked уже изменился после нажатия!!
             }
         }

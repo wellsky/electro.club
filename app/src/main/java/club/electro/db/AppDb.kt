@@ -5,17 +5,15 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import club.electro.dao.AreaDao
-import club.electro.dao.MapMarkerDao
-import club.electro.dao.PostDao
-import club.electro.dao.UserDao
+import club.electro.dao.*
 import club.electro.entity.*
 
 
-@Database(entities = [AreaEntity::class, PostEntity::class, MapMarkerEntity::class, UserEntity::class], version = 5, exportSchema = false)
+@Database(entities = [AreaEntity::class, PostEntity::class, MapMarkerEntity::class, UserEntity::class, FeedPostEntity::class], version = 34, exportSchema = false)
 @TypeConverters(DBTypeConverters::class)
 abstract class AppDb : RoomDatabase() {
     abstract fun postDao(): PostDao
+    abstract fun feedPostDao(): FeedPostDao
     abstract fun areaDao(): AreaDao
     abstract fun mapMarkerDao(): MapMarkerDao
     abstract fun userDao(): UserDao

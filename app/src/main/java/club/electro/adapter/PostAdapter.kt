@@ -4,6 +4,7 @@ import ImageGetter
 import QuoteSpanClass
 import android.content.res.Resources
 import android.graphics.Color
+import android.graphics.Rect
 import android.os.Bundle
 import android.provider.Settings.Global.getString
 import android.text.Spannable
@@ -15,6 +16,7 @@ import android.text.style.URLSpan
 import android.text.util.Linkify
 import android.text.util.Linkify.ALL
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.core.content.ContextCompat
@@ -141,6 +143,18 @@ class PostViewHolder(
 
 
             val preparedContent = post.preparedContent
+
+
+            //val text = "l o n g t e x t l o n g t e x t l o n g t e x l o n g t e x t l o n g t e x t l o n g t e x  l o n g t e x t l o n g t e x t l o n g t e x "
+            //content.setText(text)
+            //content.measure(0, 0);       //must call measure!
+
+            //val imagesWidth = content.measuredWidth
+            //content.getWidth()
+//            val parent = content.getParent() as View
+//            val imagesWidth = parent.getWidth()
+
+
             val imageGetter = ImageGetter(resources, content)
 
             //the string to add links to

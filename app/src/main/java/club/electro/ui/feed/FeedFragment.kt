@@ -46,6 +46,8 @@ class FeedFragment : Fragment() {
             adapter.submitList(posts)
         })
 
+        feedViewModel.getFeedPosts()
+
 //        val textView: TextView = binding.textHome
 //        feedViewModel.text.observe(viewLifecycleOwner, Observer {
 //            textView.text = it

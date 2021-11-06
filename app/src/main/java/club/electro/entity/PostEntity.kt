@@ -5,7 +5,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import club.electro.dto.Post
 
-@Entity
+@Entity(indices = [Index(value = ["id"], unique = true)])
 data class PostEntity(
     @PrimaryKey(autoGenerate = true)
     val localId: Long,

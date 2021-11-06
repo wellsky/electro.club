@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 // Class to download Images which extends [Html.ImageGetter]
 class ImageGetter(
     private val res: Resources,
-    private val htmlTextView: TextView
+    private val htmlTextView: TextView,
 ) : Html.ImageGetter {
 
     // Function needs to overridden when extending [Html.ImageGetter] ,
@@ -34,7 +34,7 @@ class ImageGetter(
 
                 // To make sure Images don't go out of screen , Setting width less
                 // than screen width, You can change image size if you want
-                val width = getScreenWidth() - 100
+                val width = getScreenWidth() - 130
 
                 // Images may stretch out if you will only resize width,
                 // hence resize height to according to aspect ratio

@@ -98,27 +98,6 @@ class ThreadRepositoryServerImpl(
 
     override suspend fun removePost(post: Post) {
         postRepository.removePost(post)
-//        try {
-//            val params = HashMap<String?, String?>()
-//            params["access_token"] = resources.getString(R.string.electro_club_access_token)
-//            params["user_token"] = appAuth.myToken()
-//            params["method"] = "removePost"
-//            params["thread_type"] = threadType.toString()
-//            params["thread_id"] = threadId.toString()
-//            params["post_id"] = post.id.toString()
-//
-//            val response = apiService.removePost(params)
-//            if (!response.isSuccessful) {
-//                throw ApiError(response.code(), response.message())
-//            }
-//
-//            val body = response.body() ?: throw ApiError(response.code(), response.message())
-//            //dao.insert(PostEntity.fromDto(body))
-//        } catch (e: IOException) {
-//            throw NetworkError
-//        } catch (e: Exception) {
-//            throw UnknownError
-//        }
     }
 
     override suspend fun checkForUpdates()  {
