@@ -1,21 +1,31 @@
 package club.electro.adapter
 
+import androidx.core.text.HtmlCompat
+import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import club.electro.di.DependencyContainer
+import club.electro.dto.FeedPost
+import club.electro.dto.Post
 import club.electro.repository.PostRepository
 import club.electro.repository.ThreadRepository
 import kotlinx.coroutines.runBlocking
 
-class PostTextPreparator(source: String) {
+class PostTextPreparator(source: String, val answerTo: Long? = null) {
+    val ANSWERTO_MAX_TEXT_LENGTH = 128
+
     var text = source
 
     val diContainer = DependencyContainer.getInstance()
     val repository: PostRepository = diContainer.postRepository
+
+    constructor(post: Post): this(post.content, post.answerTo)
+    constructor(post: FeedPost): this(post.content)
 
     fun get(): String {
         return text
     }
 
     suspend fun prepareAll(): PostTextPreparator {
+        prepareAnswerTo()
         prepareQuotes()
         prepareEmojies()
         prepareImagesOnNewLine()
@@ -26,6 +36,7 @@ class PostTextPreparator(source: String) {
         return this
     }
 
+
     fun prepareBasicTags(): PostTextPreparator {
         var newText = text
         newText = newText.replace("<br /></p>", "</p>")
@@ -33,6 +44,27 @@ class PostTextPreparator(source: String) {
         newText = newText.replace("</p>", "<br>")
 
         text = newText
+        return this
+    }
+
+    suspend fun prepareAnswerTo(): PostTextPreparator {
+        fun shortTextPreview(content: String): String {
+            val noHtmlTags = HtmlCompat.fromHtml(content, FROM_HTML_MODE_LEGACY).toString()
+
+            return if (noHtmlTags.length > ANSWERTO_MAX_TEXT_LENGTH) {
+                noHtmlTags.substring(0, ANSWERTO_MAX_TEXT_LENGTH) + "..."
+            } else {
+                noHtmlTags
+            }
+        }
+
+        answerTo?.let {
+            val sourceMessage = repository.getLocalPostById(it)
+            val answerText = sourceMessage?.let {
+                "<blockquote><strong>Ответ " + sourceMessage.authorName + "</strong>: " + shortTextPreview(sourceMessage.content) + "</blockquote>"
+            } ?: "<blockquote><strong>Ответ на неизвестное сообщение</strong></blockquote>"
+            text = answerText + text
+        }
         return this
     }
 

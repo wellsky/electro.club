@@ -82,6 +82,11 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
             params["thread_id"] = entity.threadId.toString()
             params["post_id"] = entity.id.toString()
             params["post_content"] = entity.content
+
+            entity.answerTo?.let {
+                params["answer_to"] = it.toString()
+            }
+
             val response = apiService.savePost(params)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())

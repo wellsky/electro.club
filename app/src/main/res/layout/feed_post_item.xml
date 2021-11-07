@@ -118,7 +118,7 @@
                 tools:layout_editor_absoluteY="230dp" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/share"
+                android:id="@+id/views"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
@@ -127,27 +127,23 @@
                 android:layout_marginStart="@dimen/common_spacing"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/share"
-                app:icon="@drawable/ic_baseline_share_24"
+                tools:text="@sample/posts.json/data/viewsCount"
                 app:layout_constraintTop_toBottomOf="@+id/bottomBarrier"
-                style="@style/ShareButton"
+                style="@style/ViewsIcon"
                 />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/views"
+                android:id="@+id/comments"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/common_spacing"
                 android:layout_marginRight="@dimen/common_spacing"
                 android:layout_marginEnd="@dimen/common_spacing"
-
                 tools:text="@sample/posts.json/data/viewsCount"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/share"
-
-                app:srcCompat="@drawable/ic_baseline_visibility_24"
+                app:layout_constraintTop_toTopOf="@+id/views"
                 android:contentDescription="@string/views"
-
-                style="@style/ViewsIcon"
+                style="@style/CommentsIcon"
                 />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

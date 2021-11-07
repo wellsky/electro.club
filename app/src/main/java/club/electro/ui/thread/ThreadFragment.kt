@@ -86,6 +86,10 @@ class ThreadFragment : Fragment() {
                 viewModel.startEditPost(post)
             }
 
+            override fun onAnswerClicked(post: Post) {
+                viewModel.startAnswerPost(post)
+            }
+
             override fun onRemoveClicked(post: Post) {
                 val builder = AlertDialog.Builder(requireContext())
                 builder.setMessage("Are you sure you want to Delete?")
@@ -162,6 +166,15 @@ class ThreadFragment : Fragment() {
             }
         }
 
+        viewModel.answerToPost.observe(viewLifecycleOwner) {
+            if (it.id != 0L) {
+                binding.answerPostGroup.visibility = View.VISIBLE
+                binding.answerToContent.text = it.content
+            } else {
+                binding.answerPostGroup.visibility = View.GONE
+            }
+        }
+
         binding.editorPostSave.setOnClickListener {
             with (binding.editorPostContent) {
                 if (text.isNullOrBlank()) {
@@ -188,23 +201,9 @@ class ThreadFragment : Fragment() {
             }
         }
 
-
-
-
-//        binding.cancelEdition.setOnClickListener {
-//            with(binding.content) {
-//                viewModel.cancelEdit()
-//                setText("")
-//                clearFocus()
-//                AndroidUtils.hideKeyboard(it)
-//            }
-//            binding.editMessageGroup.visibility = View.GONE
-//        }
-//
-//        binding.postEditorButton.setOnClickListener {
-//            editPostLauncher.launch(null)
-//        }
-
+        binding.cancelAnswer.setOnClickListener {
+            viewModel.cancelAnswerPost()
+        }
 
         return root
     }

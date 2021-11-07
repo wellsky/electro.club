@@ -44,6 +44,9 @@ class FeedPostViewHolder(
             content.text = feedPost.content
             published.text = sdf.format(date).toString()
 
+            views.setText(feedPost.views.toString())
+            comments.setText(feedPost.comments.toString())
+
             if (!feedPost.channelAvatar.isEmpty()) {
                 Glide.with(channelAvatar.context)
                     .load(feedPost.channelAvatar)

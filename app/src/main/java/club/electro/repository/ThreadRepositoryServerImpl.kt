@@ -33,7 +33,7 @@ class ThreadRepositoryServerImpl(
             //println("Preparing post " + it.id)
             val post = it.toDto()
 
-            val preparedContent: String = PostTextPreparator(post.content)
+            val preparedContent: String = PostTextPreparator(post)
                 .prepareAll()
                 .get()
 

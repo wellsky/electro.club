@@ -71,6 +71,16 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
         editorPost.value = emptyPost
     }
 
+    fun startAnswerPost(post: Post) {
+        answerToPost.value = post
+        editorPost.value = editorPost.value?.copy(answerTo = post.id)
+    }
+
+    fun cancelAnswerPost() {
+        answerToPost.value = emptyPost
+        editorPost.value = editorPost.value?.copy(answerTo = null)
+    }
+
     fun stop() {
         repository.stopCheckUpdates()
     }

@@ -18,6 +18,7 @@ data class PostEntity(
     val authorAvatar: String,
     val content: String,
     val published: Long,
+    val answerTo: Long?,
     val likes: Int = 0,
     val views: Int = 0,
 
@@ -34,6 +35,7 @@ data class PostEntity(
         authorAvatar = authorAvatar,
         content = content,
         published = published,
+        answerTo = answerTo,
         likes = likes,
         views = views,
         canEdit = canEdit,
@@ -53,6 +55,7 @@ data class PostEntity(
                 authorAvatar = dto.authorAvatar,
                 content = dto.content,
                 published = dto.published,
+                answerTo = dto.answerTo,
                 likes = dto.likes,
                 views = dto.views,
                 canEdit = dto.canEdit,

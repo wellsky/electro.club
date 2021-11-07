@@ -11,6 +11,7 @@ data class Post (
     val content: String,
     val preparedContent: String = content,
     val published: Long,
+    val answerTo: Long? = null,
     val likes: Int = 0,
     val views: Int = 0,
 

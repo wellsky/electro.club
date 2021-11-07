@@ -35,6 +35,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         android:background="@color/white"
+        android:paddingBottom="1dp"
         >
 
         <View
@@ -47,13 +48,15 @@
 
         <ImageView
             android:id="@+id/editedImage"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:contentDescription="@string/avatar_description"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/editorPostContent"
-            android:layout_margin="6dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="16dp"
             android:src="@drawable/ic_baseline_edit_24"
             />
 
@@ -62,7 +65,7 @@
             android:layout_width="0dp"
             android:layout_height="20dp"
             android:text="Edited message"
-            android:layout_marginLeft="16dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginRight="16dp"
             android:ellipsize="end"
             android:singleLine="true"
@@ -79,7 +82,8 @@
             android:layout_height="24dp"
             android:layout_margin="16dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@id/editedImage"
+            app:layout_constraintBottom_toBottomOf="@id/editedImage"
             app:layout_constraintLeft_toRightOf="@id/editedPostContent"
             app:srcCompat="@drawable/ic_baseline_cancel_24"
             />
@@ -92,19 +96,67 @@
             app:constraint_referenced_ids="editedImage, editedPostContent, cancelEdit"
             />
 
+        <ImageView
+            android:id="@+id/answerToImage"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/avatar_description"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/editorPostContent"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="16dp"
+            android:src="@drawable/ic_baseline_reply_24"
+            />
+
+        <TextView
+            android:id="@+id/answerToContent"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            android:text="Answer to message"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="16dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            app:layout_constraintStart_toEndOf="@id/answerToImage"
+            app:layout_constraintLeft_toRightOf="@id/answerToImage"
+            app:layout_constraintEnd_toStartOf="@id/cancelAnswer"
+            app:layout_constraintTop_toTopOf="@id/answerToImage"
+            app:layout_constraintBottom_toBottomOf="@id/answerToImage"
+            />
+
+        <ImageButton
+            android:id="@+id/cancelAnswer"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_margin="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/answerToImage"
+            app:layout_constraintBottom_toBottomOf="@id/answerToImage"
+            app:layout_constraintLeft_toRightOf="@id/answerToContent"
+            app:srcCompat="@drawable/ic_baseline_cancel_24"
+            />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/answerPostGroup"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            app:constraint_referenced_ids="answerToImage, answerToContent, cancelAnswer"
+            />
+
         <EditText
             android:id="@+id/editorPostContent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@android:color/white"
             android:hint="@string/message_text"
             android:importantForAutofill="no"
             android:inputType="textMultiLine|textCapSentences"
             android:maxLines="6"
             android:padding="@dimen/common_spacing"
-            android:layout_marginTop="1dp"
+            android:background="@null"
             android:textCursorDrawable="@null"
-            app:layout_constraintTop_toBottomOf="@id/editedImage"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/editorPostSave"
             app:layout_constraintStart_toStartOf="parent" />
@@ -123,6 +175,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/editorPostContent"
             app:layout_constraintTop_toTopOf="@+id/editorPostContent"
+
             app:srcCompat="@drawable/ic_baseline_send_24" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 

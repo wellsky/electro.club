@@ -32,8 +32,8 @@
         <item name="iconPadding">0dp</item>
     </style>
 
-    <style name="ShareButton" parent="Widget.AppCompat.CompoundButton.CheckBox">
-        <item name="icon">@drawable/ic_baseline_share_24</item>
+    <style name="CommentsIcon" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="icon">@drawable/ic_baseline_mode_comment_24</item>
         <item name="iconTint">?attr/colorControlNormal</item>
         <item name="android:minWidth">@dimen/icon_button_min_size</item>
         <item name="android:minHeight">@dimen/icon_button_min_size</item>
