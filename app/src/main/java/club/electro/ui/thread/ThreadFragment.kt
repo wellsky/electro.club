@@ -144,25 +144,37 @@ class ThreadFragment : Fragment() {
             }
         })
 
-        viewModel.editorPost.observe(viewLifecycleOwner) {
-            with (binding.editorPostContent) {
-                requestFocus()
-                //setText(HtmlCompat.fromHtml(it.content, HtmlCompat.FROM_HTML_MODE_LEGACY))
-                val editorText = PostTextPreparator(it.content)
-                    .prepareBasicTags()
-                    .prepareEmojies()
-                    .preparePlainText()
-                    .get()
-                setText(editorText)
-            }
-        }
+//        viewModel.editorPost.observe(viewLifecycleOwner) {
+//            with (binding.editorPostContent) {
+//                requestFocus()
+//                //setText(HtmlCompat.fromHtml(it.content, HtmlCompat.FROM_HTML_MODE_LEGACY))
+//                val editorText = PostTextPreparator(it.content)
+//                    .prepareBasicTags()
+//                    .prepareEmojies()
+//                    .preparePlainText()
+//                    .get()
+//                setText(editorText)
+//            }
+//        }
 
         viewModel.editedPost.observe(viewLifecycleOwner) {
             if (it.id != 0L) {
                 binding.editedPostGroup.visibility = View.VISIBLE
                 binding.editedPostContent.text = it.content
+
+                with (binding.editorPostContent) {
+                    requestFocus()
+                    //setText(HtmlCompat.fromHtml(it.content, HtmlCompat.FROM_HTML_MODE_LEGACY))
+                    val editorText = PostTextPreparator(it.content)
+                        .prepareBasicTags()
+                        .prepareEmojies()
+                        .preparePlainText()
+                        .get()
+                    setText(editorText)
+                }
             } else {
                 binding.editedPostGroup.visibility = View.GONE
+                binding.editorPostContent.setText("")
             }
         }
 

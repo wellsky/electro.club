@@ -54,9 +54,9 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/editorPostContent"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginLeft="12dp"
             android:src="@drawable/ic_baseline_edit_24"
             />
 
@@ -104,9 +104,9 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/editorPostContent"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginLeft="12dp"
             android:src="@drawable/ic_baseline_reply_24"
             />
 
@@ -154,7 +154,7 @@
             android:importantForAutofill="no"
             android:inputType="textMultiLine|textCapSentences"
             android:maxLines="6"
-            android:padding="@dimen/common_spacing"
+            android:padding="12dp"
             android:background="@null"
             android:textCursorDrawable="@null"
             app:layout_constraintBottom_toBottomOf="parent"

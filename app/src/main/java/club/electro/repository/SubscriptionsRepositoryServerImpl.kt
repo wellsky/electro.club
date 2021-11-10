@@ -24,23 +24,23 @@ class SubscriptionsRepositoryServerImpl(diContainer: DependencyContainer) : Subs
     override val data: Flow<List<SubscriptionArea>> = dao.getAll().map(List<AreaEntity>::toDto).flowOn(Dispatchers.Default)
 
     override suspend fun getAll() {
-        try {
-            val params = HashMap<String?, String?>()
-            params["access_token"] = resources.getString(R.string.electro_club_access_token)
-            params["user_token"] = appAuth.myToken()
-            params["method"] = "whatsUp"
-            params["last_event_time"] = "0"
-            val response = apiService.getSubscriptions(params)
+        appAuth.myToken()?.let { myToken ->
+            try {
+                val response = apiService.getSubscriptions(
+                    access_token = resources.getString(R.string.electro_club_access_token),
+                    user_token = myToken
+                )
 
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
+                if (!response.isSuccessful) {
+                    throw ApiError(response.code(), response.message())
+                }
+                val body = response.body() ?: throw ApiError(response.code(), response.message())
+                dao.insert(body.data.items.toEntity())
+            } catch (e: IOException) {
+                throw NetworkError
+            } catch (e: Exception) {
+                throw UnknownError
             }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(body.data.items.toEntity())
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
         }
     }
 }

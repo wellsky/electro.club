@@ -42,8 +42,11 @@ class FeedRepositoryServerImpl(diContainer: DependencyContainer): FeedRepository
             //println("Loading posts from server")
             val params = HashMap<String?, String?>()
             params["access_token"] = resources.getString(R.string.electro_club_access_token)
-            params["user_token"] = appAuth.myToken()
             params["method"] = "getFeedPosts"
+
+            appAuth.myToken()?.let {
+                params["user_token"] = it
+            }
 
             val response = apiService.getFeedPosts(params)
             if (!response.isSuccessful) {

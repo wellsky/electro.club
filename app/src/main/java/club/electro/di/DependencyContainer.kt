@@ -11,6 +11,7 @@ import club.electro.repository.PostRepository
 import club.electro.repository.PostRepositoryServerImpl
 
 class DependencyContainer private constructor(val context: Context) {
+    val resources = context.resources
     val appDb = AppDb.getInstance(context = context)
     val apiService: ApiService = Api.service
     val appAuth: AppAuth = AppAuth.initApp(context, this)

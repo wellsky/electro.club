@@ -81,7 +81,7 @@ class FCMService : FirebaseMessagingService() {
         val action = message.data.get(action)
 
         when (action) {
-            ACTION_PERSONAL_MESSAGE, ACTION_THREAD_POST -> {
+            ACTION_PERSONAL_MESSAGE, ACTION_THREAD_POST, ACTION_ANSWER, ACTION_MENTION, ACTION_QUOTE -> {
                 val data = gson.fromJson(message.data[content], PostNotification::class.java)
 
                 // https://stackoverflow.com/questions/26608627/how-to-open-fragment-page-when-pressed-a-notification-in-android
@@ -96,11 +96,14 @@ class FCMService : FirebaseMessagingService() {
                     })
                     .createPendingIntent()
 
+                val groupKey = "THREAD-" + data.threadType + "-" + data.threadId
+
                 val notificationBuilder = NotificationCompat.Builder(this, channelId)
                     .setSmallIcon(R.drawable.electro_club_icon_grey_64)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setContentIntent(resultPendingIntent)
                     .setAutoCancel(true)
+                    .setGroup(groupKey)
 
                 if (action.equals(ACTION_PERSONAL_MESSAGE)) {
                     notificationBuilder

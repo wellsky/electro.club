@@ -9,7 +9,7 @@ import club.electro.dao.*
 import club.electro.entity.*
 
 
-@Database(entities = [AreaEntity::class, PostEntity::class, MapMarkerEntity::class, UserEntity::class, FeedPostEntity::class], version = 35, exportSchema = false)
+@Database(entities = [AreaEntity::class, PostEntity::class, MapMarkerEntity::class, UserEntity::class, FeedPostEntity::class], version = 38, exportSchema = false)
 @TypeConverters(DBTypeConverters::class)
 abstract class AppDb : RoomDatabase() {
     abstract fun postDao(): PostDao

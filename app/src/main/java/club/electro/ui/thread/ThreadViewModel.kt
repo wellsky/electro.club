@@ -52,6 +52,7 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
             }
         }
         editedPost.value = emptyPost
+        answerToPost.value = emptyPost
         editorPost.value = emptyPost
     }
 

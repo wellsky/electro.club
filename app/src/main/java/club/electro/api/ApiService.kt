@@ -3,8 +3,10 @@ package club.electro.api
 import club.electro.BuildConfig
 import club.electro.auth.AppAuth
 import club.electro.dao.AreaDao
+import club.electro.di.DependencyContainer
 import club.electro.dto.*
 import com.google.gson.annotations.SerializedName
+import okhttp3.Interceptor
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
@@ -23,6 +25,23 @@ val logging = HttpLoggingInterceptor().apply {
     }
 }
 
+
+//val okhttp = OkHttpClient.Builder()
+//    .addInterceptor(logging)
+//    .addInterceptor { chain ->
+//        val diContainer = DependencyContainer.getInstance()
+//        val appAuth = diContainer.appAuth
+//        appAuth.authStateFlow.value.token?.let { token ->
+//            val newRequest = chain.request().newBuilder()
+//                .addHeader("Authorization", token)
+//                .build()
+//            return@addInterceptor chain.proceed(newRequest)
+//        }
+//        chain.proceed(chain.request())
+//    }
+//    .build()
+
+
 val okhttp = OkHttpClient.Builder()
         .addInterceptor(logging)
         .build()
@@ -38,13 +57,36 @@ interface ApiService {
     @POST(BASE_SERVER_URL)
     suspend fun getFeedPosts(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiFeedPostsData>>
 
+//    @FormUrlEncoded
+//    @POST(UPDATES_SERVER_URL)
+//    suspend fun getSubscriptions(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiSubscriptionsData>>
+
+
+    //TODO перервести остальные запросы на такой формат вместо HashMap
     @FormUrlEncoded
     @POST(UPDATES_SERVER_URL)
-    suspend fun getSubscriptions(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiSubscriptionsData>>
+    suspend fun getSubscriptions(
+        @Field("access_token") access_token: String,
+        @Field("user_token") user_token: String,
+        @Field("method") method: String = "whatsUp",
+        @Field("last_event_time") last_event_time: Long = 0
+    ): Response<ApiResponse<ApiSubscriptionsData>>
+
+//    @FormUrlEncoded
+//    @POST(BASE_SERVER_URL)
+//    suspend fun getThreadPosts(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiPostsData>>
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
-    suspend fun getThreadPosts(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiPostsData>>
+    suspend fun getThreadPosts(
+        @Field("method") method: String = "getPosts",
+        @Field("access_token") access_token: String,
+        @Field("user_token") user_token: String? = null,
+        @Field("thread_type") threadType: Byte,
+        @Field("thread_id") threadId: Long,
+        @Field("from") from: String? = null,
+        @Field("count") count: Int? = null,
+    ): Response<ApiResponse<ApiPostsData>>
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
@@ -131,6 +173,8 @@ data class ApiSavedPost (
     val message: Post
 )
 
+// TODO от API надо все получать не в CamelCase
+// Еще возможно использовать аннотацию @SerializedName("nickname")
 data class ApiUserProfileData (
     val user_id: Long,
     val nickname: String,
@@ -152,3 +196,22 @@ data class ApiUserProfileData (
         myChat = myChat
     )
 }
+
+
+/**
+Типы запросов:
+https://stackoverflow.com/questions/47392832/retrofit2-use-body-vs-query
+
+Версия с любыми параметрами:
+@FormUrlEncoded
+@POST(UPDATES_SERVER_URL)
+suspend fun getSubscriptions(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiSubscriptionsData>>
+
+Как вызывать:
+val params = HashMap<String?, String?>()
+params["access_token"] = resources.getString(R.string.electro_club_access_token)
+params["user_token"] = appAuth.myToken()
+params["method"] = "whatsUp"
+params["last_event_time"] = "0"
+val response = apiService.getSubscriptions(params)
+ */

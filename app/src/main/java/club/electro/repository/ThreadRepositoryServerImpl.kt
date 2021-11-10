@@ -49,14 +49,21 @@ class ThreadRepositoryServerImpl(
     override suspend fun getThreadPosts() {
         try {
             //println("Loading posts from server")
-            val params = HashMap<String?, String?>()
-            params["access_token"] = resources.getString(R.string.electro_club_access_token)
-            params["user_token"] = appAuth.myToken()
-            params["method"] = "getPosts"
-            params["thread_type"] = threadType.toString()
-            params["thread_id"] = threadId.toString()
+//            val params = HashMap<String?, String?>()
+//            params["access_token"] = resources.getString(R.string.electro_club_access_token)
+//            params["user_token"] = appAuth.myToken()
+//            params["method"] = "getPosts"
+//            params["thread_type"] = threadType.toString()
+//            params["thread_id"] = threadId.toString()
+//            val response = apiService.getThreadPosts(params)
 
-            val response = apiService.getThreadPosts(params)
+            val response = apiService.getThreadPosts(
+                access_token = resources.getString(R.string.electro_club_access_token),
+                user_token = appAuth.myToken(),
+                threadType = threadType,
+                threadId = threadId,
+            )
+
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
