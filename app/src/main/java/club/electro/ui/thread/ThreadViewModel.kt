@@ -17,20 +17,20 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
 
     private val repository: ThreadRepository = ThreadRepositoryServerImpl((application as ElectroClubApp).diContainer, threadType, threadId)
 
-    val data = repository.data.asLiveData(Dispatchers.Default)
+    val data = repository.data
 
 
     val editorPost = MutableLiveData(emptyPost) // Пост, который в данный момент в текстовом редакторе
     val editedPost = MutableLiveData(emptyPost) // Исходный пост, который в данный момент редактируется
     val answerToPost = MutableLiveData(emptyPost) // Пост, на который в данный момент пишется ответ
 
-    fun loadPosts() = viewModelScope.launch {
-        try {
-            repository.getThreadPosts()
-        } catch (e: Exception) {
-            //_dataState.value = FeedModelState(error = true)
-        }
-    }
+//    fun loadPosts() = viewModelScope.launch {
+//        try {
+//            repository.getThreadPosts()
+//        } catch (e: Exception) {
+//            //_dataState.value = FeedModelState(error = true)
+//        }
+//    }
 
     fun changeEditorPostContent(content: String) {
         editorPost.value?.let {

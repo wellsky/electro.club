@@ -1,5 +1,6 @@
 package club.electro.repository
 
+import androidx.paging.*
 import androidx.work.*
 import club.electro.R
 import club.electro.adapter.PostTextPreparator
@@ -13,6 +14,7 @@ import club.electro.error.*
 import club.electro.workers.SavePostWorker
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlin.concurrent.thread
 
 class ThreadRepositoryServerImpl(
             diContainer: DependencyContainer,
@@ -28,9 +30,27 @@ class ThreadRepositoryServerImpl(
 
 //    override var data: Flow<List<Post>> = dao.flowThreadByPublshedDESC(threadType, threadId).map(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
 
-    override var data: Flow<List<Post>> = dao.flowThreadByPublshedDESC(threadType, threadId).map {
-        it.map {
-            //println("Preparing post " + it.id)
+
+//    @OptIn(ExperimentalPagingApi::class)
+//    val data1: Flow<PagingData<Post>> = Pager(
+//        config = PagingConfig(pageSize = 25),
+//        remoteMediator = PostRemoteMediator(apiService, appDb, postDao, postRemoteKeyDao),
+//        pagingSourceFactory = postDao::pagingSource,
+//    ).flow.map { pagingData ->
+//        pagingData.map(PostEntity::toDto)
+//    }
+
+
+
+    @OptIn(ExperimentalPagingApi::class)
+    override val data: Flow<PagingData<Post>> = Pager(
+        config = PagingConfig(pageSize = 20),
+        remoteMediator = PostRemoteMediator(diContainer, threadType, threadId),
+        pagingSourceFactory = {
+            dao.pagingSource(threadType, threadId)
+        },
+    ).flow.map { pagingData ->
+        pagingData.map {
             val post = it.toDto()
 
             val preparedContent: String = PostTextPreparator(post)
@@ -40,12 +60,42 @@ class ThreadRepositoryServerImpl(
             val preparedPost = post.copy(preparedContent = preparedContent)
             preparedPost
         }
-    }.flowOn(Dispatchers.Default)
+    }
+
+
+//        pagingData.map {
+//            val post = it.toDto()
+//
+//            val preparedContent: String = PostTextPreparator(post)
+//                .prepareAll()
+//                .get()
+//
+//            val preparedPost = post.copy(preparedContent = preparedContent)
+//            preparedPost
+//        }
+//    }
+
+
+//    @OptIn(ExperimentalPagingApi::class)
+//    override var data: Flow<List<Post>> = dao.flowThreadByPublshedDESC(threadType, threadId).map {
+//        it.map {
+//            //println("Preparing post " + it.id)
+//            val post = it.toDto()
+//
+//            val preparedContent: String = PostTextPreparator(post)
+//                .prepareAll()
+//                .get()
+//
+//            val preparedPost = post.copy(preparedContent = preparedContent)
+//            preparedPost
+//        }
+//    }.flowOn(Dispatchers.Default)
 
     private var lastUpdateTime: Long = 0
 
     private val updaterJob = startCheckUpdates()
 
+    // TODO возможно, этот метод бльше не нужен? (после внедрения Pager)
     override suspend fun getThreadPosts() {
         try {
             //println("Loading posts from server")
@@ -69,15 +119,17 @@ class ThreadRepositoryServerImpl(
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
 
-            val currentMessages = dao.getAllList(threadType, threadId).toDto()
+            dao.insert(body.data.messages.toEntity())
 
-            if (currentMessages.isEmpty()) {
-                dao.insert(body.data.messages.toEntity())
-            } else {
-                val first = currentMessages.first()
-                val last = currentMessages.last()
-
-                // TODO перенести в пагинатор. Период для удаления сообщений брать из запроса, а не ответа.
+            // TODO перенести в пагинатор. Период для удаления сообщений брать из запроса, а не ответа.
+//            val currentMessages = dao.getAllList(threadType, threadId).toDto()
+//            if (currentMessages.isEmpty()) {
+//                dao.insert(body.data.messages.toEntity())
+//            } else {
+//                val first = currentMessages.first()
+//                val last = currentMessages.last()
+//
+//
 //                val last = body.data.messages.first()
 //                val first = body.data.messages.last()
 //                val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
@@ -85,9 +137,8 @@ class ThreadRepositoryServerImpl(
 //                val date2 = java.util.Date(last.published * 1000)
 //                println("first: " + sdf.format(date1).toString())
 //                println("last: " + sdf.format(date2).toString())
-
-                dao.clearAndInsert(body.data.messages.toEntity(), threadType, threadId, first.published, last.published)
-            }
+//                dao.clearAndInsert(body.data.messages.toEntity(), threadType, threadId, first.published, last.published)
+//            }
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -108,7 +159,7 @@ class ThreadRepositoryServerImpl(
     }
 
     override suspend fun checkForUpdates()  {
-        while (true) {
+        while (false) {
             delay(2_000L)
 
             val params = HashMap<String?, String?>()

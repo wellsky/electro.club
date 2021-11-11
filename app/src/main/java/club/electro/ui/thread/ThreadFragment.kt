@@ -16,8 +16,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
 import club.electro.util.StringArg
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +32,7 @@ import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.ui.user.UserProfileFragment.Companion.userId
 import club.electro.util.AndroidUtils
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.collectLatest
 
 class ThreadFragment : Fragment() {
     companion object {
@@ -74,7 +77,7 @@ class ThreadFragment : Fragment() {
             threadId!!
         )
 
-        viewModel.loadPosts()
+//        viewModel.loadPosts()
 
         _binding = FragmentThreadBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -122,27 +125,46 @@ class ThreadFragment : Fragment() {
 
         binding.postsList.adapter = adapter
 
-        viewModel.data.observe(viewLifecycleOwner, { items ->
-            val newPostPublished: Boolean = if (!adapter.currentList.isEmpty() && !items.isEmpty()) {
-                val oldLastPost: Post = adapter.currentList.first()
-                val newLastPost: Post = items.first()
-                (newLastPost.published > oldLastPost.published)
-            } else {
-                !items.isEmpty()
-            }
+        // TODO после перехода на Pager блок внизу не работает. В адаптере больше нет текущего списка
+//        viewModel.data.observe(viewLifecycleOwner, { items ->
+//            val newPostPublished: Boolean = if (!adapter.currentList.isEmpty() && !items.isEmpty()) {
+//                val oldLastPost: Post = adapter.currentList.first()
+//                val newLastPost: Post = items.first()
+//                (newLastPost.published > oldLastPost.published)
+//            } else {
+//                !items.isEmpty()
+//            }
+//
+//            adapter.submitList(items)
+//
+//            if (newPostPublished) {
+//                if (binding.postsList.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
+//                    if (getFocusedItem() == 0) {
+//                        binding.postsList.smoothScrollToPosition(0);
+//                    } else {
+//                        //TODO Внизу появились новые сообщения
+//                    }
+//                }
+//            }
+//        })
 
-            adapter.submitList(items)
-
-            if (newPostPublished) {
-                if (binding.postsList.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
-                    if (getFocusedItem() == 0) {
-                        binding.postsList.smoothScrollToPosition(0);
-                    } else {
-                        //TODO Внизу появились новые сообщения
-                    }
-                }
+        lifecycleScope.launchWhenCreated {
+            //viewModel.data.collectLatest(adapter::submitData)
+            // То же самое что и:
+            viewModel.data.collectLatest {
+                adapter.submitData(it)
             }
-        })
+        }
+
+        lifecycleScope.launchWhenCreated {
+            adapter.loadStateFlow.collectLatest { state ->
+                binding.swiperefresh.isRefreshing =
+                    state.refresh is LoadState.Loading ||
+                    state.prepend is LoadState.Loading ||
+                    state.append is LoadState.Loading
+            }
+        }
+
 
 //        viewModel.editorPost.observe(viewLifecycleOwner) {
 //            with (binding.editorPostContent) {
@@ -215,6 +237,11 @@ class ThreadFragment : Fragment() {
 
         binding.cancelAnswer.setOnClickListener {
             viewModel.cancelAnswerPost()
+        }
+
+        // TODO добавить swipeToRefresh перетягиванием вниз и вызовом adapter.refresh()
+        binding.swiperefresh.setOnRefreshListener {
+            adapter.refresh()
         }
 
         return root

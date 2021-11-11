@@ -4,9 +4,12 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
+import androidx.room.withTransaction
 import club.electro.R
 import club.electro.di.DependencyContainer
 import club.electro.entity.PostEntity
+import club.electro.entity.PostRemoteKeyEntity
+import club.electro.entity.toEntity
 import club.electro.error.ApiError
 
 
@@ -16,44 +19,59 @@ class PostRemoteMediator(
     val threadType: Byte,
     val threadId: Long,
 ) : RemoteMediator<Int, PostEntity>() {
+    val resources = diContainer.resources
     val apiService = diContainer.apiService
     val appAuth = diContainer.appAuth
     val db = diContainer.appDb
     val postDao = db.postDao()
+    val postRemoteKeyDao = db.postRemoteKeyDao()
 
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, PostEntity>
     ): MediatorResult {
-        val resources = diContainer.resources
         try {
             val response = when (loadType) {
-                LoadType.REFRESH -> apiService.getThreadPosts(
-                    access_token = resources.getString(R.string.electro_club_access_token),
-                    user_token = appAuth.myToken(),
-                    threadType = threadType,
-                    threadId = threadId
-                )
-                LoadType.PREPEND -> {
-                    val item = state.firstItemOrNull() ?: return MediatorResult.Success(
-                        endOfPaginationReached = false
-                    )
+                LoadType.REFRESH -> {
+                    println("FROM last -" + state.config.pageSize)
                     apiService.getThreadPosts(
                         access_token = resources.getString(R.string.electro_club_access_token),
                         user_token = appAuth.myToken(),
                         threadType = threadType,
-                        threadId = threadId
+                        threadId = threadId,
+                        from = "last",
+                        count = -state.config.pageSize
+                    )
+                }
+                LoadType.PREPEND -> {
+//                    val item = state.firstItemOrNull() ?: return MediatorResult.Success(
+//                        endOfPaginationReached = false
+//                    )
+                    val id = postRemoteKeyDao.max(threadType, threadId) ?: return MediatorResult.Success(
+                        endOfPaginationReached = false
+                    )
+                    println("FROM " + id + " " + state.config.pageSize)
+                    apiService.getThreadPosts(
+                        access_token = resources.getString(R.string.electro_club_access_token),
+                        user_token = appAuth.myToken(),
+                        threadType = threadType,
+                        threadId = threadId,
+                        from = id.toString(),
+                        count = state.config.pageSize
                     )
                 }
                 LoadType.APPEND -> {
-                    val item = state.lastItemOrNull() ?: return MediatorResult.Success(
+                    val id = postRemoteKeyDao.min(threadType, threadId) ?: return MediatorResult.Success(
                         endOfPaginationReached = false
                     )
+                    println("FROM " + id + " -" + state.config.pageSize)
                     apiService.getThreadPosts(
                         access_token = resources.getString(R.string.electro_club_access_token),
                         user_token = appAuth.myToken(),
                         threadType = threadType,
-                        threadId = threadId
+                        threadId = threadId,
+                        from = id.toString(),
+                        count = -state.config.pageSize
                     )
                 }
             }
@@ -66,49 +84,56 @@ class PostRemoteMediator(
                 response.message(),
             )
 
-//            postDao.insert(body.toEntity())
+            postDao.insert(body.data.messages.toEntity())
 
-//            db.withTransaction {
-//                when (loadType) {
-//                    LoadType.REFRESH -> {
-//                        //postRemoteKeyDao.removeAll()
-//                        postRemoteKeyDao.insert(
-//                            listOf(
-//                                PostRemoteKeyEntity(
-//                                    type = PostRemoteKeyEntity.KeyType.AFTER,
-//                                    id = body.first().id,
-//                                ),
-//                                PostRemoteKeyEntity(
-//                                    type = PostRemoteKeyEntity.KeyType.BEFORE,
-//                                    id = body.last().id,
-//                                ),
-//                            )
-//                        )
-//                        //postDao.removeAll()
-//                    }
-//                    LoadType.PREPEND -> {
-//                        postRemoteKeyDao.insert(
-//                            PostRemoteKeyEntity(
-//                                type = PostRemoteKeyEntity.KeyType.AFTER,
-//                                id = body.first().id,
-//                            )
-//                        )
-//                    }
-//                    LoadType.APPEND -> {
-//                        postRemoteKeyDao.insert(
-//                            PostRemoteKeyEntity(
-//                                type = PostRemoteKeyEntity.KeyType.BEFORE,
-//                                id = body.last().id,
-//                            )
-//                        )
-//                    }
-//                }
-//                postDao.insert(body.toEntity())
-//            }
+            db.withTransaction {
+                when (loadType) {
+                    LoadType.REFRESH -> {
+                        postRemoteKeyDao.removeThread(threadType, threadId)
+                        postRemoteKeyDao.insert(
+                            listOf(
+                                PostRemoteKeyEntity(
+                                    type = PostRemoteKeyEntity.KeyType.AFTER,
+                                    threadType = threadType,
+                                    threadId = threadId,
+                                    postId = body.data.messages.first().id,
+                                ),
+                                PostRemoteKeyEntity(
+                                    type = PostRemoteKeyEntity.KeyType.BEFORE,
+                                    threadType = threadType,
+                                    threadId = threadId,
+                                    postId = body.data.messages.last().id,
+                                ),
+                            )
+                        )
+                        postDao.removeThread(threadType = threadType, threadId = threadId)
+                    }
+                    LoadType.PREPEND -> {
+                        postRemoteKeyDao.update(
+                            //PostRemoteKeyEntity(
+                                type = PostRemoteKeyEntity.KeyType.AFTER,
+                                threadType = threadType,
+                                threadId = threadId,
+                                postId = body.data.messages.first().id,
+                            //)
+                        )
+                    }
+                    LoadType.APPEND -> {
+                        postRemoteKeyDao.update(
+                            //PostRemoteKeyEntity(
+                                type = PostRemoteKeyEntity.KeyType.BEFORE,
+                                threadType = threadType,
+                                threadId = threadId,
+                                postId = body.data.messages.last().id,
+                            //)
+                        )
+                    }
+                }
+                postDao.insert(body.data.messages.toEntity())
+            }
 
 
-//            return MediatorResult.Success(endOfPaginationReached = body.isEmpty())
-            return MediatorResult.Success(endOfPaginationReached = false)
+            return MediatorResult.Success(endOfPaginationReached = body.data.messages.isEmpty())
         } catch (e: Exception) {
             return MediatorResult.Error(e)
         }
