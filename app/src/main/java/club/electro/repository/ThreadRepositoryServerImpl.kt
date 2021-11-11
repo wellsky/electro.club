@@ -1,5 +1,7 @@
 package club.electro.repository
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.paging.*
 import androidx.work.*
 import club.electro.R
@@ -17,7 +19,7 @@ import kotlinx.coroutines.flow.*
 import kotlin.concurrent.thread
 
 class ThreadRepositoryServerImpl(
-            diContainer: DependencyContainer,
+            val diContainer: DependencyContainer,
             val threadType: Byte,
             val threadId: Long
         ) : ThreadRepository {
@@ -41,26 +43,58 @@ class ThreadRepositoryServerImpl(
 //    }
 
 
+    // https://stackoverflow.com/questions/64692260/paging-3-0-list-with-new-params-in-kotlin?noredirect=1&lq=1
+    var queryFlow = MutableStateFlow(value = "last")
 
-    @OptIn(ExperimentalPagingApi::class)
-    override val data: Flow<PagingData<Post>> = Pager(
-        config = PagingConfig(pageSize = 20),
-        remoteMediator = PostRemoteMediator(diContainer, threadType, threadId),
-        pagingSourceFactory = {
-            dao.pagingSource(threadType, threadId)
-        },
-    ).flow.map { pagingData ->
-        pagingData.map {
-            val post = it.toDto()
+    override val data = queryFlow.flatMapLatest { query ->
+        @OptIn(ExperimentalPagingApi::class)
+        Pager(
+            config = PagingConfig(pageSize = 5),
+            remoteMediator = PostRemoteMediator(diContainer, threadType, threadId, targetPostPosition = query),
+            pagingSourceFactory = {
+                dao.pagingSource(threadType, threadId)
+            },
+        ).flow.map { pagingData ->
+            pagingData.map {
+                val post = it.toDto()
 
-            val preparedContent: String = PostTextPreparator(post)
-                .prepareAll()
-                .get()
+                val preparedContent: String = PostTextPreparator(post)
+                    .prepareAll()
+                    .get()
 
-            val preparedPost = post.copy(preparedContent = preparedContent)
-            preparedPost
+                val preparedPost = post.copy(preparedContent = preparedContent)
+                preparedPost
+            }
         }
     }
+
+    override fun changeData() {
+        println("changes data 1")
+        //queryFlow = MutableStateFlow(value = "first")
+        queryFlow.value = "first"
+    }
+
+//    @OptIn(ExperimentalPagingApi::class)
+//    override val data: Flow<PagingData<Post>> = Pager(
+//        config = PagingConfig(pageSize = 5),
+//        remoteMediator = PostRemoteMediator(diContainer, threadType, threadId),
+//        pagingSourceFactory = {
+//            dao.pagingSource(threadType, threadId)
+//        },
+//    ).flow.map { pagingData ->
+//        pagingData.map {
+//            val post = it.toDto()
+//
+//            val preparedContent: String = PostTextPreparator(post)
+//                .prepareAll()
+//                .get()
+//
+//            val preparedPost = post.copy(preparedContent = preparedContent)
+//            preparedPost
+//        }
+//    }
+
+
 
 
 //        pagingData.map {
@@ -94,6 +128,7 @@ class ThreadRepositoryServerImpl(
     private var lastUpdateTime: Long = 0
 
     private val updaterJob = startCheckUpdates()
+
 
     // TODO возможно, этот метод бльше не нужен? (после внедрения Pager)
     override suspend fun getThreadPosts() {

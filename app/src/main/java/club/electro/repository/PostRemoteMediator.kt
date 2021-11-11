@@ -18,6 +18,8 @@ class PostRemoteMediator(
     val diContainer: DependencyContainer,
     val threadType: Byte,
     val threadId: Long,
+    val targetPostId: Long = 0,
+    val targetPostPosition: String = "last"
 ) : RemoteMediator<Int, PostEntity>() {
     val resources = diContainer.resources
     val apiService = diContainer.apiService
@@ -26,20 +28,34 @@ class PostRemoteMediator(
     val postDao = db.postDao()
     val postRemoteKeyDao = db.postRemoteKeyDao()
 
+    /**
+     * Две задачи, которые надо решить:
+     * 1. Обращаться к Api постоянно во время скроллинга, чтобы обновить посты в БД.
+     * При этом не удалять заранее все посты, тода можно быстро будет скроллить в середину чата, и только после отображения обновлять.
+     *
+     * 2. Скроллить по id поста.
+     * Как вариант - загружать данные с определенной позиции.
+     */
+
+    init {
+        println("Mediator init")
+    }
+
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, PostEntity>
     ): MediatorResult {
         try {
+            println("LOAD")
             val response = when (loadType) {
                 LoadType.REFRESH -> {
-                    println("FROM last -" + state.config.pageSize)
+                    println("FROM " + targetPostPosition + " -" + state.config.pageSize)
                     apiService.getThreadPosts(
                         access_token = resources.getString(R.string.electro_club_access_token),
                         user_token = appAuth.myToken(),
                         threadType = threadType,
                         threadId = threadId,
-                        from = "last",
+                        from = targetPostPosition,
                         count = -state.config.pageSize
                     )
                 }

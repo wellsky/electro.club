@@ -32,6 +32,10 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
 //        }
 //    }
 
+    fun loadThreadBegining() {
+        repository.changeData()
+    }
+
     fun changeEditorPostContent(content: String) {
         editorPost.value?.let {
             val text = content.trim()

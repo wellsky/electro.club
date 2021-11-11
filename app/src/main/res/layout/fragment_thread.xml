@@ -7,6 +7,16 @@
     android:layout_height="match_parent"
     android:background="@color/grey_e"
     >
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonScrollToBegin"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:text="UP"
+        />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -16,6 +26,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/bottomPanel"
         >
+
         <androidx.recyclerview.widget.RecyclerView
             android:id = "@+id/postsList"
             android:layout_width="match_parent"

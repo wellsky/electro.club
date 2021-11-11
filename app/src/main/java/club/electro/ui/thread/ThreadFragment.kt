@@ -209,6 +209,10 @@ class ThreadFragment : Fragment() {
             }
         }
 
+        binding.buttonScrollToBegin.setOnClickListener {
+            viewModel.loadThreadBegining()
+        }
+
         binding.editorPostSave.setOnClickListener {
             with (binding.editorPostContent) {
                 if (text.isNullOrBlank()) {
