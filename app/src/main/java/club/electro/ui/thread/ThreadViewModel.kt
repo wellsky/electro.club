@@ -1,16 +1,10 @@
 package club.electro.ui.thread
 
 import android.app.Application
-import android.content.Context
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import club.electro.application.ElectroClubApp
 import club.electro.dto.Post
 import club.electro.repository.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 class ThreadViewModel(application: Application, val threadType: Byte, val threadId: Long) : AndroidViewModel(application) {
@@ -18,7 +12,7 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
     private val repository: ThreadRepository = ThreadRepositoryServerImpl((application as ElectroClubApp).diContainer, threadType, threadId)
 
     val data = repository.data
-
+    val lastUpdateTime = repository.lastUpdateTime
 
     val editorPost = MutableLiveData(emptyPost) // Пост, который в данный момент в текстовом редакторе
     val editedPost = MutableLiveData(emptyPost) // Исходный пост, который в данный момент редактируется
@@ -33,7 +27,15 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
 //    }
 
     fun loadThreadBegining() {
-        repository.changeData()
+        repository.changeTargetPost(ThreadTargetPost(targetPostPosition = ThreadTargetPost.TARGET_POSITION_FIRST))
+    }
+
+    fun loadThreadEnd() {
+        repository.changeTargetPost(ThreadTargetPost(targetPostPosition = ThreadTargetPost.TARGET_POSITION_LAST))
+    }
+
+    fun reloadPosts() {
+        repository.reloadPosts()
     }
 
     fun changeEditorPostContent(content: String) {

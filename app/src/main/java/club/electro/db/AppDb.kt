@@ -16,7 +16,7 @@ import club.electro.entity.*
     MapMarkerEntity::class,
     UserEntity::class,
     FeedPostEntity::class
- ], version = 46, exportSchema = false)
+ ], version = 48, exportSchema = false)
 @TypeConverters(DBTypeConverters::class)
 abstract class AppDb : RoomDatabase() {
     abstract fun postDao(): PostDao

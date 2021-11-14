@@ -12,14 +12,12 @@ import club.electro.entity.PostRemoteKeyEntity
 import club.electro.entity.toEntity
 import club.electro.error.ApiError
 
-
 @OptIn(ExperimentalPagingApi::class)
 class PostRemoteMediator(
     val diContainer: DependencyContainer,
     val threadType: Byte,
     val threadId: Long,
-    val targetPostId: Long = 0,
-    val targetPostPosition: String = "last"
+    val target: ThreadTargetPost
 ) : RemoteMediator<Int, PostEntity>() {
     val resources = diContainer.resources
     val apiService = diContainer.apiService
@@ -46,19 +44,19 @@ class PostRemoteMediator(
         state: PagingState<Int, PostEntity>
     ): MediatorResult {
         try {
-            println("LOAD")
             val response = when (loadType) {
                 LoadType.REFRESH -> {
-                    println("FROM " + targetPostPosition + " -" + state.config.pageSize)
+                    println("REFRESH FROM " + target.targetPostPosition + " -" + state.config.pageSize)
                     apiService.getThreadPosts(
                         access_token = resources.getString(R.string.electro_club_access_token),
                         user_token = appAuth.myToken(),
                         threadType = threadType,
                         threadId = threadId,
-                        from = targetPostPosition,
+                        from = target.targetApiParameter(),
                         count = -state.config.pageSize
                     )
                 }
+                // TODO поменять логику PREPEND и APPEND чтобы соответствовала значению слов?
                 LoadType.PREPEND -> {
 //                    val item = state.firstItemOrNull() ?: return MediatorResult.Success(
 //                        endOfPaginationReached = false
@@ -66,7 +64,7 @@ class PostRemoteMediator(
                     val id = postRemoteKeyDao.max(threadType, threadId) ?: return MediatorResult.Success(
                         endOfPaginationReached = false
                     )
-                    println("FROM " + id + " " + state.config.pageSize)
+                    println("PREPEND FROM " + id + " " + state.config.pageSize)
                     apiService.getThreadPosts(
                         access_token = resources.getString(R.string.electro_club_access_token),
                         user_token = appAuth.myToken(),
@@ -80,7 +78,7 @@ class PostRemoteMediator(
                     val id = postRemoteKeyDao.min(threadType, threadId) ?: return MediatorResult.Success(
                         endOfPaginationReached = false
                     )
-                    println("FROM " + id + " -" + state.config.pageSize)
+                    println("APPEND FROM " + id + " -" + state.config.pageSize)
                     apiService.getThreadPosts(
                         access_token = resources.getString(R.string.electro_club_access_token),
                         user_token = appAuth.myToken(),
@@ -112,13 +110,13 @@ class PostRemoteMediator(
                                     type = PostRemoteKeyEntity.KeyType.AFTER,
                                     threadType = threadType,
                                     threadId = threadId,
-                                    postId = body.data.messages.first().id,
+                                    postId = body.data.messages.last().id,
                                 ),
                                 PostRemoteKeyEntity(
                                     type = PostRemoteKeyEntity.KeyType.BEFORE,
                                     threadType = threadType,
                                     threadId = threadId,
-                                    postId = body.data.messages.last().id,
+                                    postId = body.data.messages.first().id,
                                 ),
                             )
                         )
@@ -130,7 +128,7 @@ class PostRemoteMediator(
                                 type = PostRemoteKeyEntity.KeyType.AFTER,
                                 threadType = threadType,
                                 threadId = threadId,
-                                postId = body.data.messages.first().id,
+                                postId = body.data.messages.last().id,
                             //)
                         )
                     }
@@ -140,7 +138,7 @@ class PostRemoteMediator(
                                 type = PostRemoteKeyEntity.KeyType.BEFORE,
                                 threadType = threadType,
                                 threadId = threadId,
-                                postId = body.data.messages.last().id,
+                                postId = body.data.messages.first().id,
                             //)
                         )
                     }

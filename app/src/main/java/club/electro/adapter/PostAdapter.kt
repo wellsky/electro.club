@@ -158,9 +158,6 @@ class PostViewHolder(
 
             val imageGetter = ImageGetter(resources, content)
 
-            //the string to add links to
-            //val htmlString = post.content
-
             //Initial span from HtmlCompat will link anchor tags
             val htmlSpan = HtmlCompat.fromHtml(
                 preparedContent,
