@@ -7,13 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import club.electro.MainViewModel
 import club.electro.R
+import club.electro.ToolBarDoubleTitle
 import club.electro.adapter.SubscriptionAreaAdapter
 import club.electro.adapter.SubscriptionAreaInteractionListener
 import club.electro.databinding.FragmentSubscriptionsBinding
 import club.electro.dto.SubscriptionArea
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
-import club.electro.ui.thread.ThreadFragment.Companion.threadName
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 
 class SubscriptionsFragment : Fragment() {
@@ -24,6 +25,15 @@ class SubscriptionsFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        activity?.run {
+            val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+            mainViewModel.updateActionBarTitle(ToolBarDoubleTitle(title1 = getString(R.string.menu_subscriptions)))
+        } ?: throw Throwable("Invalid activity")
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,7 +52,6 @@ class SubscriptionsFragment : Fragment() {
                     Bundle().apply {
                         threadType = area.type
                         threadId = area.object_id
-                        threadName = area.name
                     }
                 )
             }

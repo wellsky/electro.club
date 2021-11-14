@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import club.electro.MainViewModel
+import club.electro.R
+import club.electro.ToolBarDoubleTitle
 import club.electro.adapter.*
 import club.electro.databinding.FragmentFeedBinding
 import club.electro.dto.FeedPost
@@ -23,6 +26,14 @@ class FeedFragment : Fragment() {
 //    private val viewModel: FeedViewModel by viewModels (
 //        ownerProducer = ::requireParentFragment
 //    )
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        activity?.run {
+            val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+            mainViewModel.updateActionBarTitle(ToolBarDoubleTitle(title1 = getString(R.string.menu_feed)))
+        } ?: throw Throwable("Invalid activity")
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

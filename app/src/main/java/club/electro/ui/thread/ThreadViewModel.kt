@@ -11,7 +11,9 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
 
     private val repository: ThreadRepository = ThreadRepositoryServerImpl((application as ElectroClubApp).diContainer, threadType, threadId)
 
-    val data = repository.data
+    val thread = repository.thread.asLiveData()
+    val posts = repository.posts
+
     val lastUpdateTime = repository.lastUpdateTime
 
     val editorPost = MutableLiveData(emptyPost) // Пост, который в данный момент в текстовом редакторе
@@ -25,6 +27,10 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
 //            //_dataState.value = FeedModelState(error = true)
 //        }
 //    }
+    fun getThread() = viewModelScope.launch {
+        repository.getThread()
+    }
+
 
     fun loadThreadBegining() {
         repository.changeTargetPost(ThreadTargetPost(targetPostPosition = ThreadTargetPost.TARGET_POSITION_FIRST))

@@ -26,28 +26,21 @@ import club.electro.ui.user.UserProfileFragment.Companion.userId
 import club.electro.util.AndroidUtils
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
-import android.widget.AbsListView
 import androidx.core.view.isVisible
+import club.electro.ToolBarDoubleTitle
 import club.electro.repository.ThreadTargetPost
-import android.widget.Toast
-
-
-
 
 
 class ThreadFragment : Fragment() {
     companion object {
         var Bundle.threadType: Byte by ByteArg
         var Bundle.threadId: Long by LongArg
-        var Bundle.threadName: String? by StringArg
     }
 
     private lateinit var viewModel: ThreadViewModel
     private var _binding: FragmentThreadBinding? = null
 
     private val binding get() = _binding!!
-
-    private var threadName: String? = null
 
     private var currentTargetPost: ThreadTargetPost? = null
 
@@ -63,7 +56,14 @@ class ThreadFragment : Fragment() {
 
         activity?.run {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-            mainViewModel.updateActionBarTitle(threadName?: "Unknown thread")
+            viewModel.thread.observe(viewLifecycleOwner) {
+                it?.let {
+                    mainViewModel.updateActionBarTitle(ToolBarDoubleTitle(
+                        title1 = it.name,
+                        title2 = getString(R.string.subscribers_count) + it.subscribersCount.toString())
+                    )
+                }
+            }
         } ?: throw Throwable("Invalid activity")
     }
 
@@ -73,7 +73,7 @@ class ThreadFragment : Fragment() {
     ): View? {
         val threadType = arguments?.threadType
         val threadId = arguments?.threadId
-        threadName = arguments?.threadName
+
 
         // TODO явно есть более красивый способ
 //        threadName?.let {
@@ -87,6 +87,7 @@ class ThreadFragment : Fragment() {
             threadId!!
         )
 
+        viewModel.getThread()
 //        viewModel.loadPosts()
 
         _binding = FragmentThreadBinding.inflate(inflater, container, false)
@@ -153,7 +154,7 @@ class ThreadFragment : Fragment() {
 //        })
 
         lifecycleScope.launchWhenCreated {
-            viewModel.data.collectLatest {
+            viewModel.posts.collectLatest {
                 adapter.submitData(it)
             }
         }

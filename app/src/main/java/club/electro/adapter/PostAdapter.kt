@@ -34,7 +34,6 @@ import club.electro.R
 import club.electro.databinding.PostItemBinding
 import club.electro.dto.Post
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
-import club.electro.ui.thread.ThreadFragment.Companion.threadName
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import com.bumptech.glide.Glide
 import club.electro.utils.trimWhiteSpaces

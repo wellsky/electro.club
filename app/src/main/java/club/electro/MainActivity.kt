@@ -15,6 +15,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import club.electro.application.ElectroClubApp
 import club.electro.databinding.ActivityMainBinding
@@ -35,10 +36,13 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
-        binding.appBarMain.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
+//        binding.appBarMain.fab.setOnClickListener { view ->
+//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                .setAction("Action", null).show()
+//        }
+
+        val toolBar = binding.appBarMain
+
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
@@ -92,7 +96,18 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
         viewModel.title.observe(this, {
-            supportActionBar?.title = it
+            supportActionBar?.title = it.title1
+            supportActionBar?.subtitle = it.title2
+
+//            toolBar.title1.text = it.title1
+//
+//            toolBar.title2.isVisible = false
+//            it.title2?.let {
+//                toolBar.title2.text = it
+//                toolBar.title2.isVisible = true
+//            }
+
+
         })
     }
 

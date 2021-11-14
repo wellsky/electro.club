@@ -11,13 +11,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import club.electro.MainViewModel
 import club.electro.R
+import club.electro.ToolBarDoubleTitle
 import club.electro.databinding.FragmentUserProfileBinding
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
-import club.electro.ui.thread.ThreadFragment.Companion.threadName
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
-import club.electro.ui.thread.ThreadViewModel
-import club.electro.util.StringArg
-import club.electro.utils.ByteArg
 import club.electro.utils.LongArg
 import com.bumptech.glide.Glide
 
@@ -90,7 +87,6 @@ class UserProfileFragment : Fragment() {
                             Bundle().apply {
                                 threadType = link.threadType
                                 threadId = link.threadId
-                                threadName = user.name
                             }
                         )
                     }
@@ -99,7 +95,7 @@ class UserProfileFragment : Fragment() {
 
             activity?.run {
                 val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-                mainViewModel.updateActionBarTitle(user.name)
+                mainViewModel.updateActionBarTitle(ToolBarDoubleTitle(title1 = user.name))
             } ?: throw Throwable("Invalid activity")
         }
 

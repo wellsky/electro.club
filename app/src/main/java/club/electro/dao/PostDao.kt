@@ -2,7 +2,6 @@ package club.electro.dao
 
 import androidx.paging.PagingSource
 import androidx.room.*
-import club.electro.dto.Post
 import club.electro.entity.PostEntity
 import kotlinx.coroutines.flow.Flow
 

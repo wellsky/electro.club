@@ -6,9 +6,12 @@ import club.electro.R
 import club.electro.adapter.PostTextPreparator
 import club.electro.di.DependencyContainer
 import club.electro.dto.Post
+import club.electro.dto.PostsThread
+import club.electro.entity.toEntity
 import club.electro.error.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import java.io.IOException
 
 class ThreadRepositoryServerImpl(
             val diContainer: DependencyContainer,
@@ -16,7 +19,8 @@ class ThreadRepositoryServerImpl(
             val threadId: Long
         ) : ThreadRepository {
 
-    private val dao = diContainer.appDb.postDao()
+    private val threadDao = diContainer.appDb.threadDao()
+    private val postDao = diContainer.appDb.postDao()
     private val resources = diContainer.context.resources
     private val apiService = diContainer.apiService
     private val appAuth = diContainer.appAuth
@@ -55,13 +59,13 @@ class ThreadRepositoryServerImpl(
 //        }
 //    }
 
-    override val data = targetFlow.flatMapLatest { refreshTarget ->
+    override val posts = targetFlow.flatMapLatest { refreshTarget ->
         @OptIn(ExperimentalPagingApi::class)
         Pager(
             config = PagingConfig(pageSize = 20),
             remoteMediator = PostRemoteMediator(diContainer, threadType, threadId, target = refreshTarget),
             pagingSourceFactory = {
-                dao.pagingSource(threadType, threadId)
+                postDao.pagingSource(threadType, threadId)
             },
         ).flow.map { pagingData ->
             pagingData.map {
@@ -77,10 +81,35 @@ class ThreadRepositoryServerImpl(
         }
     }
 
+    override val thread: Flow<PostsThread> = threadDao.get(threadType, threadId)
+
+    override suspend fun getThread() {
+        appAuth.myToken()?.let { myToken ->
+            try {
+                val response = apiService.getThread(
+                    access_token = resources.getString(R.string.electro_club_access_token),
+                    user_token = myToken,
+                    threadType = threadType,
+                    threadId = threadId
+                )
+
+                if (!response.isSuccessful) {
+                    throw ApiError(response.code(), response.message())
+                }
+                val body = response.body() ?: throw ApiError(response.code(), response.message())
+                threadDao.insert(body.data.thread.toEntity())
+            } catch (e: IOException) {
+                throw NetworkError
+            } catch (e: Exception) {
+                throw UnknownError
+            }
+        }
+    }
+
     override fun reloadPosts() {
         // https://stackoverflow.com/questions/64715949/update-current-page-or-update-data-in-paging-3-library-android-kotlin
         println("reloadPosts()")
-        dao.pagingSource(threadType, threadId).invalidate()
+        postDao.pagingSource(threadType, threadId).invalidate()
         //targetFlow.value = targetFlow.value
     }
 

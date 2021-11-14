@@ -15,8 +15,9 @@ import club.electro.entity.*
     PostRemoteKeyEntity::class,
     MapMarkerEntity::class,
     UserEntity::class,
-    FeedPostEntity::class
- ], version = 48, exportSchema = false)
+    FeedPostEntity::class,
+    ThreadEntity::class
+ ], version = 49, exportSchema = false)
 @TypeConverters(DBTypeConverters::class)
 abstract class AppDb : RoomDatabase() {
     abstract fun postDao(): PostDao
@@ -25,6 +26,7 @@ abstract class AppDb : RoomDatabase() {
     abstract fun areaDao(): AreaDao
     abstract fun mapMarkerDao(): MapMarkerDao
     abstract fun userDao(): UserDao
+    abstract fun threadDao(): ThreadDao
 
     companion object {
         @Volatile

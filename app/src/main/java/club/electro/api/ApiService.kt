@@ -78,6 +78,16 @@ interface ApiService {
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
+    suspend fun getThread(
+        @Field("access_token") access_token: String,
+        @Field("user_token") user_token: String,
+        @Field("method") method: String = "getThread",
+        @Field("thread_type") threadType: Byte,
+        @Field("thread_id") threadId: Long,
+    ): Response<ApiResponse<ApiThreadData>>
+
+    @FormUrlEncoded
+    @POST(BASE_SERVER_URL)
     suspend fun getThreadPosts(
         @Field("method") method: String = "getPosts",
         @Field("access_token") access_token: String,
@@ -133,6 +143,10 @@ data class ApiSubscriptionsData (
     val method: String,
     val lastEventTime: String,
     val items: List<SubscriptionArea>
+)
+
+data class ApiThreadData (
+    val thread: PostsThread
 )
 
 data class ApiPostsData (
