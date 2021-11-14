@@ -12,24 +12,28 @@ import club.electro.databinding.FragmentThreadBinding
 import club.electro.dto.Post
 import club.electro.utils.LongArg
 import club.electro.utils.ByteArg
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.text.HtmlCompat
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.NavHostFragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
 import club.electro.util.StringArg
 import androidx.recyclerview.widget.LinearLayoutManager
 import club.electro.MainViewModel
 import club.electro.R
 import club.electro.adapter.PostTextPreparator
-import club.electro.ui.thread.ThreadFragment.Companion.threadId
-import club.electro.ui.thread.ThreadFragment.Companion.threadName
-import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.ui.user.UserProfileFragment.Companion.userId
 import club.electro.util.AndroidUtils
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.collectLatest
+import android.widget.AbsListView
+import androidx.core.view.isVisible
+import club.electro.repository.ThreadTargetPost
+import android.widget.Toast
+
+
+
+
 
 class ThreadFragment : Fragment() {
     companion object {
@@ -44,6 +48,15 @@ class ThreadFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var threadName: String? = null
+
+    private var currentTargetPost: ThreadTargetPost? = null
+
+    private var firstUpdateTimeReceived = false
+
+    private var lastFirstVisiblePosition = 0
+    private var scrolledToTop: Boolean = true
+    private var scrolledToBottom: Boolean = true
+
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -74,7 +87,7 @@ class ThreadFragment : Fragment() {
             threadId!!
         )
 
-        viewModel.loadPosts()
+//        viewModel.loadPosts()
 
         _binding = FragmentThreadBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -95,15 +108,9 @@ class ThreadFragment : Fragment() {
                 builder.setMessage("Are you sure you want to Delete?")
                     .setCancelable(false)
                     .setPositiveButton("Yes") { dialog, id ->
-                    viewModel.removePost(post)
-                    // Delete selected note from database
-                        //var dbManager = DbManager(this.context!!)
-                        //val selectionArgs = arrayOf(myNote.nodeID.toString())
-                        //dbManager.delete("ID=?", selectionArgs)
-                        //LoadQuery("%")
+                        viewModel.removePost(post)
                     }
                     .setNegativeButton("No") { dialog, id ->
-                        // Dismiss the dialog
                         dialog.dismiss()
                     }
                 val alert = builder.create()
@@ -122,40 +129,100 @@ class ThreadFragment : Fragment() {
 
         binding.postsList.adapter = adapter
 
-        viewModel.data.observe(viewLifecycleOwner, { items ->
-            val newPostPublished: Boolean = if (!adapter.currentList.isEmpty() && !items.isEmpty()) {
-                val oldLastPost: Post = adapter.currentList.first()
-                val newLastPost: Post = items.first()
-                (newLastPost.published > oldLastPost.published)
-            } else {
-                !items.isEmpty()
+        // TODO после перехода на Pager блок внизу не работает. В адаптере больше нет текущего списка
+//        viewModel.data.observe(viewLifecycleOwner, { items ->
+//            val newPostPublished: Boolean = if (!adapter.currentList.isEmpty() && !items.isEmpty()) {
+//                val oldLastPost: Post = adapter.currentList.first()
+//                val newLastPost: Post = items.first()
+//                (newLastPost.published > oldLastPost.published)
+//            } else {
+//                !items.isEmpty()
+//            }
+//
+//            adapter.submitList(items)
+//
+//            if (newPostPublished) {
+//                if (binding.postsList.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
+//                    if (getFocusedItem() == 0) {
+//                        binding.postsList.smoothScrollToPosition(0);
+//                    } else {
+//                        //TODO Внизу появились новые сообщения
+//                    }
+//                }
+//            }
+//        })
+
+        lifecycleScope.launchWhenCreated {
+            viewModel.data.collectLatest {
+                adapter.submitData(it)
             }
+        }
 
-            adapter.submitList(items)
+        // https://stackoverflow.com/questions/27816217/how-to-save-recyclerviews-scroll-position-using-recyclerview-state/61609823#61609823
+        adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT
 
-            if (newPostPublished) {
-                if (binding.postsList.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
-                    if (getFocusedItem() == 0) {
-                        binding.postsList.smoothScrollToPosition(0);
-                    } else {
-                        //TODO Внизу появились новые сообщения
+        adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
+            // https://stackoverflow.com/questions/51889154/recycler-view-not-scrolling-to-the-top-after-adding-new-item-at-the-top-as-chan
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                currentTargetPost?.let {
+                    if (it.targetPostPosition == ThreadTargetPost.TARGET_POSITION_FIRST) {
+                        setGravityTop()
+                        binding.postsList.scrollToPosition((binding.postsList.getAdapter()!!.getItemCount() - 1))
+                        scrolledToTop = true
+                        binding.buttonScrollToBegin.isVisible = false
+
+                    }
+                    if (it.targetPostPosition == ThreadTargetPost.TARGET_POSITION_LAST) {
+                        setGravityBottom()
+                        binding.postsList.smoothScrollToPosition(0)
+                        scrolledToBottom = true
+                        binding.buttonScrollToEnd.isVisible = false
                     }
                 }
+
+                currentTargetPost = null
+
+                // TODO нужен нормальный метод для определения публикации новых постов
+                val newPostsPublished = ((positionStart == 0) and (itemCount == 1))
+
+                if (newPostsPublished) {
+                    if (binding.postsList.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
+                        if (getFocusedItem() == 0) {
+                            binding.postsList.smoothScrollToPosition(0);
+                        } else {
+                            //TODO Внизу появились новые сообщения
+                            println("new messages in bottom of the list")
+                        }
+                    }
+                }
+
+
             }
         })
 
-//        viewModel.editorPost.observe(viewLifecycleOwner) {
-//            with (binding.editorPostContent) {
-//                requestFocus()
-//                //setText(HtmlCompat.fromHtml(it.content, HtmlCompat.FROM_HTML_MODE_LEGACY))
-//                val editorText = PostTextPreparator(it.content)
-//                    .prepareBasicTags()
-//                    .prepareEmojies()
-//                    .preparePlainText()
-//                    .get()
-//                setText(editorText)
-//            }
-//        }
+        lifecycleScope.launchWhenCreated {
+            adapter.loadStateFlow.collectLatest { state ->
+                binding.swiperefresh.isRefreshing =
+                    state.refresh is LoadState.Loading ||
+                    state.prepend is LoadState.Loading ||
+                    state.append is LoadState.Loading
+            }
+        }
+
+        // TODO реализовано криво. Вообще логику обновления лучше не выносить за репозиторий.
+        // Но почему-то вызванная из checkForUpdates() функция reloadPosts() не релодит посты
+        viewModel.lastUpdateTime.observe(viewLifecycleOwner) {
+            println("lastUpdateChanged: " + it)
+            if (it > 0L) {
+                if (firstUpdateTimeReceived) {
+                    adapter.refresh()
+                    //viewModel.reloadPosts()
+                } else {
+                    firstUpdateTimeReceived = true
+                }
+            }
+        }
+
 
         viewModel.editedPost.observe(viewLifecycleOwner) {
             if (it.id != 0L) {
@@ -187,6 +254,63 @@ class ThreadFragment : Fragment() {
             }
         }
 
+        binding.postsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 0) {
+                    // Scrolling down
+                    binding.buttonScrollToBegin.isVisible = false
+                    if (!scrolledToBottom) {
+                        binding.buttonScrollToEnd.isVisible = true
+                    }
+                } else {
+                    // Scrolling up
+                    if (!scrolledToTop) {
+                        binding.buttonScrollToBegin.isVisible = true
+                    }
+                    binding.buttonScrollToEnd.isVisible = false
+                }
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (!recyclerView.canScrollVertically(-1)) {
+                    // Внизу больше ничего нет
+                    scrolledToTop = true
+                    binding.buttonScrollToBegin.isVisible = false
+                } else {
+                    scrolledToTop = false
+                }
+
+                if (!recyclerView.canScrollVertically(1)) {
+                    // Внизу больше ничего нет
+                    scrolledToBottom = true
+                    binding.buttonScrollToEnd.isVisible = false
+                } else {
+                    scrolledToBottom = false
+                }
+            }
+        })
+
+        binding.testButton.setOnClickListener {
+            println(binding.postsList.getAdapter()!!.getItemCount())
+            binding.postsList.smoothScrollToPosition((binding.postsList.getAdapter()!!.getItemCount() - 1))
+
+            setGravityTop()
+        }
+
+        binding.buttonScrollToBegin.setOnClickListener {
+            viewModel.loadThreadBegining()
+            adapter.refresh()
+            currentTargetPost = ThreadTargetPost(targetPostPosition = ThreadTargetPost.TARGET_POSITION_FIRST)
+        }
+
+        binding.buttonScrollToEnd.setOnClickListener {
+            viewModel.loadThreadEnd()
+            adapter.refresh()
+            currentTargetPost = ThreadTargetPost(targetPostPosition = ThreadTargetPost.TARGET_POSITION_LAST)
+        }
+
         binding.editorPostSave.setOnClickListener {
             with (binding.editorPostContent) {
                 if (text.isNullOrBlank()) {
@@ -200,6 +324,7 @@ class ThreadFragment : Fragment() {
                 setText("")
                 clearFocus()
                 AndroidUtils.hideKeyboard(it)
+                currentTargetPost = ThreadTargetPost(targetPostPosition = ThreadTargetPost.TARGET_POSITION_LAST)
             }
             //binding.editMessageGroup.visibility = View.GONE
         }
@@ -217,6 +342,13 @@ class ThreadFragment : Fragment() {
             viewModel.cancelAnswerPost()
         }
 
+        // TODO добавить swipeToRefresh перетягиванием вниз и вызовом adapter.refresh()
+        binding.swiperefresh.setOnRefreshListener {
+            adapter.refresh()
+        }
+
+        setGravityBottom()
+
         return root
     }
 
@@ -228,12 +360,45 @@ class ThreadFragment : Fragment() {
         .findFirstVisibleItemPosition()
     }
 
+    // TODO не работает. Надо сделать сохранение текущей позиции.
+    // https://stackoverflow.com/questions/27816217/how-to-save-recyclerviews-scroll-position-using-recyclerview-state/61609823#61609823
+    override fun onPause() {
+        super.onPause()
+        lastFirstVisiblePosition = (binding.postsList.getLayoutManager() as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (binding.postsList.getLayoutManager() as LinearLayoutManager).scrollToPosition(lastFirstVisiblePosition)
+    }
+
+
     /**
      * Необходимо остановить корутину в репозитории, которая опрашивает сервер об обновлениях в текущем thread
      */
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.stop()
+    }
+
+    /**
+     * Прижимает все сообщения к верху
+     */
+    fun setGravityTop() {
+        val linearLayoutManager = LinearLayoutManager(this.context)
+        linearLayoutManager.reverseLayout = true
+        linearLayoutManager.stackFromEnd = true
+        binding.postsList.setLayoutManager(linearLayoutManager)
+    }
+
+    /**
+     * Прижимает все сообщения к низу
+     */
+    fun setGravityBottom() {
+        val linearLayoutManager = LinearLayoutManager(this.context)
+        linearLayoutManager.reverseLayout = true
+        linearLayoutManager.stackFromEnd = false
+        binding.postsList.setLayoutManager(linearLayoutManager)
     }
 }
 

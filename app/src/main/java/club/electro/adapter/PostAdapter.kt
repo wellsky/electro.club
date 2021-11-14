@@ -26,6 +26,7 @@ import androidx.core.text.util.LinkifyCompat
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -53,14 +54,14 @@ interface PostInteractionListener {
 
 class PostAdapter(
     private val onInteractionListener: PostInteractionListener,
-) : ListAdapter<Post, PostViewHolder>(PostDiffCallback()) {
+) : PagingDataAdapter<Post, PostViewHolder>(PostDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = PostItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return PostViewHolder(binding, onInteractionListener)
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        val post = getItem(position)
+        val post = getItem(position) ?: return
         holder.bind(post)
     }
 }
@@ -96,7 +97,7 @@ class PostViewHolder(
                     published.setText(R.string.post_status_removing)
                 }
                 Post.STATUS_PUBLISHED -> {
-                    published.setText(sdf.format(date).toString())
+                    published.setText(sdf.format(date).toString() + " (id: " + post.id + ")")
                     content.setTextColor(getColor(this.root.context, R.color.postTextColor))
                     menu.isVisible = true
                 }
@@ -156,9 +157,6 @@ class PostViewHolder(
 
 
             val imageGetter = ImageGetter(resources, content)
-
-            //the string to add links to
-            //val htmlString = post.content
 
             //Initial span from HtmlCompat will link anchor tags
             val htmlSpan = HtmlCompat.fromHtml(

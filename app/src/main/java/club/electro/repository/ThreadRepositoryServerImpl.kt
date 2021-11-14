@@ -1,21 +1,17 @@
 package club.electro.repository
 
-import androidx.work.*
+import androidx.lifecycle.MutableLiveData
+import androidx.paging.*
 import club.electro.R
 import club.electro.adapter.PostTextPreparator
 import club.electro.di.DependencyContainer
 import club.electro.dto.Post
-import club.electro.entity.PostEntity
-import club.electro.entity.toDto
-import club.electro.entity.toEntity
-import java.io.IOException
 import club.electro.error.*
-import club.electro.workers.SavePostWorker
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 class ThreadRepositoryServerImpl(
-            diContainer: DependencyContainer,
+            val diContainer: DependencyContainer,
             val threadType: Byte,
             val threadId: Long
         ) : ThreadRepository {
@@ -28,72 +24,92 @@ class ThreadRepositoryServerImpl(
 
 //    override var data: Flow<List<Post>> = dao.flowThreadByPublshedDESC(threadType, threadId).map(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
 
-    override var data: Flow<List<Post>> = dao.flowThreadByPublshedDESC(threadType, threadId).map {
-        it.map {
-            //println("Preparing post " + it.id)
-            val post = it.toDto()
-
-            val preparedContent: String = PostTextPreparator(post)
-                .prepareAll()
-                .get()
-
-            val preparedPost = post.copy(preparedContent = preparedContent)
-            preparedPost
-        }
-    }.flowOn(Dispatchers.Default)
-
-    private var lastUpdateTime: Long = 0
-
+    override val lastUpdateTime: MutableLiveData<Long> = MutableLiveData(0L)
     private val updaterJob = startCheckUpdates()
 
-    override suspend fun getThreadPosts() {
-        try {
-            //println("Loading posts from server")
-//            val params = HashMap<String?, String?>()
-//            params["access_token"] = resources.getString(R.string.electro_club_access_token)
-//            params["user_token"] = appAuth.myToken()
-//            params["method"] = "getPosts"
-//            params["thread_type"] = threadType.toString()
-//            params["thread_id"] = threadId.toString()
-//            val response = apiService.getThreadPosts(params)
+//    @OptIn(ExperimentalPagingApi::class)
+//    val data1: Flow<PagingData<Post>> = Pager(
+//        config = PagingConfig(pageSize = 25),
+//        remoteMediator = PostRemoteMediator(apiService, appDb, postDao, postRemoteKeyDao),
+//        pagingSourceFactory = postDao::pagingSource,
+//    ).flow.map { pagingData ->
+//        pagingData.map(PostEntity::toDto)
+//    }
 
-            val response = apiService.getThreadPosts(
-                access_token = resources.getString(R.string.electro_club_access_token),
-                user_token = appAuth.myToken(),
-                threadType = threadType,
-                threadId = threadId,
-            )
 
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
+    // https://stackoverflow.com/questions/64692260/paging-3-0-list-with-new-params-in-kotlin?noredirect=1&lq=1
+    var targetFlow = MutableStateFlow(value = ThreadTargetPost(targetPostPosition = "last"))
+    //val pagingSource = dao.pagingSource(threadType, threadId)
+
+//    val dataSourceFactory = object : PagingSource<Int, PostEntity>() {
+//        fun create(): PagingSource<Int, PostEntity> {
+//            return dao.pagingSource(threadType, threadId)
+//        }
+//
+//        override fun getRefreshKey(state: PagingState<Int, PostEntity>): Int? {
+//            TODO("Not yet implemented")
+//        }
+//
+//        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PostEntity> {
+//            TODO("Not yet implemented")
+//        }
+//    }
+
+    override val data = targetFlow.flatMapLatest { refreshTarget ->
+        @OptIn(ExperimentalPagingApi::class)
+        Pager(
+            config = PagingConfig(pageSize = 20),
+            remoteMediator = PostRemoteMediator(diContainer, threadType, threadId, target = refreshTarget),
+            pagingSourceFactory = {
+                dao.pagingSource(threadType, threadId)
+            },
+        ).flow.map { pagingData ->
+            pagingData.map {
+                val post = it.toDto()
+
+                val preparedContent: String = PostTextPreparator(post)
+                    .prepareAll()
+                    .get()
+
+                val preparedPost = post.copy(preparedContent = preparedContent)
+                preparedPost
             }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-
-            val currentMessages = dao.getAllList(threadType, threadId).toDto()
-
-            if (currentMessages.isEmpty()) {
-                dao.insert(body.data.messages.toEntity())
-            } else {
-                val first = currentMessages.first()
-                val last = currentMessages.last()
-
-                // TODO перенести в пагинатор. Период для удаления сообщений брать из запроса, а не ответа.
-//                val last = body.data.messages.first()
-//                val first = body.data.messages.last()
-//                val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
-//                val date1 = java.util.Date(first.published * 1000)
-//                val date2 = java.util.Date(last.published * 1000)
-//                println("first: " + sdf.format(date1).toString())
-//                println("last: " + sdf.format(date2).toString())
-
-                dao.clearAndInsert(body.data.messages.toEntity(), threadType, threadId, first.published, last.published)
-            }
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
         }
     }
+
+    override fun reloadPosts() {
+        // https://stackoverflow.com/questions/64715949/update-current-page-or-update-data-in-paging-3-library-android-kotlin
+        println("reloadPosts()")
+        dao.pagingSource(threadType, threadId).invalidate()
+        //targetFlow.value = targetFlow.value
+    }
+
+    override fun changeTargetPost(target: ThreadTargetPost) {
+        targetFlow.value = target
+    }
+
+//    // TODO возможно, этот метод бльше не нужен? (после внедрения Pager)
+//    override suspend fun getThreadPosts() {
+//        try {
+//            val response = apiService.getThreadPosts(
+//                access_token = resources.getString(R.string.electro_club_access_token),
+//                user_token = appAuth.myToken(),
+//                threadType = threadType,
+//                threadId = threadId,
+//            )
+//
+//            if (!response.isSuccessful) {
+//                throw ApiError(response.code(), response.message())
+//            }
+//            val body = response.body() ?: throw ApiError(response.code(), response.message())
+//
+//            dao.insert(body.data.messages.toEntity())
+//        } catch (e: IOException) {
+//            throw NetworkError
+//        } catch (e: Exception) {
+//            throw UnknownError
+//        }
+//    }
 
     override suspend fun savePost(post: Post) {
         val newPost = post.copy(
@@ -127,9 +143,10 @@ class ThreadRepositoryServerImpl(
 
             val newTime = body.data.time
 
-            if (newTime > lastUpdateTime) {
-                if (lastUpdateTime != 0L) getThreadPosts()
-                lastUpdateTime = newTime
+            if (newTime > lastUpdateTime.value!!) {
+                //refreshData()
+                //if (lastUpdateTime != 0L) getThreadPosts()
+                lastUpdateTime.postValue(newTime)
             }
             //println("lastUpdate: " + lastUpdateTime + ", newTime: " + newTime)
         }
@@ -144,5 +161,22 @@ class ThreadRepositoryServerImpl(
 
     override fun stopCheckUpdates() {
         updaterJob.cancel()
+    }
+}
+
+class ThreadTargetPost (
+    val targetPostId: Long? = null,
+    val targetPostPosition: String? = "last"
+) {
+    companion object {
+        val TARGET_POSITION_FIRST = "first"
+        val TARGET_POSITION_LAST = "last"
+    }
+
+    fun targetApiParameter():String {
+        if (targetPostId != null) {
+            return targetPostId.toString()
+        }
+        return targetPostPosition ?: TARGET_POSITION_LAST
     }
 }
