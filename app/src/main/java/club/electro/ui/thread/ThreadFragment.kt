@@ -17,7 +17,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
-import club.electro.util.StringArg
 import androidx.recyclerview.widget.LinearLayoutManager
 import club.electro.MainViewModel
 import club.electro.R
@@ -27,8 +26,10 @@ import club.electro.util.AndroidUtils
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import androidx.core.view.isVisible
-import club.electro.ToolBarDoubleTitle
+import club.electro.ToolBarConfig
 import club.electro.repository.ThreadTargetPost
+import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
+import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
 
 
 class ThreadFragment : Fragment() {
@@ -58,10 +59,19 @@ class ThreadFragment : Fragment() {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
             viewModel.thread.observe(viewLifecycleOwner) {
                 it?.let {
-                    mainViewModel.updateActionBarTitle(ToolBarDoubleTitle(
+                    mainViewModel.updateActionBarTitle(ToolBarConfig(
                         title1 = it.name,
-                        title2 = getString(R.string.subscribers_count) + it.subscribersCount.toString())
-                    )
+                        title2 = getString(R.string.subscribers_count) + ": " + it.subscribersCount.toString(),
+                        onClick = {
+                            findNavController().navigate(
+                                R.id.action_threadFragment_to_threadInfoFragment,
+                                Bundle().apply {
+                                    threadInfoType = it.type
+                                    threadInfoId = it.id
+                                }
+                            )
+                        }
+                    ))
                 }
             }
         } ?: throw Throwable("Invalid activity")
@@ -71,8 +81,8 @@ class ThreadFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val threadType = arguments?.threadType
-        val threadId = arguments?.threadId
+        val threadType = requireArguments().threadType
+        val threadId =  requireArguments().threadId
 
 
         // TODO явно есть более красивый способ
@@ -153,6 +163,27 @@ class ThreadFragment : Fragment() {
 //            }
 //        })
 
+//        viewModel.thread.observe(viewLifecycleOwner) {
+//            activity?.run {
+//                val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+//                it?.let {
+//                    mainViewModel.updateActionBarTitle(ToolBarConfig(
+//                        title1 = it.name,
+//                        title2 = getString(R.string.subscribers_count) + ": " + it.subscribersCount.toString(),
+//                        onClick = {
+//                            findNavController().navigate(
+//                                R.id.action_threadFragment_to_threadInfoFragment,
+//                                Bundle().apply {
+//                                    threadInfoType = it.type
+//                                    threadInfoId = it.id
+//                                }
+//                            )
+//                        }
+//                    ))
+//                }
+//            }
+//        }
+
         lifecycleScope.launchWhenCreated {
             viewModel.posts.collectLatest {
                 adapter.submitData(it)
@@ -213,7 +244,6 @@ class ThreadFragment : Fragment() {
         // TODO реализовано криво. Вообще логику обновления лучше не выносить за репозиторий.
         // Но почему-то вызванная из checkForUpdates() функция reloadPosts() не релодит посты
         viewModel.lastUpdateTime.observe(viewLifecycleOwner) {
-            println("lastUpdateChanged: " + it)
             if (it > 0L) {
                 if (firstUpdateTimeReceived) {
                     adapter.refresh()
@@ -379,8 +409,9 @@ class ThreadFragment : Fragment() {
      */
     override fun onDestroyView() {
         super.onDestroyView()
-        viewModel.stop()
+        viewModel.stopCheckUpdates()
     }
+
 
     /**
      * Прижимает все сообщения к верху
@@ -401,6 +432,7 @@ class ThreadFragment : Fragment() {
         linearLayoutManager.stackFromEnd = false
         binding.postsList.setLayoutManager(linearLayoutManager)
     }
+
 }
 
 //      Перехват изменения состояния скроллинга

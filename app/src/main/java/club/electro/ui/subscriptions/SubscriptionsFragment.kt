@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import club.electro.MainViewModel
 import club.electro.R
-import club.electro.ToolBarDoubleTitle
+import club.electro.ToolBarConfig
 import club.electro.adapter.SubscriptionAreaAdapter
 import club.electro.adapter.SubscriptionAreaInteractionListener
 import club.electro.databinding.FragmentSubscriptionsBinding
@@ -31,7 +31,7 @@ class SubscriptionsFragment : Fragment() {
 
         activity?.run {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-            mainViewModel.updateActionBarTitle(ToolBarDoubleTitle(title1 = getString(R.string.menu_subscriptions)))
+            mainViewModel.updateActionBarTitle(ToolBarConfig(title1 = getString(R.string.menu_subscriptions)))
         } ?: throw Throwable("Invalid activity")
     }
 

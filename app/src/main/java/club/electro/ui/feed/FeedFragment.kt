@@ -5,11 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import club.electro.MainViewModel
 import club.electro.R
-import club.electro.ToolBarDoubleTitle
+import club.electro.ToolBarConfig
 import club.electro.adapter.*
 import club.electro.databinding.FragmentFeedBinding
 import club.electro.dto.FeedPost
@@ -31,7 +30,7 @@ class FeedFragment : Fragment() {
 
         activity?.run {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-            mainViewModel.updateActionBarTitle(ToolBarDoubleTitle(title1 = getString(R.string.menu_feed)))
+            mainViewModel.updateActionBarTitle(ToolBarConfig(title1 = getString(R.string.menu_feed)))
         } ?: throw Throwable("Invalid activity")
     }
 

@@ -94,7 +94,7 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
         editorPost.value = editorPost.value?.copy(answerTo = null)
     }
 
-    fun stop() {
+    fun stopCheckUpdates() {
         repository.stopCheckUpdates()
     }
 }

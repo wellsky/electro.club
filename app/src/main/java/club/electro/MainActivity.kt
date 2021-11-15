@@ -95,19 +95,15 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
-        viewModel.title.observe(this, {
-            supportActionBar?.title = it.title1
-            supportActionBar?.subtitle = it.title2
+        // https://developer.android.com/guide/fragments/appbar
+        viewModel.title.observe(this, { config->
+            supportActionBar?.title = config.title1
+            supportActionBar?.subtitle = config.title2
 
-//            toolBar.title1.text = it.title1
-//
-//            toolBar.title2.isVisible = false
-//            it.title2?.let {
-//                toolBar.title2.text = it
-//                toolBar.title2.isVisible = true
-//            }
-
-
+            binding.appBarMain.toolbar.setOnClickListener {
+                //TODO или лучше сразу вызывать onClick, но тогда надо будет поменять параметры функции
+                config.onClick()
+            }
         })
     }
 

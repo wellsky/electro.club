@@ -6,12 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import club.electro.MainViewModel
 import club.electro.R
-import club.electro.ToolBarDoubleTitle
+import club.electro.ToolBarConfig
 import club.electro.databinding.FragmentUserProfileBinding
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
@@ -39,7 +38,7 @@ class UserProfileFragment : Fragment() {
         _binding = FragmentUserProfileBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val userId = arguments!!.userId!!
+        val userId = requireArguments().userId
 
         viewModel = UserProfileViewModel(
             requireActivity().getApplication(),
@@ -95,7 +94,7 @@ class UserProfileFragment : Fragment() {
 
             activity?.run {
                 val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-                mainViewModel.updateActionBarTitle(ToolBarDoubleTitle(title1 = user.name))
+                mainViewModel.updateActionBarTitle(ToolBarConfig(title1 = user.name))
             } ?: throw Throwable("Invalid activity")
         }
 

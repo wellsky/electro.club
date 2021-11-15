@@ -39,5 +39,5 @@
     <string name="post_status_saving">Saving...</string>
     <string name="post_status_removing">Removing...</string>
 
-    <string name="subscribers_count">Subscribers: </string>
+    <string name="subscribers_count">Subscribers</string>
 </resources>

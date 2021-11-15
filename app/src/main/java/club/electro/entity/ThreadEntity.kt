@@ -12,6 +12,7 @@ data class ThreadEntity(
     val type: Byte,
     val name: String,
     val image: String,
+    val messages: Long,
     val subscribersCount: Long,
 ) {
     fun toDto() = PostsThread(
@@ -19,6 +20,7 @@ data class ThreadEntity(
         type = type,
         name = name,
         image = image,
+        messages = messages,
         subscribersCount = subscribersCount
     )
 
@@ -29,6 +31,7 @@ data class ThreadEntity(
                 type = dto.type,
                 name = dto.name,
                 image = dto.image,
+                messages = dto.messages,
                 subscribersCount = dto.subscribersCount
             )
     }
