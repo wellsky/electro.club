@@ -33,15 +33,15 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
 
 
     fun loadThreadBegining() {
-        repository.changeTargetPost(ThreadTargetPost(targetPostPosition = ThreadTargetPost.TARGET_POSITION_FIRST))
+        repository.changeTargetPost(ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_FIRST))
     }
 
     fun loadThreadEnd() {
-        repository.changeTargetPost(ThreadTargetPost(targetPostPosition = ThreadTargetPost.TARGET_POSITION_LAST))
+        repository.changeTargetPost(ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST))
     }
 
-    fun reloadPosts() {
-        repository.reloadPosts()
+    fun reloadPosts(target: ThreadLoadTarget) {
+        repository.reloadPosts(target)
     }
 
     fun changeEditorPostContent(content: String) {

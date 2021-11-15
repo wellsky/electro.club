@@ -42,7 +42,7 @@ class ThreadRepositoryServerImpl(
 
 
     // https://stackoverflow.com/questions/64692260/paging-3-0-list-with-new-params-in-kotlin?noredirect=1&lq=1
-    var targetFlow = MutableStateFlow(value = ThreadTargetPost(targetPostPosition = "last"))
+    var targetFlow = MutableStateFlow(value = ThreadLoadTarget(targetPostPosition = "last"))
     //val pagingSource = dao.pagingSource(threadType, threadId)
 
 //    val dataSourceFactory = object : PagingSource<Int, PostEntity>() {
@@ -106,14 +106,14 @@ class ThreadRepositoryServerImpl(
         }
     }
 
-    override fun reloadPosts() {
+    override fun reloadPosts(target: ThreadLoadTarget) {
         // https://stackoverflow.com/questions/64715949/update-current-page-or-update-data-in-paging-3-library-android-kotlin
         println("reloadPosts()")
-        postDao.pagingSource(threadType, threadId).invalidate()
-        //targetFlow.value = targetFlow.value
+        //postDao.pagingSource(threadType, threadId).invalidate()
+        targetFlow.value = target
     }
 
-    override fun changeTargetPost(target: ThreadTargetPost) {
+    override fun changeTargetPost(target: ThreadLoadTarget) {
         targetFlow.value = target
     }
 
@@ -193,13 +193,23 @@ class ThreadRepositoryServerImpl(
     }
 }
 
-class ThreadTargetPost (
+
+/**
+ * Класс, описывающий задачу для загрузки поста
+ * Передается в RemoteMediator чтобы загрузить соответствующий пост
+ * А также используется во фрагменте, чтобы после загрузки отобразить соответствующий пост
+ */
+class ThreadLoadTarget (
     val targetPostId: Long? = null,
-    val targetPostPosition: String? = "last"
+    val targetPostPosition: String? = "last",
+
+    val quiet: Boolean = false,
+    val highlight: Boolean = false,
 ) {
     companion object {
         val TARGET_POSITION_FIRST = "first"
         val TARGET_POSITION_LAST = "last"
+//        val TARGET_POSITION_CURRENT = "current"
     }
 
     fun targetApiParameter():String {

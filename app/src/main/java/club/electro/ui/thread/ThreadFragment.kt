@@ -27,7 +27,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import androidx.core.view.isVisible
 import club.electro.ToolBarConfig
-import club.electro.repository.ThreadTargetPost
+import club.electro.repository.ThreadLoadTarget
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
 
@@ -43,7 +43,7 @@ class ThreadFragment : Fragment() {
 
     private val binding get() = _binding!!
 
-    private var currentTargetPost: ThreadTargetPost? = null
+    private var currentTargetPost: ThreadLoadTarget? = null
 
     private var firstUpdateTimeReceived = false
 
@@ -197,14 +197,14 @@ class ThreadFragment : Fragment() {
             // https://stackoverflow.com/questions/51889154/recycler-view-not-scrolling-to-the-top-after-adding-new-item-at-the-top-as-chan
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 currentTargetPost?.let {
-                    if (it.targetPostPosition == ThreadTargetPost.TARGET_POSITION_FIRST) {
+                    if (it.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_FIRST) {
                         setGravityTop()
                         binding.postsList.scrollToPosition((binding.postsList.getAdapter()!!.getItemCount() - 1))
                         scrolledToTop = true
                         binding.buttonScrollToBegin.isVisible = false
 
                     }
-                    if (it.targetPostPosition == ThreadTargetPost.TARGET_POSITION_LAST) {
+                    if (it.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_LAST) {
                         setGravityBottom()
                         binding.postsList.smoothScrollToPosition(0)
                         scrolledToBottom = true
@@ -247,7 +247,9 @@ class ThreadFragment : Fragment() {
             if (it > 0L) {
                 if (firstUpdateTimeReceived) {
                     adapter.refresh()
-                    //viewModel.reloadPosts()
+//                    viewModel.reloadPosts(ThreadLoadTarget(
+//                        targetPostPosition = ThreadLoadTarget.TARGET_POSITION_CURRENT
+//                    ))
                 } else {
                     firstUpdateTimeReceived = true
                 }
@@ -324,22 +326,22 @@ class ThreadFragment : Fragment() {
         })
 
         binding.testButton.setOnClickListener {
-            println(binding.postsList.getAdapter()!!.getItemCount())
-            binding.postsList.smoothScrollToPosition((binding.postsList.getAdapter()!!.getItemCount() - 1))
-
-            setGravityTop()
+            adapter.refresh()
+//            viewModel.reloadPosts(ThreadLoadTarget(
+//                targetPostPosition = ThreadLoadTarget.TARGET_POSITION_CURRENT
+//            ))
         }
 
         binding.buttonScrollToBegin.setOnClickListener {
             viewModel.loadThreadBegining()
             adapter.refresh()
-            currentTargetPost = ThreadTargetPost(targetPostPosition = ThreadTargetPost.TARGET_POSITION_FIRST)
+            currentTargetPost = ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_FIRST)
         }
 
         binding.buttonScrollToEnd.setOnClickListener {
             viewModel.loadThreadEnd()
             adapter.refresh()
-            currentTargetPost = ThreadTargetPost(targetPostPosition = ThreadTargetPost.TARGET_POSITION_LAST)
+            currentTargetPost = ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST)
         }
 
         binding.editorPostSave.setOnClickListener {
@@ -355,7 +357,7 @@ class ThreadFragment : Fragment() {
                 setText("")
                 clearFocus()
                 AndroidUtils.hideKeyboard(it)
-                currentTargetPost = ThreadTargetPost(targetPostPosition = ThreadTargetPost.TARGET_POSITION_LAST)
+                currentTargetPost = ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST)
             }
             //binding.editMessageGroup.visibility = View.GONE
         }

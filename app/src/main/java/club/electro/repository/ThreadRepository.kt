@@ -19,8 +19,8 @@ interface ThreadRepository {
     suspend fun removePost(post: Post)
     suspend fun checkForUpdates()
 
-    fun reloadPosts()
-    fun changeTargetPost(target: ThreadTargetPost)
+    fun reloadPosts(target: ThreadLoadTarget)
+    fun changeTargetPost(target: ThreadLoadTarget)
 
     fun startCheckUpdates(): Job
     fun stopCheckUpdates()

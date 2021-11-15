@@ -17,7 +17,7 @@ class PostRemoteMediator(
     val diContainer: DependencyContainer,
     val threadType: Byte,
     val threadId: Long,
-    val target: ThreadTargetPost
+    val target: ThreadLoadTarget
 ) : RemoteMediator<Int, PostEntity>() {
     val resources = diContainer.resources
     val apiService = diContainer.apiService
@@ -25,15 +25,6 @@ class PostRemoteMediator(
     val db = diContainer.appDb
     val postDao = db.postDao()
     val postRemoteKeyDao = db.postRemoteKeyDao()
-
-    /**
-     * Две задачи, которые надо решить:
-     * 1. Обращаться к Api постоянно во время скроллинга, чтобы обновить посты в БД.
-     * При этом не удалять заранее все посты, тода можно быстро будет скроллить в середину чата, и только после отображения обновлять.
-     *
-     * 2. Скроллить по id поста.
-     * Как вариант - загружать данные с определенной позиции.
-     */
 
     init {
         println("Mediator init")
@@ -46,16 +37,35 @@ class PostRemoteMediator(
         try {
             val response = when (loadType) {
                 LoadType.REFRESH -> {
-                    println("REFRESH FROM " + target.targetPostPosition + " -" + state.config.pageSize)
+
+                    // Если надо начать от последнего сообщения, то при рефреше загружаем отрицательное число постов (т.е. вверх по списку)
+                    var count = if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_LAST)
+                                -state.config.pageSize else state.config.pageSize
+
+
+                    // Если anchorPosition не null, значит был вызван refresh() (особенности библиотеки) и надо обновить видимые посты
+                    val from = state.anchorPosition?.let {
+                        println("anchor: " + state.anchorPosition + " postId: " + state.closestItemToPosition(it)?.id + " gravity: " + target.targetPostPosition)
+
+                        // В зависимости от "гравитации" ближайший пост будет либо выше, либо ниже видимой области экрана
+                        count = if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_LAST)
+                                state.config.pageSize else -state.config.pageSize
+
+                        state.closestItemToPosition(it)?.id.toString()
+                    } ?: target.targetApiParameter() // Иначе начинаем загрузку с указанного в цели значения
+
+                    println("REFRESH FROM " + from + " " + count + " anchor: " +  state.anchorPosition)
+
                     apiService.getThreadPosts(
                         access_token = resources.getString(R.string.electro_club_access_token),
                         user_token = appAuth.myToken(),
                         threadType = threadType,
                         threadId = threadId,
-                        from = target.targetApiParameter(),
-                        count = -state.config.pageSize
+                        from = from,
+                        count = count
                     )
                 }
+
                 // TODO поменять логику PREPEND и APPEND чтобы соответствовала значению слов?
                 LoadType.PREPEND -> {
 //                    val item = state.firstItemOrNull() ?: return MediatorResult.Success(
@@ -64,7 +74,7 @@ class PostRemoteMediator(
                     val id = postRemoteKeyDao.max(threadType, threadId) ?: return MediatorResult.Success(
                         endOfPaginationReached = false
                     )
-                    println("PREPEND FROM " + id + " " + state.config.pageSize)
+                    println("PREPEND FROM " + id + " " + state.config.pageSize + " anchor: " +  state.anchorPosition)
                     apiService.getThreadPosts(
                         access_token = resources.getString(R.string.electro_club_access_token),
                         user_token = appAuth.myToken(),
@@ -78,7 +88,8 @@ class PostRemoteMediator(
                     val id = postRemoteKeyDao.min(threadType, threadId) ?: return MediatorResult.Success(
                         endOfPaginationReached = false
                     )
-                    println("APPEND FROM " + id + " -" + state.config.pageSize)
+                    println("APPEND FROM " + id + " -" + state.config.pageSize + " anchor: " +  state.anchorPosition)
+
                     apiService.getThreadPosts(
                         access_token = resources.getString(R.string.electro_club_access_token),
                         user_token = appAuth.myToken(),
