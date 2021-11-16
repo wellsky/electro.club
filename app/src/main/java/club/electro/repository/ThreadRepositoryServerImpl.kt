@@ -3,7 +3,6 @@ package club.electro.repository
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.*
 import club.electro.R
-import club.electro.adapter.PostTextPreparator
 import club.electro.di.DependencyContainer
 import club.electro.dto.Post
 import club.electro.dto.PostsThread
@@ -21,6 +20,7 @@ class ThreadRepositoryServerImpl(
 
     private val threadDao = diContainer.appDb.threadDao()
     private val postDao = diContainer.appDb.postDao()
+    private val userDao = diContainer.appDb.userDao()
     private val resources = diContainer.context.resources
     private val apiService = diContainer.apiService
     private val appAuth = diContainer.appAuth
@@ -71,12 +71,20 @@ class ThreadRepositoryServerImpl(
             pagingData.map {
                 val post = it.toDto()
 
-                val preparedContent: String = PostTextPreparator(post)
-                    .prepareAll()
-                    .get()
+//                val user = User(
+//                    id = it.authorId,
+//                    name = it.authorName,
+//                    avatar = it.authorAvatar
+//                )
+//                userDao.insertIfNotExists(user.toEntity())
 
-                val preparedPost = post.copy(preparedContent = preparedContent)
-                preparedPost
+//                val preparedContent: String = PostTextPreparator(post)
+//                    .prepareAll()
+//                    .get()
+//
+//                val preparedPost = post.copy(preparedContent = preparedContent)
+//                preparedPost
+                post
             }
         }
     }
@@ -145,14 +153,15 @@ class ThreadRepositoryServerImpl(
             threadId = threadId,
             threadType = threadType,
         )
-        postRepository.savePost(newPost)
+        postRepository.savePostToServer(newPost)
     }
 
     override suspend fun removePost(post: Post) {
-        postRepository.removePost(post)
+        postRepository.removePostFromServer(post)
     }
 
     override suspend fun checkForUpdates()  {
+        println("Start checking updates...")
         while (true) {
             delay(2_000L)
 
@@ -196,12 +205,12 @@ class ThreadRepositoryServerImpl(
 
 /**
  * Класс, описывающий задачу для загрузки поста
- * Передается в RemoteMediator чтобы загрузить соответствующий пост
+ * Передается в RemoteMediator чтобы загрузить посты от указанного в настройках
  * А также используется во фрагменте, чтобы после загрузки отобразить соответствующий пост
  */
 class ThreadLoadTarget (
     val targetPostId: Long? = null,
-    val targetPostPosition: String? = "last",
+    val targetPostPosition: String? = TARGET_POSITION_LAST,
 
     val quiet: Boolean = false,
     val highlight: Boolean = false,
@@ -209,7 +218,6 @@ class ThreadLoadTarget (
     companion object {
         val TARGET_POSITION_FIRST = "first"
         val TARGET_POSITION_LAST = "last"
-//        val TARGET_POSITION_CURRENT = "current"
     }
 
     fun targetApiParameter():String {

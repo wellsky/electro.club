@@ -32,13 +32,13 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
     }
 
 
-    fun loadThreadBegining() {
-        repository.changeTargetPost(ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_FIRST))
-    }
-
-    fun loadThreadEnd() {
-        repository.changeTargetPost(ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST))
-    }
+//    fun loadThreadBegining() {
+//        repository.changeTargetPost(ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_FIRST))
+//    }
+//
+//    fun loadThreadEnd() {
+//        repository.changeTargetPost(ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST))
+//    }
 
     fun reloadPosts(target: ThreadLoadTarget) {
         repository.reloadPosts(target)

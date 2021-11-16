@@ -3,9 +3,9 @@ package club.electro.dto
 open class User(
     val id: Long,
     val name: String,
-    val avatar: String?,
-    val messages: Int,
-    val rating: Int,
+    val avatar: String? = null,
+    val messages: Int = 0,
+    val rating: Int = 0,
     val primaryTransport: UserPrimaryTransport? = null,
     val myChat: ThreadLink? = null
 )

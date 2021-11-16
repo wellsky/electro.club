@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import club.electro.dto.Post
+import club.electro.dto.User
 
 @Entity(indices = [Index(value = ["id"], unique = true)])
 data class PostEntity(
@@ -17,6 +18,7 @@ data class PostEntity(
     val authorName: String,
     val authorAvatar: String,
     val content: String,
+    val preparedContent: String,
     val published: Long,
     val answerTo: Long?,
     val likes: Int = 0,
@@ -34,6 +36,7 @@ data class PostEntity(
         authorName = authorName,
         authorAvatar = authorAvatar,
         content = content,
+        preparedContent = preparedContent,
         published = published,
         answerTo = answerTo,
         likes = likes,
@@ -54,6 +57,7 @@ data class PostEntity(
                 authorName = dto.authorName,
                 authorAvatar = dto.authorAvatar,
                 content = dto.content,
+                preparedContent = dto.preparedContent,
                 published = dto.published,
                 answerTo = dto.answerTo,
                 likes = dto.likes,
@@ -66,3 +70,4 @@ data class PostEntity(
 
 fun List<PostEntity>.toDto(): List<Post> = map(PostEntity::toDto)
 fun List<Post>.toEntity(): List<PostEntity> = map(PostEntity::fromDto)
+fun Post.toEntity(): PostEntity = PostEntity.fromDto(this)

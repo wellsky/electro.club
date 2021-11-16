@@ -5,6 +5,7 @@ import club.electro.R
 import club.electro.di.DependencyContainer
 import club.electro.dto.Post
 import club.electro.entity.PostEntity
+import club.electro.entity.toEntity
 import club.electro.error.ApiError
 import club.electro.error.NetworkError
 import club.electro.error.UnknownError
@@ -32,7 +33,11 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
         return dao.getPostById(id)?.toDto()
     }
 
-    override suspend fun savePost(post: Post) {
+    override suspend fun savePostToChache(post: Post) {
+        dao.insert(post.toEntity())
+    }
+
+    override suspend fun savePostToServer(post: Post) {
         println("Insert new post")
 
         val savingEntity = if (post.id == 0L) {
@@ -102,7 +107,7 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
         }
     }
 
-    override suspend fun removePost(post: Post) {
+    override suspend fun removePostFromServer(post: Post) {
         val exist = dao.getPostById(post.id)
         val removingPost = PostEntity.fromDto(post).copy(
             localId = exist.localId,

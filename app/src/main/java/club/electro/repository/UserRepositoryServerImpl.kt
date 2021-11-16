@@ -5,6 +5,7 @@ import club.electro.R
 import club.electro.di.DependencyContainer
 import club.electro.dto.EmptyUserProfile
 import club.electro.dto.MapMarker
+import club.electro.dto.Post
 import club.electro.dto.User
 import club.electro.entity.MapMarkerEntity
 import club.electro.entity.UserEntity
@@ -13,15 +14,12 @@ import club.electro.entity.toEntity
 import club.electro.error.ApiError
 import club.electro.error.NetworkError
 import club.electro.error.UnknownError
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import java.io.IOException
 
 class UserRepositoryServerImpl(
     private val diContainer: DependencyContainer,
-    private val userId: Long
 ) : UserRepository {
     private val resources = diContainer.context.resources
     private val appAuth = diContainer.appAuth
@@ -29,11 +27,49 @@ class UserRepositoryServerImpl(
     private val dao = diContainer.appDb.userDao()
 
     //override val currentProfile: Flow<User> = dao.getById(12343545).map(UserEntity::toDto).flowOn(Dispatchers.Default)
-    override val currentProfile: Flow<User> = dao.getById(userId).map {
-        it?.toDto() ?: EmptyUserProfile()
-    }.flowOn(Dispatchers.Default)
 
-    override suspend fun getUserProfile(id: Long) {
+    var currentProfileFlow = MutableStateFlow(0L)
+
+    override val currentProfile: Flow<User> = currentProfileFlow.flatMapLatest {
+        dao.flowById(it).map {
+            it?.toDto() ?: EmptyUserProfile()
+        }.flowOn(Dispatchers.Default)
+    }
+
+    override suspend fun getLocalById(id: Long, callback: () -> Unit): User? {
+        println("getLocalByid " + id)
+        return dao.getById(id)?.let {
+            println("got it " + id)
+            it.toDto()
+        } ?: run {
+            println("Create empty " + id)
+            dao.insert(User(
+                id = id,
+                name = "Loading...",
+            ).toEntity())
+
+            CoroutineScope(Dispatchers.Default).launch {
+                println("load it " + id)
+                // TODO юзера с сервера и вынести функцию в репозиторий PostRepository
+                val user = loadUser(id)
+                dao.insert(user.toEntity())
+                delay(100)
+                println("load done, callback  " + id)
+                callback()
+            }
+            println("return null " + id)
+            null
+        }
+    }
+
+    override suspend fun setCurrentProfile(id: Long) {
+        currentProfileFlow.value = id
+        val user = loadUser(id)
+        dao.insert(user.toEntity())
+    }
+
+    override suspend fun loadUser(id: Long): User {
+        println("Load user profile: " + id)
         try {
             val params = HashMap<String?, String?>()
             params["access_token"] = resources.getString(R.string.electro_club_access_token)
@@ -46,7 +82,8 @@ class UserRepositoryServerImpl(
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            dao.insert(body.data.user.toDto().toEntity())
+            //dao.insert(body.data.user.toDto().toEntity())
+            return body.data.user.toDto()
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {

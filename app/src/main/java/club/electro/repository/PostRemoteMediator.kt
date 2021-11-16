@@ -6,6 +6,8 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import club.electro.R
+import club.electro.adapter.MultiplePostsTextPreparator
+import club.electro.adapter.PostTextPreparator
 import club.electro.di.DependencyContainer
 import club.electro.entity.PostEntity
 import club.electro.entity.PostRemoteKeyEntity
@@ -43,16 +45,17 @@ class PostRemoteMediator(
                                 -state.config.pageSize else state.config.pageSize
 
 
-                    // Если anchorPosition не null, значит был вызван refresh() (особенности библиотеки) и надо обновить видимые посты
+                    // Если anchorPosition не null, значит был вызван adapter.refresh() (особенности библиотеки) и надо обновить видимые посты
                     val from = state.anchorPosition?.let {
                         println("anchor: " + state.anchorPosition + " postId: " + state.closestItemToPosition(it)?.id + " gravity: " + target.targetPostPosition)
 
-                        // В зависимости от "гравитации" ближайший пост будет либо выше, либо ниже видимой области экрана
+                        // В зависимости от "гравитации" ближайший видимый пост будет либо выше, либо ниже видимой области экрана
+                        // Значит загрузку надо начать с сообщений либо до либо после этого поста
                         count = if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_LAST)
                                 state.config.pageSize else -state.config.pageSize
 
                         state.closestItemToPosition(it)?.id.toString()
-                    } ?: target.targetApiParameter() // Иначе начинаем загрузку с указанного в цели значения
+                    } ?: target.targetApiParameter() // Это не adapter.refresh(), начинаем загрузку с указанного в цели значения
 
                     println("REFRESH FROM " + from + " " + count + " anchor: " +  state.anchorPosition)
 
@@ -74,7 +77,7 @@ class PostRemoteMediator(
                     val id = postRemoteKeyDao.max(threadType, threadId) ?: return MediatorResult.Success(
                         endOfPaginationReached = false
                     )
-                    println("PREPEND FROM " + id + " " + state.config.pageSize + " anchor: " +  state.anchorPosition)
+                    println("PREPEND FROM " + id + " " + state.config.pageSize)
                     apiService.getThreadPosts(
                         access_token = resources.getString(R.string.electro_club_access_token),
                         user_token = appAuth.myToken(),
@@ -88,7 +91,7 @@ class PostRemoteMediator(
                     val id = postRemoteKeyDao.min(threadType, threadId) ?: return MediatorResult.Success(
                         endOfPaginationReached = false
                     )
-                    println("APPEND FROM " + id + " -" + state.config.pageSize + " anchor: " +  state.anchorPosition)
+                    println("APPEND FROM " + id + " -" + state.config.pageSize)
 
                     apiService.getThreadPosts(
                         access_token = resources.getString(R.string.electro_club_access_token),
@@ -109,7 +112,7 @@ class PostRemoteMediator(
                 response.message(),
             )
 
-            postDao.insert(body.data.messages.toEntity())
+            //postDao.insert(body.data.messages.toEntity())
 
             db.withTransaction {
                 when (loadType) {
@@ -135,26 +138,24 @@ class PostRemoteMediator(
                     }
                     LoadType.PREPEND -> {
                         postRemoteKeyDao.update(
-                            //PostRemoteKeyEntity(
-                                type = PostRemoteKeyEntity.KeyType.AFTER,
-                                threadType = threadType,
-                                threadId = threadId,
-                                postId = body.data.messages.last().id,
-                            //)
+                            type = PostRemoteKeyEntity.KeyType.AFTER,
+                            threadType = threadType,
+                            threadId = threadId,
+                            postId = body.data.messages.last().id,
                         )
                     }
                     LoadType.APPEND -> {
                         postRemoteKeyDao.update(
-                            //PostRemoteKeyEntity(
-                                type = PostRemoteKeyEntity.KeyType.BEFORE,
-                                threadType = threadType,
-                                threadId = threadId,
-                                postId = body.data.messages.first().id,
-                            //)
+                            type = PostRemoteKeyEntity.KeyType.BEFORE,
+                            threadType = threadType,
+                            threadId = threadId,
+                            postId = body.data.messages.first().id,
                         )
                     }
                 }
-                postDao.insert(body.data.messages.toEntity())
+
+                val messages = MultiplePostsTextPreparator(body.data.messages).prepareAll()
+                postDao.insert(messages.toEntity())
             }
 
 

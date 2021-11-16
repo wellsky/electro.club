@@ -9,6 +9,8 @@ import club.electro.auth.AppAuth
 import club.electro.db.AppDb
 import club.electro.repository.PostRepository
 import club.electro.repository.PostRepositoryServerImpl
+import club.electro.repository.UserRepository
+import club.electro.repository.UserRepositoryServerImpl
 
 class DependencyContainer private constructor(val context: Context) {
     val resources = context.resources
@@ -17,6 +19,7 @@ class DependencyContainer private constructor(val context: Context) {
     val appAuth: AppAuth = AppAuth.initApp(context, this)
 
     val postRepository: PostRepository = PostRepositoryServerImpl(this)
+    val userRepository: UserRepository = UserRepositoryServerImpl(this)
     val workManager = WorkManager.getInstance(context)
 
     init {

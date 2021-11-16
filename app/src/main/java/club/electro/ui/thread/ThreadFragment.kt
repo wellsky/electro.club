@@ -140,62 +140,10 @@ class ThreadFragment : Fragment() {
 
         binding.postsList.adapter = adapter
 
-        // TODO после перехода на Pager блок внизу не работает. В адаптере больше нет текущего списка
-//        viewModel.data.observe(viewLifecycleOwner, { items ->
-//            val newPostPublished: Boolean = if (!adapter.currentList.isEmpty() && !items.isEmpty()) {
-//                val oldLastPost: Post = adapter.currentList.first()
-//                val newLastPost: Post = items.first()
-//                (newLastPost.published > oldLastPost.published)
-//            } else {
-//                !items.isEmpty()
-//            }
-//
-//            adapter.submitList(items)
-//
-//            if (newPostPublished) {
-//                if (binding.postsList.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
-//                    if (getFocusedItem() == 0) {
-//                        binding.postsList.smoothScrollToPosition(0);
-//                    } else {
-//                        //TODO Внизу появились новые сообщения
-//                    }
-//                }
-//            }
-//        })
-
-//        viewModel.thread.observe(viewLifecycleOwner) {
-//            activity?.run {
-//                val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-//                it?.let {
-//                    mainViewModel.updateActionBarTitle(ToolBarConfig(
-//                        title1 = it.name,
-//                        title2 = getString(R.string.subscribers_count) + ": " + it.subscribersCount.toString(),
-//                        onClick = {
-//                            findNavController().navigate(
-//                                R.id.action_threadFragment_to_threadInfoFragment,
-//                                Bundle().apply {
-//                                    threadInfoType = it.type
-//                                    threadInfoId = it.id
-//                                }
-//                            )
-//                        }
-//                    ))
-//                }
-//            }
-//        }
 
         lifecycleScope.launchWhenCreated {
             viewModel.posts.collectLatest {
-                adapter.submitData(it)
-            }
-        }
 
-        // https://stackoverflow.com/questions/27816217/how-to-save-recyclerviews-scroll-position-using-recyclerview-state/61609823#61609823
-        adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT
-
-        adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
-            // https://stackoverflow.com/questions/51889154/recycler-view-not-scrolling-to-the-top-after-adding-new-item-at-the-top-as-chan
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 currentTargetPost?.let {
                     if (it.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_FIRST) {
                         setGravityTop()
@@ -210,16 +158,22 @@ class ThreadFragment : Fragment() {
                         scrolledToBottom = true
                         binding.buttonScrollToEnd.isVisible = false
                     }
+                    currentTargetPost = null
                 }
 
-                currentTargetPost = null
+                adapter.submitData(it)
+            }
+        }
 
+        adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
+            // https://stackoverflow.com/questions/51889154/recycler-view-not-scrolling-to-the-top-after-adding-new-item-at-the-top-as-chan
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 // TODO нужен нормальный метод для определения публикации новых постов
                 val newPostsPublished = ((positionStart == 0) and (itemCount == 1))
 
                 if (newPostsPublished) {
                     if (binding.postsList.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
-                        if (getFocusedItem() == 0) {
+                        if (scrolledToBottom) {
                             binding.postsList.smoothScrollToPosition(0);
                         } else {
                             //TODO Внизу появились новые сообщения
@@ -227,8 +181,6 @@ class ThreadFragment : Fragment() {
                         }
                     }
                 }
-
-
             }
         })
 
@@ -242,14 +194,11 @@ class ThreadFragment : Fragment() {
         }
 
         // TODO реализовано криво. Вообще логику обновления лучше не выносить за репозиторий.
-        // Но почему-то вызванная из checkForUpdates() функция reloadPosts() не релодит посты
+        // Но только adapter.refresh() может указать медиатору на текущий видимый пост
         viewModel.lastUpdateTime.observe(viewLifecycleOwner) {
             if (it > 0L) {
                 if (firstUpdateTimeReceived) {
                     adapter.refresh()
-//                    viewModel.reloadPosts(ThreadLoadTarget(
-//                        targetPostPosition = ThreadLoadTarget.TARGET_POSITION_CURRENT
-//                    ))
                 } else {
                     firstUpdateTimeReceived = true
                 }
@@ -308,7 +257,7 @@ class ThreadFragment : Fragment() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 if (!recyclerView.canScrollVertically(-1)) {
-                    // Внизу больше ничего нет
+                    // Вверху больше ничего нет
                     scrolledToTop = true
                     binding.buttonScrollToBegin.isVisible = false
                 } else {
@@ -327,21 +276,17 @@ class ThreadFragment : Fragment() {
 
         binding.testButton.setOnClickListener {
             adapter.refresh()
-//            viewModel.reloadPosts(ThreadLoadTarget(
-//                targetPostPosition = ThreadLoadTarget.TARGET_POSITION_CURRENT
-//            ))
         }
 
         binding.buttonScrollToBegin.setOnClickListener {
-            viewModel.loadThreadBegining()
-            adapter.refresh()
             currentTargetPost = ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_FIRST)
+            viewModel.reloadPosts(currentTargetPost!!)
+
         }
 
         binding.buttonScrollToEnd.setOnClickListener {
-            viewModel.loadThreadEnd()
-            adapter.refresh()
             currentTargetPost = ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST)
+            viewModel.reloadPosts(currentTargetPost!!)
         }
 
         binding.editorPostSave.setOnClickListener {
@@ -385,16 +330,9 @@ class ThreadFragment : Fragment() {
         return root
     }
 
-    /**
-     * Возвращает порядковый номер поста, на котором находится фокус
-     */
-    fun getFocusedItem(): Int {
-        return (binding.postsList.getLayoutManager() as LinearLayoutManager)
-        .findFirstVisibleItemPosition()
-    }
-
     // TODO не работает. Надо сделать сохранение текущей позиции.
     // https://stackoverflow.com/questions/27816217/how-to-save-recyclerviews-scroll-position-using-recyclerview-state/61609823#61609823
+    // adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT
     override fun onPause() {
         super.onPause()
         lastFirstVisiblePosition = (binding.postsList.getLayoutManager() as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
@@ -417,6 +355,10 @@ class ThreadFragment : Fragment() {
 
     /**
      * Прижимает все сообщения к верху
+     * Гравитация была добавлена из-за асинхронной подгрузки изображений в сообщения
+     * Если при нижней гравитации перемотать чат до самого верха, то загрузится первое сообщение, сфокусируется,
+     * а потом начнет уползать вверх из-за подгружаемых ниже изображений, вместо того чтобы нижние сообщения ползли вниз.
+     * И дойдет даже до того, что начнут грузится все новые и новые страницы.
      */
     fun setGravityTop() {
         val linearLayoutManager = LinearLayoutManager(this.context)

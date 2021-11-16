@@ -6,12 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import club.electro.MainViewModel
 import club.electro.R
 import club.electro.ToolBarConfig
 import club.electro.databinding.FragmentUserProfileBinding
+import club.electro.di.DependencyContainer
+import club.electro.ui.map.MapViewModel
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.utils.LongArg
@@ -22,13 +25,14 @@ class UserProfileFragment : Fragment() {
         var Bundle.userId: Long by LongArg
     }
 
+    val diContainer: DependencyContainer = DependencyContainer.getInstance()
+
     private var _binding: FragmentUserProfileBinding? = null
     private val binding get() = _binding!!
 
-//    private val viewModel: UserProfileViewModel by viewModels (
-//        ownerProducer = ::requireParentFragment
-//    )
-    private lateinit var viewModel: UserProfileViewModel
+    private val viewModel: UserProfileViewModel by viewModels (
+        ownerProducer = ::requireParentFragment
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,12 +44,7 @@ class UserProfileFragment : Fragment() {
 
         val userId = requireArguments().userId
 
-        viewModel = UserProfileViewModel(
-            requireActivity().getApplication(),
-            userId,
-        )
-
-        viewModel.getUserProfile(userId)
+        viewModel.setCurrentProfile(userId)
 
         viewModel.currentProfile.observe(viewLifecycleOwner) { user->
             with (binding) {

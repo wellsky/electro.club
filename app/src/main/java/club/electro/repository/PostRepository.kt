@@ -8,8 +8,10 @@ interface PostRepository {
 
     suspend fun getLocalPostById(id: Long): Post?
 
-    suspend fun savePost(post: Post)
+    suspend fun savePostToChache(post: Post)
+
+    suspend fun savePostToServer(post: Post)
     suspend fun savePostWork(localId: Long)
 
-    suspend fun removePost(post: Post)
+    suspend fun removePostFromServer(post: Post)
 }
