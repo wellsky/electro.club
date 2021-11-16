@@ -142,7 +142,7 @@ class PostViewHolder(
             val resources: Resources = this.root.resources
 
 
-            val preparedContent = post.preparedContent
+            val preparedContent = post.preparedContent ?: post.content
 
 
             //val text = "l o n g t e x t l o n g t e x t l o n g t e x l o n g t e x t l o n g t e x t l o n g t e x  l o n g t e x t l o n g t e x t l o n g t e x "

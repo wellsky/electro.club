@@ -14,7 +14,7 @@ interface ThreadRepository {
 
     suspend fun getThread()
 
-    suspend fun savePost(post: Post)
+    suspend fun saveToServerPost(post: Post)
 
     suspend fun removePost(post: Post)
     suspend fun checkForUpdates()

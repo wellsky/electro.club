@@ -1,6 +1,7 @@
 package club.electro.dto
 
 data class Post (
+    val localId: Long,
     val id: Long,
     val status: Byte,
     val threadType: Byte,
@@ -9,7 +10,7 @@ data class Post (
     val authorName: String,
     val authorAvatar: String,
     val content: String,
-    val preparedContent: String = content,
+    val preparedContent: String? = content,
     val published: Long,
     val answerTo: Long? = null,
     val likes: Int = 0,

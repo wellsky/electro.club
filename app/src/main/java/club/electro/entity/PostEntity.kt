@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import club.electro.dto.Post
 import club.electro.dto.User
 
-@Entity(indices = [Index(value = ["id"], unique = true)])
+@Entity(indices = [Index(value = ["threadType", "threadId", "id"], unique = true)])
 data class PostEntity(
     @PrimaryKey(autoGenerate = true)
     val localId: Long,
@@ -18,16 +18,19 @@ data class PostEntity(
     val authorName: String,
     val authorAvatar: String,
     val content: String,
-    val preparedContent: String,
+    val preparedContent: String?,
     val published: Long,
     val answerTo: Long?,
     val likes: Int = 0,
     val views: Int = 0,
 
     val canEdit: Boolean = false,
-    val canRemove: Boolean = false
+    val canRemove: Boolean = false,
+
+    val fresh: Boolean = false,
 ) {
     fun toDto() = Post(
+        localId = localId,
         id = id,
         status = status,
         threadType = threadType,
@@ -48,7 +51,7 @@ data class PostEntity(
     companion object {
         fun fromDto(dto: Post) =
             PostEntity(
-                localId = 0,
+                localId = dto.localId,
                 id = dto.id,
                 status = dto.status,
                 threadType = dto.threadType,
