@@ -7,20 +7,26 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PostDao {
-    @Query("SELECT * FROM PostEntity WHERE threadType = :threadType AND threadId = :threadId ORDER BY published DESC")
-    fun flowThreadByPublshedDESC(threadType: Byte, threadId: Long): Flow<List<PostEntity>>
+//    @Query("SELECT * FROM PostEntity WHERE threadType = :threadType AND threadId = :threadId ORDER BY published DESC")
+//    fun flowThreadByPublshedDESC(threadType: Byte, threadId: Long): Flow<List<PostEntity>>
 
-    @Query("SELECT * FROM PostEntity WHERE threadType = :threadType AND threadId = :threadId ORDER BY published DESC")
-    fun pagingSource(threadType: Byte, threadId: Long): PagingSource<Int, PostEntity>
+    @Query("SELECT * FROM PostEntity WHERE threadType = :threadType AND threadId = :threadId AND fresh = 1 ORDER BY published DESC")
+    fun freshPosts(threadType: Byte, threadId: Long): PagingSource<Int, PostEntity>
 
-    @Query("SELECT * FROM PostEntity WHERE threadType = :threadType AND threadId = :threadId ORDER BY published")
-    suspend fun getAllList(threadType: Byte, threadId: Long): List<PostEntity>
+    @Query("UPDATE PostEntity SET fresh = 0 WHERE threadType = :threadType AND threadId = :threadId")
+    suspend fun unfreshThread(threadType: Byte, threadId: Long)
 
-    @Query("SELECT * FROM PostEntity WHERE id = :id")
-    suspend fun getPostById(id: Long): PostEntity
+    @Query("UPDATE PostEntity SET preparedContent = :content WHERE threadType = :threadType AND threadId = :threadId AND id = :id")
+    suspend fun updatePreparedContent(threadType: Byte, threadId: Long, id: Long, content: String)
+
+//    @Query("SELECT * FROM PostEntity WHERE threadType = :threadType AND threadId = :threadId ORDER BY published")
+//    suspend fun getAllList(threadType: Byte, threadId: Long): List<PostEntity>
+
+    @Query("SELECT * FROM PostEntity WHERE threadType = :threadType AND threadId = :threadId AND id = :id")
+    suspend fun getById(threadType: Byte, threadId:Long, id: Long): PostEntity?
 
     @Query("SELECT * FROM PostEntity WHERE localId = :id")
-    suspend fun getPostByLocalId(id: Long): PostEntity
+    suspend fun getByLocalId(id: Long): PostEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(post: PostEntity): Long
@@ -28,8 +34,8 @@ interface PostDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(posts: List<PostEntity>)
 
-    @Query("DELETE FROM PostEntity WHERE threadType = :threadType AND threadId = :threadId")
-    suspend fun removeThread(threadType: Byte, threadId: Long)
+//    @Query("DELETE FROM PostEntity WHERE threadType = :threadType AND threadId = :threadId")
+//    suspend fun removeThread(threadType: Byte, threadId: Long)
 
     @Query("DELETE FROM PostEntity")
     suspend fun removeAll()

@@ -65,7 +65,7 @@ class ThreadRepositoryServerImpl(
             config = PagingConfig(pageSize = 20),
             remoteMediator = PostRemoteMediator(diContainer, threadType, threadId, target = refreshTarget),
             pagingSourceFactory = {
-                postDao.pagingSource(threadType, threadId)
+                postDao.freshPosts(threadType, threadId)
             },
         ).flow.map { pagingData ->
             pagingData.map {
@@ -148,7 +148,7 @@ class ThreadRepositoryServerImpl(
 //        }
 //    }
 
-    override suspend fun savePost(post: Post) {
+    override suspend fun savePostToServer(post: Post) {
         val newPost = post.copy(
             threadId = threadId,
             threadType = threadType,
@@ -162,7 +162,7 @@ class ThreadRepositoryServerImpl(
 
     override suspend fun checkForUpdates()  {
         println("Start checking updates...")
-        while (true) {
+        while (false) {
             delay(2_000L)
 
             val params = HashMap<String?, String?>()

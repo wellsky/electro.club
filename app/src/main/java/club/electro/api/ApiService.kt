@@ -95,6 +95,7 @@ interface ApiService {
         @Field("thread_type") threadType: Byte,
         @Field("thread_id") threadId: Long,
         @Field("from") from: String? = null,
+        @Field("included") included: Byte? = null,
         @Field("count") count: Int? = null,
     ): Response<ApiResponse<ApiPostsData>>
 

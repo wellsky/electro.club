@@ -57,7 +57,7 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
         editorPost.value?.let {
             viewModelScope.launch {
                 try {
-                    repository.savePost(it)
+                    repository.savePostToServer(it)
                 } catch (e: Exception) {
 
                 }
@@ -100,6 +100,7 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
 }
 
 private val emptyPost = Post(
+    localId = 0L,
     id = 0L,
     status = 0,
     threadType = 0,

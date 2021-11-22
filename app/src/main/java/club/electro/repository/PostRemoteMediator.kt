@@ -74,6 +74,7 @@ class PostRemoteMediator(
 //                    val item = state.firstItemOrNull() ?: return MediatorResult.Success(
 //                        endOfPaginationReached = false
 //                    )
+//                    val id = item.id
                     val id = postRemoteKeyDao.max(threadType, threadId) ?: return MediatorResult.Success(
                         endOfPaginationReached = false
                     )
@@ -88,6 +89,10 @@ class PostRemoteMediator(
                     )
                 }
                 LoadType.APPEND -> {
+//                    val item = state.lastItemOrNull() ?: return MediatorResult.Success(
+//                        endOfPaginationReached = false
+//                    )
+//                    val id = item.id
                     val id = postRemoteKeyDao.min(threadType, threadId) ?: return MediatorResult.Success(
                         endOfPaginationReached = false
                     )
@@ -134,7 +139,8 @@ class PostRemoteMediator(
                                 ),
                             )
                         )
-                        postDao.removeThread(threadType = threadType, threadId = threadId)
+//                        postDao.removeThread(threadType = threadType, threadId = threadId)
+                          postDao.unfreshThread(threadType = threadType, threadId = threadId)
                     }
                     LoadType.PREPEND -> {
                         postRemoteKeyDao.update(
@@ -155,7 +161,10 @@ class PostRemoteMediator(
                 }
 
                 val messages = MultiplePostsTextPreparator(body.data.messages).prepareAll()
-                postDao.insert(messages.toEntity())
+                postDao.insert(messages.toEntity().map {
+                    it.copy(fresh = true)
+                })
+
             }
 
 

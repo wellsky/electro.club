@@ -3,7 +3,6 @@ package club.electro.adapter
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import club.electro.di.DependencyContainer
-import club.electro.dto.FeedPost
 import club.electro.dto.Post
 import club.electro.dto.User
 import club.electro.repository.PostRepository
@@ -15,25 +14,24 @@ class MultiplePostsTextPreparator(val posts: List<Post>) {
     val postRepository: PostRepository = diContainer.postRepository
 
     suspend fun prepareAll(): List<Post> {
-        println("Prepare all")
         return posts.map {
             val post = it.copy( preparedContent = PostTextPreparator(it) {
-                val updatedPsot = it.copy(preparedContent = PostTextPreparator(it).prepareAll().get())
-                postRepository.savePostToChache(updatedPsot)
+                postRepository.updateLocalPostPreparedContent(it.threadType, it.threadId, it.id, PostTextPreparator(it).prepareAll().get())
             }.prepareAll().get())
-
-            if (post.id == 31921L) {
-                println("31921!!!!")
-            }
+//            val post = it.copy( preparedContent = PostTextPreparator(it).prepareAll().get())
             post
         }
     }
 }
 
-class PostTextPreparator(source: String, val answerTo: Long? = null, val callback: suspend () -> Unit = {}) {
+class PostTextPreparator(
+        val source: String? = null,
+        val post: Post? = null,
+        val onLoadDataCallback: (suspend () -> Unit)? = null
+) {
     val ANSWERTO_MAX_TEXT_LENGTH = 128
 
-    var text = source
+    var text = ""
 
     val diContainer = DependencyContainer.getInstance()
     val postRepository: PostRepository = diContainer.postRepository
@@ -42,8 +40,19 @@ class PostTextPreparator(source: String, val answerTo: Long? = null, val callbac
     val userRepository: UserRepository = diContainer.userRepository
 
 
-    constructor(post: Post, callback: suspend () -> Unit = {}): this(post.content, post.answerTo, callback)
-    constructor(post: FeedPost, callback: suspend () -> Unit = {}): this(post.content, null, callback)
+    constructor(text: String): this(source = text)
+    constructor(sourcePost: Post, callback: (suspend () -> Unit)? = null): this(post = sourcePost, onLoadDataCallback = callback)
+    //constructor(post: FeedPost, callback: (suspend () -> Unit)? = null): this(post.content, null, callback)
+
+    init {
+        source?.let {
+            text = it
+        }
+
+        post?.let {
+            text = post.content
+        }
+    }
 
     fun get(): String {
         return text
@@ -51,14 +60,18 @@ class PostTextPreparator(source: String, val answerTo: Long? = null, val callbac
 
     suspend fun prepareAll(): PostTextPreparator {
         prepareLegacyQuotes()
+        prepareLegacyUrls()
         prepareEmojies()
         prepareImagesOnNewLine()
         prepareBasicTags()
         prepareRelativeUrls()
 
         // suspend:
-        prepareAnswerTo()
-        prepareQuotes()
+        post?.let {
+            prepareAnswerTo()
+            prepareQuotes()
+        }
+
         prepareUsers()
 
         return this
@@ -86,8 +99,13 @@ class PostTextPreparator(source: String, val answerTo: Long? = null, val callbac
             }
         }
 
-        answerTo?.let {
-            val sourceMessage = postRepository.getLocalPostById(it)
+        post?.answerTo?.let {
+            val sourceMessage: Post? = postRepository.getLocalById(
+                post.threadType,
+                post.threadId,
+                it,
+                onLoadDataCallback
+            )
             val answerText = sourceMessage?.let {
                 "<blockquote><strong>Ответ " + sourceMessage.authorName + "</strong>: " + shortTextPreview(sourceMessage.content) + "</blockquote>"
             } ?: "<blockquote><strong>Ответ на сообщение " + it + "</strong></blockquote>"
@@ -117,30 +135,24 @@ class PostTextPreparator(source: String, val answerTo: Long? = null, val callbac
      * Заменяет тэги [quote messge=<id>]<text>[/quote] на цитату
      */
     suspend fun prepareQuotes(): PostTextPreparator {
-        val pattern = """\[quote message=(\d+?)\](.*?)\[\/quote\]"""
-
-        val result = Regex(pattern).replace(text) {
-            runBlocking {
-                val (quotedMessageId, quoteText) = it.destructured
-                val sourceMessage = postRepository.getLocalPostById(quotedMessageId.toLong())
-                val author = ("<strong>" + sourceMessage?.authorName ?: "?") + "</strong>: "
-                "<blockquote>" + author + quoteText + "</blockquote>"
+        post?.let { post ->
+            val pattern = """\[quote message=(\d+?)\](.*?)\[\/quote\]"""
+            val result = Regex(pattern).replace(text) {
+                runBlocking {
+                    val (quotedMessageId, quoteText) = it.destructured
+                    val sourceMessage: Post? = postRepository.getLocalById(
+                        post.threadType,
+                        post.threadId,
+                        quotedMessageId.toLong(),
+                        onLoadDataCallback
+                    )
+                    val author = ("<strong>" + sourceMessage?.authorName ?: "?") + "</strong>: "
+                    "<blockquote>" + author + quoteText + "</blockquote>"
+                }
             }
+
+            text = result
         }
-
-//        val lamda: (it: MatchResult) -> CharSequence = {
-//            val (quotedMessageId, quoteText) = it.destructured
-//
-//            val sourceMessage = GlobalScope.async {
-//                repository.getPostById(quotedMessageId.toLong())
-//            }
-//
-//            val author = ("<strong>" + sourceMessage.authorName ?: "?") + "</strong>: "
-//            "<blockquote>" +author + quoteText + "</blockquote>"
-//        }
-//        val result = Regex(pattern).replace(text, lamda)
-
-        text = result
         return this
     }
 
@@ -154,14 +166,10 @@ class PostTextPreparator(source: String, val answerTo: Long? = null, val callbac
         val result = Regex(pattern).replace(text) {
             runBlocking {
                 val (userId) = it.destructured
-                val author: User? = userRepository.getLocalById(userId.toLong()) {
-                    runBlocking {
-                        callback()
-                    }
-                } // userDao.getUserById(userId.toLong())?.toDto()
-                //val author = ("<strong>" + sourceMessage?.authorName ?: "?") + "</strong>: "
+                val author: User? = userRepository.getLocalById(userId.toLong(), onLoadedCallback = onLoadDataCallback)
+
                 "<a href=\"https://electro.club/users/" + userId + "\">@" + (author?.name
-                    ?: "@user" + userId) + "</a>"
+                    ?: "user" + userId) + "</a>"
             }
         }
 
@@ -185,16 +193,27 @@ class PostTextPreparator(source: String, val answerTo: Long? = null, val callbac
 
         val pattern2= """\[quote\](.*?)\[\/quote\]"""
         val result2 = Regex(pattern2).replace(result1) {
-            runBlocking {
-                val (quoteText) = it.destructured
-                val author = "<strong>Цитата: </strong>: "
-                "<blockquote>" + author + quoteText + "</blockquote>"
-            }
+            val (quoteText) = it.destructured
+            val author = "<strong>Цитата: </strong>: "
+            "<blockquote>" + author + quoteText + "</blockquote>"
         }
 
         text = result2
         return this
     }
+
+    fun prepareLegacyUrls(): PostTextPreparator {
+        val pattern= """\[url=(.*?)\](.*?)\[\/url\]"""
+
+        val result = Regex(pattern).replace(text) {
+            val (url, anchor) = it.destructured
+            "<a href=\"" + url + "\">" + anchor + "</a>"
+        }
+
+        text = result
+        return this
+    }
+
 
     /**
      * В текстах встречаются изображения с классом emojione

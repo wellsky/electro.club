@@ -4,14 +4,14 @@ import androidx.work.*
 import club.electro.R
 import club.electro.di.DependencyContainer
 import club.electro.dto.Post
+import club.electro.dto.User
 import club.electro.entity.PostEntity
 import club.electro.entity.toEntity
 import club.electro.error.ApiError
 import club.electro.error.NetworkError
 import club.electro.error.UnknownError
 import club.electro.workers.SavePostWorker
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
+import kotlinx.coroutines.*
 import java.io.IOException
 
 class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository {
@@ -26,11 +26,77 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
         this.workManager = workManager
     }
 
-    override suspend fun getLocalPostById(id: Long): Post? {
-        GlobalScope.async {
-            // TODO загрузить пост с сервера и вынести функцию в репозиторий PostRepository
+    override suspend fun getLocalById(threadType: Byte, threadId:Long, id: Long, onLoadedCallback:  (suspend () -> Unit)?): Post? {
+        return dao.getById(threadType, threadId, id)?.let {
+            if (it.status != Post.STATUS_WAITING_FOR_LOAD) {
+                it.toDto()
+            } else {
+                null
+            }
+        } ?: onLoadedCallback?.run {
+            dao.insert(Post(
+                localId = 0,
+                id = id,
+                status = Post.STATUS_WAITING_FOR_LOAD,
+                threadType = threadType,
+                threadId = threadId,
+                authorId = 0,
+                authorName = "Loading author...",
+                published = 0L,
+            ).toEntity())
+
+            CoroutineScope(Dispatchers.Default).launch {
+                delay(2000)
+                dao.getById(threadType, threadId, id)?.let {
+                    if (it.published == 0L) {
+                        val post = getRemoteById(threadType, threadId, id)
+                        post?.let {
+                            dao.insert(post.toEntity())
+                        } ?: run {
+                            //TODO удалить созданный временно пост
+                        }
+                    }
+                    onLoadedCallback()
+                }
+            }
+            null
         }
-        return dao.getPostById(id)?.toDto()
+    }
+
+    override suspend fun getRemoteById(threadType: Byte, threadId: Long, id: Long): Post? {
+        println("Load remote post: " + id)
+        try {
+            val response = apiService.getThreadPosts(
+                access_token = resources.getString(R.string.electro_club_access_token),
+                user_token = appAuth.myToken(),
+                threadType = threadType,
+                threadId = threadId,
+                from = id.toString(),
+                included = 1,
+                count = 1
+            )
+
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+
+            return if (body.data.messages.size > 0) {
+                //TODO сервер не отдает посты из других тем. Надо отдавать, если threadType=2
+                body.data.messages[0]
+            } else {
+                null
+            }
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }
+
+    override suspend fun updateLocalPostPreparedContent(threadType: Byte, threadId: Long, id: Long, preparedContent: String) {
+        //println("Update content for: " + post.id + " localId: " + post.localId)
+        dao.updatePreparedContent(threadType, threadId, id, preparedContent)
     }
 
     override suspend fun savePostToChache(post: Post) {
@@ -38,22 +104,22 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
     }
 
     override suspend fun savePostToServer(post: Post) {
-        println("Insert new post")
-
         val savingEntity = if (post.id == 0L) {
             PostEntity.fromDto(post).copy(
                 status = Post.STATUS_CREATED_LOCAL,
                 published = System.currentTimeMillis()/1000,
                 authorId = appAuth.myId(),
                 authorName = appAuth.myName() ?: "",
-                authorAvatar = appAuth.myAvatar() ?: ""
+                authorAvatar = appAuth.myAvatar() ?: "",
+                preparedContent = post.content, //TODO стоит сразу пропускать через Preparator?
+                fresh = true
             )
-
         } else {
-            val exist = dao.getPostById(post.id)
+            val exist = dao.getById(post.threadType, post.threadId, post.id)
             PostEntity.fromDto(post).copy(
-                localId = exist.localId,
+                localId = exist!!.localId, // TODO
                 status = Post.STATUS_SAVING_LOCAL,
+                fresh = true
             )
         }
 
@@ -75,42 +141,49 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
     }
 
     override suspend fun savePostWork(localId: Long) {
-        val entity = dao.getPostByLocalId(localId)
-        println("Saving work for post: " + entity.localId)
+        val entity = dao.getByLocalId(localId)
 
-        try {
-            val params = HashMap<String?, String?>()
-            params["access_token"] = resources.getString(R.string.electro_club_access_token)
-            params["user_token"] = appAuth.myToken()
-            params["method"] = "savePost"
-            params["thread_type"] = entity.threadType.toString()
-            params["thread_id"] = entity.threadId.toString()
-            params["post_id"] = entity.id.toString()
-            params["post_content"] = entity.content
+        entity?.let { entity ->
+            println("Saving work for post: " + entity.localId)
+            try {
+                val params = HashMap<String?, String?>()
+                params["access_token"] = resources.getString(R.string.electro_club_access_token)
+                params["user_token"] = appAuth.myToken()
+                params["method"] = "savePost"
+                params["thread_type"] = entity.threadType.toString()
+                params["thread_id"] = entity.threadId.toString()
+                params["post_id"] = entity.id.toString()
+                params["post_content"] = entity.content
 
-            entity.answerTo?.let {
-                params["answer_to"] = it.toString()
+                entity.answerTo?.let {
+                    params["answer_to"] = it.toString()
+                }
+
+                val response = apiService.savePost(params)
+                if (!response.isSuccessful) {
+                    throw ApiError(response.code(), response.message())
+                }
+                val body = response.body() ?: throw ApiError(response.code(), response.message())
+
+                val currentCached = dao.getByLocalId(localId)
+
+                val newPost = PostEntity.fromDto(body.data.message).copy(localId = localId, fresh = (currentCached?.fresh ?: false))
+
+                dao.insert(newPost)
+                println("Have response new post id:" + body.data.message.id)
+            } catch (e: IOException) {
+                throw NetworkError
+            } catch (e: Exception) {
+                throw UnknownError
             }
-
-            val response = apiService.savePost(params)
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
-            }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            val newPost = PostEntity.fromDto(body.data.message).copy(localId = localId)
-            dao.insert(newPost)
-            println("Have response new post id:" + body.data.message.id)
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
         }
     }
 
     override suspend fun removePostFromServer(post: Post) {
-        val exist = dao.getPostById(post.id)
+        val exist = dao.getById(post.threadType, post.threadId, post.id)
+
         val removingPost = PostEntity.fromDto(post).copy(
-            localId = exist.localId,
+            localId = exist!!.localId, //TODO
             status = Post.STATUS_REMOVING_LOCAL,
         )
 

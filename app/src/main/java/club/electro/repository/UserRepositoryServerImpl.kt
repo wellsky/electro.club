@@ -36,39 +36,32 @@ class UserRepositoryServerImpl(
         }.flowOn(Dispatchers.Default)
     }
 
-    override suspend fun getLocalById(id: Long, callback: () -> Unit): User? {
-        println("getLocalByid " + id)
+    override suspend fun getLocalById(id: Long, onLoadedCallback:  (suspend () -> Unit)?): User? {
         return dao.getById(id)?.let {
-            println("got it " + id)
             it.toDto()
-        } ?: run {
-            println("Create empty " + id)
+        } ?: onLoadedCallback?.run {
             dao.insert(User(
                 id = id,
                 name = "Loading...",
             ).toEntity())
 
             CoroutineScope(Dispatchers.Default).launch {
-                println("load it " + id)
-                // TODO юзера с сервера и вынести функцию в репозиторий PostRepository
-                val user = loadUser(id)
+                val user = getRemoteById(id)
                 dao.insert(user.toEntity())
-                delay(100)
-                println("load done, callback  " + id)
-                callback()
+                //println("call callback " + id)
+                onLoadedCallback()
             }
-            println("return null " + id)
             null
         }
     }
 
     override suspend fun setCurrentProfile(id: Long) {
         currentProfileFlow.value = id
-        val user = loadUser(id)
+        val user = getRemoteById(id)
         dao.insert(user.toEntity())
     }
 
-    override suspend fun loadUser(id: Long): User {
+    override suspend fun getRemoteById(id: Long): User {
         println("Load user profile: " + id)
         try {
             val params = HashMap<String?, String?>()

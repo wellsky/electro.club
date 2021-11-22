@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.Flow
 interface UserRepository {
     val currentProfile: Flow<User>
 
-    suspend fun getLocalById(id: Long, callback: () -> Unit): User?
+    suspend fun getLocalById(id: Long, onLoadedCallback:  (suspend () -> Unit)? = null): User?
 
-    suspend fun loadUser(id: Long): User
+    suspend fun getRemoteById(id: Long): User
 
     suspend fun setCurrentProfile(id: Long)
 }
