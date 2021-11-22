@@ -8,8 +8,8 @@ data class Post (
     val threadId: Long,
     val authorId: Long,
     val authorName: String,
-    val authorAvatar: String,
-    val content: String,
+    val authorAvatar: String? = null,
+    val content: String = "",
     val preparedContent: String? = content,
     val published: Long,
     val answerTo: Long? = null,
@@ -24,5 +24,6 @@ data class Post (
         const val STATUS_CREATED_LOCAL: Byte = 101
         const val STATUS_SAVING_LOCAL: Byte = 102
         const val STATUS_REMOVING_LOCAL: Byte = 103
+        const val STATUS_WAITING_FOR_LOAD: Byte = 104
     }
 }

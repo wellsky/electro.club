@@ -102,7 +102,7 @@ class PostViewHolder(
                 }
             }
 
-            if (!post.authorAvatar.isEmpty()) {
+            post.authorAvatar?.let {
                 Glide.with(authorAvatar.context)
                     .load(post.authorAvatar)
                     .circleCrop()

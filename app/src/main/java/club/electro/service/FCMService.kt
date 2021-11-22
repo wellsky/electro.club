@@ -76,12 +76,18 @@ class FCMService : FirebaseMessagingService() {
         }
     }
 
+    override fun onDeletedMessages() {
+        super.onDeletedMessages()
+    }
+
     private fun handleNewMessage(message: RemoteMessage) {
         val action = message.data.get(action)
 
         when (action) {
             ACTION_PERSONAL_MESSAGE, ACTION_THREAD_POST, ACTION_ANSWER, ACTION_MENTION, ACTION_QUOTE -> {
                 val data = gson.fromJson(message.data[content], PostNotification::class.java)
+                val groupTitle = "new messages"
+                val groupKey = "electro.club" //"THREAD-" + data.threadType + "-" + data.threadId
 
                 // https://stackoverflow.com/questions/26608627/how-to-open-fragment-page-when-pressed-a-notification-in-android
                 val resultPendingIntent = NavDeepLinkBuilder(this)
@@ -93,8 +99,6 @@ class FCMService : FirebaseMessagingService() {
                         threadId = data.threadId
                     })
                     .createPendingIntent()
-
-                val groupKey = "THREAD-" + data.threadType + "-" + data.threadId
 
                 val notificationBuilder = NotificationCompat.Builder(this, channelId)
                     .setSmallIcon(R.drawable.electro_club_icon_grey_64)
@@ -114,6 +118,7 @@ class FCMService : FirebaseMessagingService() {
                         .setContentText(data.postContent)
                         .setStyle(NotificationCompat.BigTextStyle()
                         .bigText(data.postContent))
+                    //groupTitle = data.authorName
                 }
 
                 if (action.equals(ACTION_THREAD_POST)) {
@@ -122,13 +127,26 @@ class FCMService : FirebaseMessagingService() {
                         .setContentText(data.authorName + ": " + data.postContent)
                         .setStyle(NotificationCompat.BigTextStyle()
                         .bigText(data.authorName + ": " + data.postContent))
-
+                    //groupTitle = data.threadName
                 }
 
                 applyImageUrl(notificationBuilder, data.threadImage)
                 val notification = notificationBuilder.build()
+
                 NotificationManagerCompat.from(this)
                     .notify(Random.nextInt(100_000), notification)
+
+                val summaryNotification = NotificationCompat.Builder(this, channelId)
+                    .setSilent(true)
+                    .setContentText(groupTitle)
+                    .setSubText(groupTitle)
+                    .setSmallIcon(R.drawable.electro_club_icon_grey_64)
+                    .setGroup(groupKey)
+                    .setGroupSummary(true)
+                    .build()
+
+                NotificationManagerCompat.from(this)
+                    .notify(1, summaryNotification)
             }
         }
     }

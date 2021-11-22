@@ -148,7 +148,7 @@ class ThreadRepositoryServerImpl(
 //        }
 //    }
 
-    override suspend fun saveToServerPost(post: Post) {
+    override suspend fun savePostToServer(post: Post) {
         val newPost = post.copy(
             threadId = threadId,
             threadType = threadType,

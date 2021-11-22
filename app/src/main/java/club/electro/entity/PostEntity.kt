@@ -16,7 +16,7 @@ data class PostEntity(
     val threadId: Long,
     val authorId: Long,
     val authorName: String,
-    val authorAvatar: String,
+    val authorAvatar: String?,
     val content: String,
     val preparedContent: String?,
     val published: Long,

@@ -28,37 +28,33 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
 
     override suspend fun getLocalById(threadType: Byte, threadId:Long, id: Long, onLoadedCallback:  (suspend () -> Unit)?): Post? {
         return dao.getById(threadType, threadId, id)?.let {
-            it.toDto()
+            if (it.status != Post.STATUS_WAITING_FOR_LOAD) {
+                it.toDto()
+            } else {
+                null
+            }
         } ?: onLoadedCallback?.run {
             dao.insert(Post(
                 localId = 0,
                 id = id,
-                status = 0,
+                status = Post.STATUS_WAITING_FOR_LOAD,
                 threadType = threadType,
                 threadId = threadId,
                 authorId = 0,
                 authorName = "Loading author...",
-                authorAvatar = "",
-                content = "",
                 published = 0L,
             ).toEntity())
 
             CoroutineScope(Dispatchers.Default).launch {
-                if (id == 262638L) {
-                    println("coroutine")
-                }
-                delay(3000)
+                delay(2000)
                 dao.getById(threadType, threadId, id)?.let {
                     if (it.published == 0L) {
-                        if (it.id == 262638L) {
-                            println("load")
-                        }
                         val post = getRemoteById(threadType, threadId, id)
-                        dao.insert(post.toEntity())
-                        delay(1000)
-                    }
-                    if (it.id == 262638L) {
-                        println("callback " + it.authorName)
+                        post?.let {
+                            dao.insert(post.toEntity())
+                        } ?: run {
+                            //TODO удалить созданный временно пост
+                        }
                     }
                     onLoadedCallback()
                 }
@@ -67,7 +63,7 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
         }
     }
 
-    override suspend fun getRemoteById(threadType: Byte, threadId: Long, id: Long): Post {
+    override suspend fun getRemoteById(threadType: Byte, threadId: Long, id: Long): Post? {
         println("Load remote post: " + id)
         try {
             val response = apiService.getThreadPosts(
@@ -84,8 +80,13 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            //dao.insert(body.data.user.toDto().toEntity())
-            return body.data.messages[0]
+
+            return if (body.data.messages.size > 0) {
+                //TODO сервер не отдает посты из других тем. Надо отдавать, если threadType=2
+                body.data.messages[0]
+            } else {
+                null
+            }
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -103,8 +104,6 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
     }
 
     override suspend fun savePostToServer(post: Post) {
-        println("Insert new post")
-
         val savingEntity = if (post.id == 0L) {
             PostEntity.fromDto(post).copy(
                 status = Post.STATUS_CREATED_LOCAL,
@@ -112,14 +111,15 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
                 authorId = appAuth.myId(),
                 authorName = appAuth.myName() ?: "",
                 authorAvatar = appAuth.myAvatar() ?: "",
+                preparedContent = post.content, //TODO стоит сразу пропускать через Preparator?
                 fresh = true
             )
-
         } else {
             val exist = dao.getById(post.threadType, post.threadId, post.id)
             PostEntity.fromDto(post).copy(
                 localId = exist!!.localId, // TODO
                 status = Post.STATUS_SAVING_LOCAL,
+                fresh = true
             )
         }
 
@@ -164,7 +164,11 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
                     throw ApiError(response.code(), response.message())
                 }
                 val body = response.body() ?: throw ApiError(response.code(), response.message())
-                val newPost = PostEntity.fromDto(body.data.message).copy(localId = localId)
+
+                val currentCached = dao.getByLocalId(localId)
+
+                val newPost = PostEntity.fromDto(body.data.message).copy(localId = localId, fresh = (currentCached?.fresh ?: false))
+
                 dao.insert(newPost)
                 println("Have response new post id:" + body.data.message.id)
             } catch (e: IOException) {
