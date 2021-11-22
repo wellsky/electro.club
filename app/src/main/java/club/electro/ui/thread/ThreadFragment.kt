@@ -30,6 +30,8 @@ import club.electro.ToolBarConfig
 import club.electro.repository.ThreadLoadTarget
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
+import club.electro.utils.StripTags
+import club.electro.utils.UrlHandler
 
 
 class ThreadFragment : Fragment() {
@@ -105,6 +107,8 @@ class ThreadFragment : Fragment() {
 
         //val context1 = requireContext()
 
+        val threadFragment = this
+
         val adapter = PostAdapter(object : PostInteractionListener {
             override fun onEditClicked(post: Post) {
                 viewModel.startEditPost(post)
@@ -135,6 +139,10 @@ class ThreadFragment : Fragment() {
                         userId = post.authorId
                     }
                 )
+            }
+
+            override fun onUrlClicked(url: String?) {
+                UrlHandler(threadFragment).open(url)
             }
         })
 
@@ -209,7 +217,7 @@ class ThreadFragment : Fragment() {
         viewModel.editedPost.observe(viewLifecycleOwner) {
             if (it.id != 0L) {
                 binding.editedPostGroup.visibility = View.VISIBLE
-                binding.editedPostContent.text = it.content
+                binding.editedPostContent.text = StripTags(it.content).toString()
 
                 with (binding.editorPostContent) {
                     requestFocus()
@@ -230,7 +238,7 @@ class ThreadFragment : Fragment() {
         viewModel.answerToPost.observe(viewLifecycleOwner) {
             if (it.id != 0L) {
                 binding.answerPostGroup.visibility = View.VISIBLE
-                binding.answerToContent.text = it.content
+                binding.answerToContent.text = StripTags(it.content).toString()
             } else {
                 binding.answerPostGroup.visibility = View.GONE
             }

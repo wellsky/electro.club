@@ -42,6 +42,19 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.logging.Level.ALL
+import android.text.SpannableStringBuilder
+
+import android.text.Html
+
+import android.widget.TextView
+
+import android.text.style.ClickableSpan
+import androidx.core.content.ContextCompat.startActivity
+
+import android.content.Intent
+import android.net.Uri
+import club.electro.utils.UrlHandler
+import retrofit2.http.Url
 
 
 interface PostInteractionListener {
@@ -49,6 +62,7 @@ interface PostInteractionListener {
     fun onEditClicked(post: Post) {}
     fun onRemoveClicked(post: Post) {}
     fun onAvatarClicked(post: Post) {}
+    fun onUrlClicked(url: String?) {}
 }
 
 class PostAdapter(
@@ -142,18 +156,7 @@ class PostViewHolder(
             val resources: Resources = this.root.resources
 
 
-            val preparedContent = post.preparedContent ?: post.content
-
-
-            //val text = "l o n g t e x t l o n g t e x t l o n g t e x l o n g t e x t l o n g t e x t l o n g t e x  l o n g t e x t l o n g t e x t l o n g t e x "
-            //content.setText(text)
-            //content.measure(0, 0);       //must call measure!
-
-            //val imagesWidth = content.measuredWidth
-            //content.getWidth()
-//            val parent = content.getParent() as View
-//            val imagesWidth = parent.getWidth()
-
+            val preparedContent = post.preparedContent ?: "" //post.content
 
             val imageGetter = ImageGetter(resources, content)
 
@@ -165,34 +168,64 @@ class PostViewHolder(
                 null
             ) as Spannable
 
-            //save anchor links for later
-            val anchorTagSpans = htmlSpan.getSpans(0, htmlSpan.length, URLSpan::class.java)
-
-            //add first span to TextView
-            content.text = htmlSpan
-
-            //Linkify will now make urls clickable but overwrite our anchor links
-            Linkify.addLinks(content, Linkify.ALL)
-            //content.movementMethod = LinkMovementMethod.getInstance()
-            content.linksClickable = true
-
-            //we will add back the anchor links here
-            val restoreAnchorsSpan = SpannableString(content.text)
-            for (span in anchorTagSpans) {
-                restoreAnchorsSpan.setSpan(
-                    span,
-                    htmlSpan.getSpanStart(span),
-                    htmlSpan.getSpanEnd(span),
-                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
-                )
-            }
-
-            val trimmedPostText: CharSequence = trimWhiteSpaces(restoreAnchorsSpan)
+            val trimmedPostText: CharSequence = trimWhiteSpaces(htmlSpan)
             val result = trimmedPostText
             replaceQuoteSpans(result as Spannable)
 
-            content.setText(result);
+
+//            //save anchor links for later
+//            val anchorTagSpans = htmlSpan.getSpans(0, htmlSpan.length, URLSpan::class.java)
+//
+//            //add first span to TextView
+//            content.text = htmlSpan
+//
+//            //Linkify will now make urls clickable but overwrite our anchor links
+//            Linkify.addLinks(content, Linkify.ALL)
+//            //content.movementMethod = LinkMovementMethod.getInstance()
+//            content.linksClickable = true
+//
+//            //we will add back the anchor links here
+//            val restoreAnchorsSpan = SpannableString(content.text)
+//            for (span in anchorTagSpans) {
+//                restoreAnchorsSpan.setSpan(
+//                    span,
+//                    htmlSpan.getSpanStart(span),
+//                    htmlSpan.getSpanEnd(span),
+//                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
+//                )
+//            }
+
+            setTextViewHTML(content, result)
+
+            //content.setText(result)
         }
+    }
+
+
+    protected fun makeLinkClickable(strBuilder: SpannableStringBuilder, span: URLSpan?) {
+        val start = strBuilder.getSpanStart(span)
+        val end = strBuilder.getSpanEnd(span)
+        val flags = strBuilder.getSpanFlags(span)
+        val clickable: ClickableSpan = object : ClickableSpan() {
+            override fun onClick(view: View) {
+                // Do something with span.getURL() to handle the link click...
+                onInteractionListener.onUrlClicked(span?.getURL())
+                //UrlHandler(span?.getURL(), binding.root.context).run()
+            }
+        }
+        strBuilder.setSpan(clickable, start, end, flags)
+        strBuilder.removeSpan(span)
+    }
+
+    protected fun setTextViewHTML(text: TextView, html: CharSequence) {
+        val sequence = html //: CharSequence = Html.fromHtml(html)
+        val strBuilder = SpannableStringBuilder(sequence)
+        val urls = strBuilder.getSpans(0, sequence.length, URLSpan::class.java)
+        for (span in urls) {
+            makeLinkClickable(strBuilder, span)
+        }
+        text.text = strBuilder
+        text.movementMethod = LinkMovementMethod.getInstance()
     }
 
     private fun replaceQuoteSpans(spannable: Spannable) {

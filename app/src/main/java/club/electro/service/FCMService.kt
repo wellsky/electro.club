@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.text.HtmlCompat
 import androidx.navigation.NavDeepLinkBuilder
 import club.electro.MainActivity
 import club.electro.R
@@ -18,6 +19,7 @@ import club.electro.auth.AppAuth
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.utils.GetCircleBitmap
+import club.electro.utils.StripTags
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -110,12 +112,9 @@ class FCMService : FirebaseMessagingService() {
                 if (action.equals(ACTION_PERSONAL_MESSAGE)) {
                     notificationBuilder
                         .setContentTitle(
-                            getString(
-                                R.string.notification_personal_message,
-                                data.authorName
-                            )
+                            StripTags(getString(R.string.notification_personal_message, data.authorName)).toString()
                         )
-                        .setContentText(data.postContent)
+                        .setContentText(StripTags(data.postContent).toString())
                         .setStyle(NotificationCompat.BigTextStyle()
                         .bigText(data.postContent))
                     //groupTitle = data.authorName
@@ -123,8 +122,8 @@ class FCMService : FirebaseMessagingService() {
 
                 if (action.equals(ACTION_THREAD_POST)) {
                     notificationBuilder
-                        .setContentTitle(data.threadName)
-                        .setContentText(data.authorName + ": " + data.postContent)
+                        .setContentTitle(StripTags(data.threadName).toString())
+                        .setContentText(data.authorName + ": " + StripTags(data.postContent).toString())
                         .setStyle(NotificationCompat.BigTextStyle()
                         .bigText(data.authorName + ": " + data.postContent))
                     //groupTitle = data.threadName

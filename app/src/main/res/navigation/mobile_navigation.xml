@@ -57,4 +57,7 @@
         android:id="@+id/threadInfoFragment"
         android:name="club.electro.ui.user.ThreadInfoFragment"
         android:label="ThreadInfoFragment" />
+    <action
+        android:id="@+id/action_global_userProfileFragment"
+        app:destination="@id/userProfileFragment" />
 </navigation>

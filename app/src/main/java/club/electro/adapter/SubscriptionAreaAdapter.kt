@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import club.electro.R
 import club.electro.databinding.SubscriptionItemBinding
 import club.electro.dto.SubscriptionArea
+import club.electro.utils.StripTags
 import com.bumptech.glide.Glide
 
 interface SubscriptionAreaInteractionListener {
@@ -41,7 +42,7 @@ class SubscriptionAreaViewHolder(
             val date = java.util.Date(area.last_time * 1000)
 
             areaName.text = area.name
-            areaLastMessage.text = HtmlCompat.fromHtml(area.last_text, HtmlCompat.FROM_HTML_MODE_LEGACY)
+            areaLastMessage.text = StripTags(area.last_text).toString()
             areaLastName.text = area.last_name + ": "
             areaLastMessageTime.text = sdf.format(date).toString()
 
