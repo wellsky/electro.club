@@ -167,7 +167,6 @@ class PostTextPreparator(
             runBlocking {
                 val (userId) = it.destructured
                 val author: User? = userRepository.getLocalById(userId.toLong(), onLoadedCallback = onLoadDataCallback)
-
                 "<a href=\"https://electro.club/users/" + userId + "\">@" + (author?.name
                     ?: "user" + userId) + "</a>"
             }

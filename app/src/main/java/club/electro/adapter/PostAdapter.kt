@@ -173,29 +173,29 @@ class PostViewHolder(
             replaceQuoteSpans(result as Spannable)
 
 
-//            //save anchor links for later
-//            val anchorTagSpans = htmlSpan.getSpans(0, htmlSpan.length, URLSpan::class.java)
-//
-//            //add first span to TextView
-//            content.text = htmlSpan
-//
-//            //Linkify will now make urls clickable but overwrite our anchor links
-//            Linkify.addLinks(content, Linkify.ALL)
-//            //content.movementMethod = LinkMovementMethod.getInstance()
-//            content.linksClickable = true
-//
-//            //we will add back the anchor links here
-//            val restoreAnchorsSpan = SpannableString(content.text)
-//            for (span in anchorTagSpans) {
-//                restoreAnchorsSpan.setSpan(
-//                    span,
-//                    htmlSpan.getSpanStart(span),
-//                    htmlSpan.getSpanEnd(span),
-//                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
-//                )
-//            }
+            //save anchor links for later
+            val anchorTagSpans = result.getSpans(0, result.length, URLSpan::class.java)
 
-            setTextViewHTML(content, result)
+            //add first span to TextView
+            content.text = result
+
+            //Linkify will now make urls clickable but overwrite our anchor links
+            Linkify.addLinks(content, Linkify.ALL)
+            //content.movementMethod = LinkMovementMethod.getInstance()
+            content.linksClickable = true
+
+            //we will add back the anchor links here
+            val restoreAnchorsSpan = SpannableString(content.text)
+            for (span in anchorTagSpans) {
+                restoreAnchorsSpan.setSpan(
+                    span,
+                    result.getSpanStart(span),
+                    result.getSpanEnd(span),
+                    Spanned.SPAN_INCLUSIVE_INCLUSIVE
+                )
+            }
+
+            setTextViewHTML(content, restoreAnchorsSpan)
 
             //content.setText(result)
         }
