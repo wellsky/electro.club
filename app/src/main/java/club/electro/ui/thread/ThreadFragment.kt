@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 import club.electro.MainViewModel
 import club.electro.R
-import club.electro.adapter.PostTextPreparator
 import club.electro.ui.user.UserProfileFragment.Companion.userId
 import club.electro.util.AndroidUtils
 import com.google.android.material.snackbar.Snackbar
@@ -222,11 +221,13 @@ class ThreadFragment : Fragment() {
                 with (binding.editorPostContent) {
                     requestFocus()
                     //setText(HtmlCompat.fromHtml(it.content, HtmlCompat.FROM_HTML_MODE_LEGACY))
-                    val editorText = PostTextPreparator(it.content)
-                        .prepareBasicTags()
-                        .prepareEmojies()
-                        .preparePlainText()
-                        .get()
+//                    val editorText = PostTextPreparator(it.content)
+//                        .prepareBasicTags()
+//                        .prepareEmojies()
+//                        .preparePlainText()
+//                        .get()
+                    val editorText = it.content
+
                     setText(editorText)
                 }
             } else {

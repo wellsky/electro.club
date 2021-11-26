@@ -2,9 +2,9 @@ package club.electro.repository
 
 import androidx.work.*
 import club.electro.R
+import club.electro.adapter.PostsEntitiesPreparator
 import club.electro.di.DependencyContainer
 import club.electro.dto.Post
-import club.electro.dto.User
 import club.electro.entity.PostEntity
 import club.electro.entity.toEntity
 import club.electro.error.ApiError
@@ -94,14 +94,34 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
         }
     }
 
-    override suspend fun updateLocalPostPreparedContent(threadType: Byte, threadId: Long, id: Long, preparedContent: String) {
-        //println("Update content for: " + post.id + " localId: " + post.localId)
-        dao.updatePreparedContent(threadType, threadId, id, preparedContent)
+    override suspend fun prepareAndSaveLocal(postsEntities: List<PostEntity>) {
+        PostsEntitiesPreparator(
+            postsEntities = postsEntities,
+            onFirstResult = {
+                dao.insert(it)
+            },
+            onEveryDataUpdate = {
+                dao.updatePreparedContent(
+                    it.threadType,
+                    it.threadId,
+                    it.id,
+                    it.preparedContent ?: ""
+                )
+            }
+        ).prepareAll()
     }
 
-    override suspend fun savePostToChache(post: Post) {
-        dao.insert(post.toEntity())
+    override suspend fun prepareAndSaveLocal(postEntity: PostEntity) {
+        prepareAndSaveLocal(listOf(postEntity))
     }
+
+//    override suspend fun updateLocalPostPreparedContent(threadType: Byte, threadId: Long, id: Long, preparedContent: String) {
+//        dao.updatePreparedContent(threadType, threadId, id, preparedContent)
+//    }
+
+//    override suspend fun savePostToChache(post: Post) {
+//        dao.insert(post.toEntity())
+//    }
 
     override suspend fun savePostToServer(post: Post) {
         val savingEntity = if (post.id == 0L) {
@@ -169,7 +189,9 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
 
                 val newPost = PostEntity.fromDto(body.data.message).copy(localId = localId, fresh = (currentCached?.fresh ?: false))
 
-                dao.insert(newPost)
+                //dao.insert(newPost)
+                prepareAndSaveLocal(newPost)
+
                 println("Have response new post id:" + body.data.message.id)
             } catch (e: IOException) {
                 throw NetworkError

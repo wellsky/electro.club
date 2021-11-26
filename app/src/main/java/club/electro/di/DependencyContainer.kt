@@ -18,6 +18,9 @@ class DependencyContainer private constructor(val context: Context) {
     val apiService: ApiService = Api.service
     val appAuth: AppAuth = AppAuth.initApp(context, this)
 
+    val postDao = appDb.postDao()
+    val userDao = appDb.userDao()
+
     val postRepository: PostRepository = PostRepositoryServerImpl(this)
     val userRepository: UserRepository = UserRepositoryServerImpl(this)
     val workManager = WorkManager.getInstance(context)

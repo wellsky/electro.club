@@ -6,8 +6,6 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import club.electro.R
-import club.electro.adapter.MultiplePostsTextPreparator
-import club.electro.adapter.PostTextPreparator
 import club.electro.di.DependencyContainer
 import club.electro.entity.PostEntity
 import club.electro.entity.PostRemoteKeyEntity
@@ -23,14 +21,11 @@ class PostRemoteMediator(
 ) : RemoteMediator<Int, PostEntity>() {
     val resources = diContainer.resources
     val apiService = diContainer.apiService
+    val repository = diContainer.postRepository
     val appAuth = diContainer.appAuth
     val db = diContainer.appDb
     val postDao = db.postDao()
     val postRemoteKeyDao = db.postRemoteKeyDao()
-
-    init {
-        println("Mediator init")
-    }
 
     override suspend fun load(
         loadType: LoadType,
@@ -160,11 +155,23 @@ class PostRemoteMediator(
                     }
                 }
 
-                val messages = MultiplePostsTextPreparator(body.data.messages).prepareAll()
-                postDao.insert(messages.toEntity().map {
-                    it.copy(fresh = true)
-                })
+                val freshEntities = body.data.messages.map {
+                    it.toEntity().copy(
+                        fresh = true
+                    )
+                }
 
+                repository.prepareAndSaveLocal(freshEntities)
+
+//                MultiplePostEntityPreparator(
+//                    postsEntities = freshEntities,
+//                    onFirstResult = {
+//                        postDao.insert(it)
+//                    },
+//                    onEveryDataUpdate = {
+//                        postDao.updatePreparedContent(it.threadType, it.threadId, it.id, it.preparedContent ?: "")
+//                    }
+//                ).prepareAll()
             }
 
 

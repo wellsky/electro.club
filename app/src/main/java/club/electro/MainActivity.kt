@@ -19,7 +19,11 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import club.electro.application.ElectroClubApp
 import club.electro.databinding.ActivityMainBinding
+import club.electro.di.DependencyContainer
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 //class MainActivity : FragmentActivity() {
@@ -72,7 +76,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        val appAuth = (application as ElectroClubApp).diContainer.appAuth
+        val appAuth = DependencyContainer.getInstance().appAuth
 
         appAuth.authState.observe(this, {
             if (it.id != 0L) {
@@ -105,6 +109,13 @@ class MainActivity : AppCompatActivity() {
                 config.onClick()
             }
         })
+
+
+        // Очистка БД для тестирования
+//        CoroutineScope(Dispatchers.Default).launch {
+//            DependencyContainer.getInstance().postDao.removeAll()
+//            DependencyContainer.getInstance().userDao.removeAll()
+//        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

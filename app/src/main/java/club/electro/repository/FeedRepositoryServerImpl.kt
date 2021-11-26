@@ -1,11 +1,8 @@
 package club.electro.repository
 
 import club.electro.R
-import club.electro.adapter.PostTextPreparator
 import club.electro.di.DependencyContainer
 import club.electro.dto.FeedPost
-import club.electro.dto.Post
-import club.electro.entity.toDto
 import club.electro.entity.toEntity
 import club.electro.error.ApiError
 import club.electro.error.NetworkError
@@ -27,13 +24,13 @@ class FeedRepositoryServerImpl(diContainer: DependencyContainer): FeedRepository
         it.map {
             //println("Preparing post " + it.id)
             val post = it.toDto()
-
-            val preparedContent: String = PostTextPreparator(post.content)
-                .prepareAll()
-                .get()
-
-            val preparedPost = post.copy(content = preparedContent)
-            preparedPost
+            post
+//            val preparedContent: String = PostTextPreparator(post.content)
+//                .prepareAll()
+//                .get()
+//
+//            val preparedPost = post.copy(content = preparedContent)
+//            preparedPost
         }
     }.flowOn(Dispatchers.Default)
 

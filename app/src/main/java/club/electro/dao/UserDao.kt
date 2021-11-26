@@ -25,5 +25,5 @@ interface UserDao {
     suspend fun insertIfNotExists(user: UserEntity)
 
     @Query("DELETE FROM UserEntity")
-    suspend fun clear()
+    suspend fun removeAll()
 }

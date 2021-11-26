@@ -10,7 +10,7 @@ data class Post (
     val authorName: String,
     val authorAvatar: String? = null,
     val content: String = "",
-    val preparedContent: String? = content,
+    val preparedContent: String? = null,
     val published: Long,
     val answerTo: Long? = null,
     val likes: Int = 0,

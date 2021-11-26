@@ -38,17 +38,20 @@ class UserRepositoryServerImpl(
 
     override suspend fun getLocalById(id: Long, onLoadedCallback:  (suspend () -> Unit)?): User? {
         return dao.getById(id)?.let {
-            it.toDto()
+            if (it.name.isNotBlank()) {
+                it.toDto()
+            } else {
+                null
+            }
         } ?: onLoadedCallback?.run {
             dao.insert(User(
                 id = id,
-                name = "Loading...",
+                name = "",
             ).toEntity())
 
             CoroutineScope(Dispatchers.Default).launch {
                 val user = getRemoteById(id)
                 dao.insert(user.toEntity())
-                //println("call callback " + id)
                 onLoadedCallback()
             }
             null

@@ -156,7 +156,7 @@ class PostViewHolder(
             val resources: Resources = this.root.resources
 
 
-            val preparedContent = post.preparedContent ?: "" //post.content
+            val preparedContent = post.preparedContent ?: post.content
 
             val imageGetter = ImageGetter(resources, content)
 

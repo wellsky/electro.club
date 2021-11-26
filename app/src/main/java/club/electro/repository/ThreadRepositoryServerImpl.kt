@@ -26,38 +26,11 @@ class ThreadRepositoryServerImpl(
     private val appAuth = diContainer.appAuth
     private val postRepository = diContainer.postRepository
 
-//    override var data: Flow<List<Post>> = dao.flowThreadByPublshedDESC(threadType, threadId).map(List<PostEntity>::toDto).flowOn(Dispatchers.Default)
-
     override val lastUpdateTime: MutableLiveData<Long> = MutableLiveData(0L)
     private val updaterJob = startCheckUpdates()
 
-//    @OptIn(ExperimentalPagingApi::class)
-//    val data1: Flow<PagingData<Post>> = Pager(
-//        config = PagingConfig(pageSize = 25),
-//        remoteMediator = PostRemoteMediator(apiService, appDb, postDao, postRemoteKeyDao),
-//        pagingSourceFactory = postDao::pagingSource,
-//    ).flow.map { pagingData ->
-//        pagingData.map(PostEntity::toDto)
-//    }
-
-
     // https://stackoverflow.com/questions/64692260/paging-3-0-list-with-new-params-in-kotlin?noredirect=1&lq=1
     var targetFlow = MutableStateFlow(value = ThreadLoadTarget(targetPostPosition = "last"))
-    //val pagingSource = dao.pagingSource(threadType, threadId)
-
-//    val dataSourceFactory = object : PagingSource<Int, PostEntity>() {
-//        fun create(): PagingSource<Int, PostEntity> {
-//            return dao.pagingSource(threadType, threadId)
-//        }
-//
-//        override fun getRefreshKey(state: PagingState<Int, PostEntity>): Int? {
-//            TODO("Not yet implemented")
-//        }
-//
-//        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PostEntity> {
-//            TODO("Not yet implemented")
-//        }
-//    }
 
     override val posts = targetFlow.flatMapLatest { refreshTarget ->
         @OptIn(ExperimentalPagingApi::class)
@@ -69,22 +42,7 @@ class ThreadRepositoryServerImpl(
             },
         ).flow.map { pagingData ->
             pagingData.map {
-                val post = it.toDto()
-
-//                val user = User(
-//                    id = it.authorId,
-//                    name = it.authorName,
-//                    avatar = it.authorAvatar
-//                )
-//                userDao.insertIfNotExists(user.toEntity())
-
-//                val preparedContent: String = PostTextPreparator(post)
-//                    .prepareAll()
-//                    .get()
-//
-//                val preparedPost = post.copy(preparedContent = preparedContent)
-//                preparedPost
-                post
+                it.toDto()
             }
         }
     }
@@ -125,29 +83,6 @@ class ThreadRepositoryServerImpl(
         targetFlow.value = target
     }
 
-//    // TODO возможно, этот метод бльше не нужен? (после внедрения Pager)
-//    override suspend fun getThreadPosts() {
-//        try {
-//            val response = apiService.getThreadPosts(
-//                access_token = resources.getString(R.string.electro_club_access_token),
-//                user_token = appAuth.myToken(),
-//                threadType = threadType,
-//                threadId = threadId,
-//            )
-//
-//            if (!response.isSuccessful) {
-//                throw ApiError(response.code(), response.message())
-//            }
-//            val body = response.body() ?: throw ApiError(response.code(), response.message())
-//
-//            dao.insert(body.data.messages.toEntity())
-//        } catch (e: IOException) {
-//            throw NetworkError
-//        } catch (e: Exception) {
-//            throw UnknownError
-//        }
-//    }
-
     override suspend fun savePostToServer(post: Post) {
         val newPost = post.copy(
             threadId = threadId,
@@ -161,8 +96,7 @@ class ThreadRepositoryServerImpl(
     }
 
     override suspend fun checkForUpdates()  {
-        println("Start checking updates...")
-        while (false) {
+        while (true) {
             delay(2_000L)
 
             val params = HashMap<String?, String?>()
@@ -182,11 +116,8 @@ class ThreadRepositoryServerImpl(
             val newTime = body.data.time
 
             if (newTime > lastUpdateTime.value!!) {
-                //refreshData()
-                //if (lastUpdateTime != 0L) getThreadPosts()
                 lastUpdateTime.postValue(newTime)
             }
-            //println("lastUpdate: " + lastUpdateTime + ", newTime: " + newTime)
         }
     }
 
