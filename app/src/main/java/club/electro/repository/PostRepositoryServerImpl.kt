@@ -46,7 +46,7 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
             ).toEntity())
 
             CoroutineScope(Dispatchers.Default).launch {
-                delay(2000)
+                delay(2000) // Это задержка нужна!!! Скорее всего, запрашиваемые посты уже запрошены пагинатором. Поэтому даем ему время 2 сек и если они не появятся в базе, то запрашиваем отдельно.
                 dao.getById(threadType, threadId, id)?.let {
                     if (it.published == 0L) {
                         val post = getRemoteById(threadType, threadId, id)
@@ -64,7 +64,6 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
     }
 
     override suspend fun getRemoteById(threadType: Byte, threadId: Long, id: Long): Post? {
-        println("Load remote post: " + id)
         try {
             val response = apiService.getThreadPosts(
                 access_token = resources.getString(R.string.electro_club_access_token),

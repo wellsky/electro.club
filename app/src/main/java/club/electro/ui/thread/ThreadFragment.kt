@@ -31,6 +31,9 @@ import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
 import club.electro.utils.StripTags
 import club.electro.utils.UrlHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class ThreadFragment : Fragment() {
@@ -141,7 +144,9 @@ class ThreadFragment : Fragment() {
             }
 
             override fun onUrlClicked(url: String?) {
-                UrlHandler(threadFragment).open(url)
+                CoroutineScope(Dispatchers.Default).launch {
+                    UrlHandler(threadFragment).open(url)
+                }
             }
         })
 

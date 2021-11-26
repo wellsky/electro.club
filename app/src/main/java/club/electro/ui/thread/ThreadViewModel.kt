@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import club.electro.application.ElectroClubApp
 import club.electro.dto.Post
 import club.electro.repository.*
+import club.electro.utils.UrlHandler
 import kotlinx.coroutines.launch
 
 class ThreadViewModel(application: Application, val threadType: Byte, val threadId: Long) : AndroidViewModel(application) {

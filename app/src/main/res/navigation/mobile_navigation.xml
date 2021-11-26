@@ -60,4 +60,7 @@
     <action
         android:id="@+id/action_global_userProfileFragment"
         app:destination="@id/userProfileFragment" />
+    <action
+        android:id="@+id/action_global_threadFragment"
+        app:destination="@id/threadFragment" />
 </navigation>

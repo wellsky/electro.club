@@ -6,6 +6,10 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import club.electro.R
+import club.electro.di.DependencyContainer
+import club.electro.error.ApiError
+import club.electro.ui.thread.ThreadFragment.Companion.threadId
+import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.ui.user.UserProfileFragment.Companion.userId
 import java.net.URI
 
@@ -13,30 +17,59 @@ import java.net.URI
 
 
 class UrlHandler(val fragment: Fragment) {
+    private val PRIMARY_HOST = "electro.club"
     private val PATH_USERS = "users"
 
-    fun open(url: String?) {
+    private val diContainer = DependencyContainer.getInstance()
+    private val apiService = diContainer.apiService
+    private val resources = diContainer.context.resources
+
+    suspend fun open(url: String?) {
 
         url?.let { url ->
             val uri = URI(url)
-            val path: String = uri.getPath()
-            if (path.isNotBlank()) {
-                val firstPath = path.substringAfter("/").substringBefore("/")
+            val host: String = uri.host
 
-                when (firstPath) {
-                    PATH_USERS -> {
-                        val urlUserId = path.substringAfter("/").substringAfter("/").toLong()
+            if (host.equals(PRIMARY_HOST)) {
+                val path: String = uri.path
+                if (path.isNotBlank()) {
+                    val firstPath = path.substringAfter("/").substringBefore("/")
 
-                        fragment.findNavController().navigate(
-                            R.id.action_global_userProfileFragment,
-                            Bundle().apply {
-                                userId = urlUserId
-                            }
-                        )
-                        return@open
+                    when (firstPath) {
+                        PATH_USERS -> {
+                            val urlUserId = path.substringAfter("/").substringAfter("/").toLong()
+
+                            fragment.findNavController().navigate(
+                                R.id.action_global_userProfileFragment,
+                                Bundle().apply {
+                                    userId = urlUserId
+                                }
+                            )
+                            return@open
+                        }
+
+                        else -> {
+                            val response = apiService.getUrlData(
+                                access_token = resources.getString(R.string.electro_club_access_token),
+                                url = url
+                            )
+
+                            val body = response.body() ?: throw ApiError(response.code(), response.message())
+
+                            fragment.findNavController().navigate(
+                                R.id.action_global_threadFragment,
+                                Bundle().apply {
+                                    threadType = body.data.thread_type!!
+                                    threadId = body.data.thread_id!!
+                                }
+                            )
+                            return@open
+
+                        }
                     }
                 }
             }
+
             openInBrowser(url)
         }
     }

@@ -61,6 +61,13 @@ interface ApiService {
 //    @POST(UPDATES_SERVER_URL)
 //    suspend fun getSubscriptions(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiSubscriptionsData>>
 
+    @FormUrlEncoded
+    @POST(BASE_SERVER_URL)
+    suspend fun getUrlData(
+        @Field("access_token") access_token: String,
+        @Field("method") method: String = "getUrlData",
+        @Field("url") url: String ,
+    ): Response<ApiResponse<ApiUrlData>>
 
     //TODO перервести остальные запросы на такой формат вместо HashMap
     @FormUrlEncoded
@@ -186,6 +193,13 @@ data class ApiUserProfile (
 
 data class ApiSavedPost (
     val message: Post
+)
+
+data class ApiUrlData (
+    val type: Byte,
+    val thread_type: Byte? = null,
+    val thread_id: Long? = null,
+    val post_id: Long? = null,
 )
 
 // TODO от API надо все получать не в CamelCase
