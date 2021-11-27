@@ -144,9 +144,7 @@ class ThreadFragment : Fragment() {
             }
 
             override fun onUrlClicked(url: String?) {
-                CoroutineScope(Dispatchers.Default).launch {
-                    UrlHandler(threadFragment).open(url)
-                }
+                UrlHandler(threadFragment).open(url)
             }
         })
 

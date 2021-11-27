@@ -11,6 +11,10 @@ import club.electro.error.ApiError
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.ui.user.UserProfileFragment.Companion.userId
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import java.net.URI
 
 
@@ -24,7 +28,7 @@ class UrlHandler(val fragment: Fragment) {
     private val apiService = diContainer.apiService
     private val resources = diContainer.context.resources
 
-    suspend fun open(url: String?) {
+    fun open(url: String?) {
 
         url?.let { url ->
             val uri = URI(url)
@@ -49,29 +53,45 @@ class UrlHandler(val fragment: Fragment) {
                         }
 
                         else -> {
-                            val response = apiService.getUrlData(
-                                access_token = resources.getString(R.string.electro_club_access_token),
-                                url = url
-                            )
+                            CoroutineScope(Dispatchers.Main).launch {
+                                val response = apiService.getUrlData(
+                                    access_token = resources.getString(R.string.electro_club_access_token),
+                                    url = url
+                                )
+                                val body = response.body() ?: throw ApiError(response.code(), response.message())
 
-                            val body = response.body() ?: throw ApiError(response.code(), response.message())
+                                navigateToThread(body.data.thread_type!!, body.data.thread_id!!)
+                            }
 
-                            fragment.findNavController().navigate(
-                                R.id.action_global_threadFragment,
-                                Bundle().apply {
-                                    threadType = body.data.thread_type!!
-                                    threadId = body.data.thread_id!!
-                                }
-                            )
-                            return@open
+                            // val body = response.body() ?: throw ApiError(response.code(), response.message())
+
+//                            fragment.findNavController().navigate(
+//                                R.id.action_global_threadFragment,
+//                                Bundle().apply {
+//                                    threadType = body.data.thread_type!!
+//                                    threadId = body.data.thread_id!!
+//                                }
+//                            )
+//                            return@open
 
                         }
                     }
                 }
             }
 
-            openInBrowser(url)
+            //openInBrowser(url)
         }
+    }
+
+    fun navigateToThread(type: Byte, id: Long) {
+        fragment.findNavController().navigate(
+            R.id.action_global_threadFragment,
+            Bundle().apply {
+                threadType = type
+                threadId = id
+            }
+        )
+
     }
 
     fun openInBrowser(url: String?) {
