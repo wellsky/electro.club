@@ -1,15 +1,9 @@
 package club.electro.api
 
 import club.electro.BuildConfig
-import club.electro.auth.AppAuth
-import club.electro.dao.AreaDao
-import club.electro.di.DependencyContainer
 import club.electro.dto.*
-import com.google.gson.annotations.SerializedName
-import okhttp3.Interceptor
-import okhttp3.MediaType
+import club.electro.utils.UrlDataResult
 import okhttp3.OkHttpClient
-import okhttp3.RequestBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -67,7 +61,7 @@ interface ApiService {
         @Field("access_token") access_token: String,
         @Field("method") method: String = "getUrlData",
         @Field("url") url: String ,
-    ): Response<ApiResponse<ApiUrlData>>
+    ): Response<ApiResponse<UrlDataResult>>
 
     //TODO перервести остальные запросы на такой формат вместо HashMap
     @FormUrlEncoded
@@ -193,13 +187,6 @@ data class ApiUserProfile (
 
 data class ApiSavedPost (
     val message: Post
-)
-
-data class ApiUrlData (
-    val type: Byte,
-    val thread_type: Byte? = null,
-    val thread_id: Long? = null,
-    val post_id: Long? = null,
 )
 
 // TODO от API надо все получать не в CamelCase

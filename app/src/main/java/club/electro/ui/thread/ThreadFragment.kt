@@ -144,7 +144,7 @@ class ThreadFragment : Fragment() {
             }
 
             override fun onUrlClicked(url: String?) {
-                UrlHandler(threadFragment).open(url)
+                UrlHandler(requireContext(), findNavController()).setUrl(url).open()
             }
         })
 

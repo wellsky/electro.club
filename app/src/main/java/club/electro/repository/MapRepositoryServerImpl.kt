@@ -3,8 +3,6 @@ package club.electro.repository
 import club.electro.R
 import club.electro.di.DependencyContainer
 import club.electro.dto.MapMarker
-import club.electro.dto.SubscriptionArea
-import club.electro.entity.AreaEntity
 import club.electro.entity.MapMarkerEntity
 import club.electro.entity.toDto
 import club.electro.entity.toEntity
