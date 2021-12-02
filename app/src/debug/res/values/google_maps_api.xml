@@ -1,0 +1,24 @@
+<resources>
+    <!--
+    TODO: Before you run your application, you need a Google Maps API key.
+
+    To get one, follow this link, follow the directions and press "Create" at the end:
+
+    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=06:2F:FF:1B:A9:12:FF:81:19:38:AB:0E:13:D0:BE:47:F0:AB:93:BF%3Bclub.electro.ui.map
+
+    You can also add your credentials to an existing key, using these values:
+
+    Package name:
+    club.electro.ui.map
+
+    SHA-1 certificate fingerprint:
+    06:2F:FF:1B:A9:12:FF:81:19:38:AB:0E:13:D0:BE:47:F0:AB:93:BF
+
+    Alternatively, follow the directions here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+
+    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+    string in this file.
+    -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyDXi4gKM24PdR8caG4AUvpSE6kv3XEVfVs</string>
+</resources>

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "828806241518",
+    "project_id": "electro-club-app",
+    "storage_bucket": "electro-club-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:828806241518:android:b29296ccf4217412fc27ff",
+        "android_client_info": {
+          "package_name": "club.electro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "828806241518-764vbaohskg7us1au4ieftkelhoja0nj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCh_2TvlNZJxGwyTJJceXKAEkiihdQHDzw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "828806241518-764vbaohskg7us1au4ieftkelhoja0nj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
