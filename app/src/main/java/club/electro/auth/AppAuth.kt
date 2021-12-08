@@ -93,18 +93,15 @@ class AppAuth private constructor(context: Context, diContainer: DependencyConta
     fun sendPushToken(token: String? = null) {
         CoroutineScope(Dispatchers.Default).launch {
             try {
-                println("setPushToken")
                 val pushToken = PushToken(token ?: Firebase.messaging.token.await())
                 val params = HashMap<String?, String?>()
-                params["access_token"] = resources.getString(R.string.electro_club_access_token)
+
                 params["push_token"] = pushToken.token
 
                 if (myId() != 0L) {
-                    println("Token 1")
                     params["user_token"] = myToken()
                     params["method"] = "setPushToken"
                 } else {
-                    println("Token 0")
                     params["method"] = "destroyPushToken"
                 }
 

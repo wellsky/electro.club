@@ -77,6 +77,10 @@ class PostAdapter(
         val post = getItem(position) ?: return
         holder.bind(post)
     }
+
+    override fun onBindViewHolder(holder: PostViewHolder, position: Int, payloads: List<Any>) {
+        super.onBindViewHolder(holder, position, payloads)
+    }
 }
 
 class PostViewHolder(
@@ -262,4 +266,6 @@ class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
     override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
         return oldItem == newItem
     }
+
+    override fun getChangePayload(oldItem: Post, newItem: Post): Any? = Unit
 }

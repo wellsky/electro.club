@@ -3,6 +3,7 @@ package club.electro.di
 import android.content.Context
 import androidx.room.Room
 import androidx.work.WorkManager
+import club.electro.R
 import club.electro.api.Api
 import club.electro.api.ApiService
 import club.electro.auth.AppAuth
@@ -14,6 +15,9 @@ import club.electro.repository.UserRepositoryServerImpl
 
 class DependencyContainer private constructor(val context: Context) {
     val resources = context.resources
+
+    val accessToken = resources.getString(R.string.electro_club_access_token)
+
     val appDb = AppDb.getInstance(context = context)
     val apiService: ApiService = Api.service
     val appAuth: AppAuth = AppAuth.initApp(context, this)

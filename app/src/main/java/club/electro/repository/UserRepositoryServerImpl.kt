@@ -65,20 +65,15 @@ class UserRepositoryServerImpl(
     }
 
     override suspend fun getRemoteById(id: Long): User {
-        println("Load user profile: " + id)
         try {
-            val params = HashMap<String?, String?>()
-            params["access_token"] = resources.getString(R.string.electro_club_access_token)
-            params["user_token"] = appAuth.myToken()
-            params["method"] = "getUserProfile"
-            params["user_id"] = id.toString()
-            val response = apiService.getUserProfile(params)
+            val response = apiService.getUserProfile(
+                userId = id
+            )
 
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            //dao.insert(body.data.user.toDto().toEntity())
             return body.data.user.toDto()
         } catch (e: IOException) {
             throw NetworkError

@@ -55,8 +55,6 @@ class PostRemoteMediator(
                     println("REFRESH FROM " + from + " " + count + " anchor: " +  state.anchorPosition)
 
                     apiService.getThreadPosts(
-                        access_token = resources.getString(R.string.electro_club_access_token),
-                        user_token = appAuth.myToken(),
                         threadType = threadType,
                         threadId = threadId,
                         from = from,
@@ -75,8 +73,6 @@ class PostRemoteMediator(
                     )
                     println("PREPEND FROM " + id + " " + state.config.pageSize)
                     apiService.getThreadPosts(
-                        access_token = resources.getString(R.string.electro_club_access_token),
-                        user_token = appAuth.myToken(),
                         threadType = threadType,
                         threadId = threadId,
                         from = id.toString(),
@@ -94,8 +90,6 @@ class PostRemoteMediator(
                     println("APPEND FROM " + id + " -" + state.config.pageSize)
 
                     apiService.getThreadPosts(
-                        access_token = resources.getString(R.string.electro_club_access_token),
-                        user_token = appAuth.myToken(),
                         threadType = threadType,
                         threadId = threadId,
                         from = id.toString(),

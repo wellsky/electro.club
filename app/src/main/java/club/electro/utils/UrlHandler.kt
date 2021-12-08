@@ -79,7 +79,6 @@ class UrlHandler(val context: Context, val navController: NavController) {
     fun parseUriRemoteAndOpen(uri: URI) {
         CoroutineScope(Dispatchers.Main).launch {
             val response = apiService.getUrlData(
-                access_token = resources.getString(R.string.electro_club_access_token),
                 url = uri.toString()
             )
 

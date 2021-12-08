@@ -1,9 +1,12 @@
 package club.electro.api
 
 import club.electro.BuildConfig
+import club.electro.di.DependencyContainer
 import club.electro.dto.*
 import club.electro.utils.UrlDataResult
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -19,24 +22,37 @@ val logging = HttpLoggingInterceptor().apply {
     }
 }
 
+// https://stackoverflow.com/questions/34791244/retrofit2-modifying-request-body-in-okhttp-interceptor
+val addTokensInterceptor = Interceptor {
+    val request = it.request()
+    val body = request.body
 
-//val okhttp = OkHttpClient.Builder()
-//    .addInterceptor(logging)
-//    .addInterceptor { chain ->
-//        val diContainer = DependencyContainer.getInstance()
-//        val appAuth = diContainer.appAuth
-//        appAuth.authStateFlow.value.token?.let { token ->
-//            val newRequest = chain.request().newBuilder()
-//                .addHeader("Authorization", token)
-//                .build()
-//            return@addInterceptor chain.proceed(newRequest)
-//        }
-//        chain.proceed(chain.request())
-//    }
-//    .build()
+    val diContainer = DependencyContainer.getInstance()
+
+    val accessToken = diContainer.accessToken
+    val userToken = if (diContainer.appAuth.myToken() != null) "&user_token=" + diContainer.appAuth.myToken() else ""
+
+    val newRequest = request.newBuilder()
+        .post(
+            RequestBody.create(
+                body?.contentType(),
+                body.bodyToString() + "&access_token=" + accessToken + "&user_token=" + userToken
+            )
+        )
+        .build()
+    it.proceed(newRequest)
+}
+
+fun RequestBody?.bodyToString(): String {
+    if (this == null) return ""
+    val buffer = okio.Buffer()
+    writeTo(buffer)
+    return buffer.readUtf8()
+}
 
 
 val okhttp = OkHttpClient.Builder()
+        .addInterceptor(addTokensInterceptor)
         .addInterceptor(logging)
         .build()
 
@@ -51,14 +67,9 @@ interface ApiService {
     @POST(BASE_SERVER_URL)
     suspend fun getFeedPosts(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiFeedPostsData>>
 
-//    @FormUrlEncoded
-//    @POST(UPDATES_SERVER_URL)
-//    suspend fun getSubscriptions(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiSubscriptionsData>>
-
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
     suspend fun getUrlData(
-        @Field("access_token") access_token: String,
         @Field("method") method: String = "getUrlData",
         @Field("url") url: String ,
     ): Response<ApiResponse<UrlDataResult>>
@@ -67,21 +78,13 @@ interface ApiService {
     @FormUrlEncoded
     @POST(UPDATES_SERVER_URL)
     suspend fun getSubscriptions(
-        @Field("access_token") access_token: String,
-        @Field("user_token") user_token: String,
         @Field("method") method: String = "whatsUp",
         @Field("last_event_time") last_event_time: Long = 0
     ): Response<ApiResponse<ApiSubscriptionsData>>
 
-//    @FormUrlEncoded
-//    @POST(BASE_SERVER_URL)
-//    suspend fun getThreadPosts(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiPostsData>>
-
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
     suspend fun getThread(
-        @Field("access_token") access_token: String,
-        @Field("user_token") user_token: String,
         @Field("method") method: String = "getThread",
         @Field("thread_type") threadType: Byte,
         @Field("thread_id") threadId: Long,
@@ -91,8 +94,6 @@ interface ApiService {
     @POST(BASE_SERVER_URL)
     suspend fun getThreadPosts(
         @Field("method") method: String = "getPosts",
-        @Field("access_token") access_token: String,
-        @Field("user_token") user_token: String? = null,
         @Field("thread_type") threadType: Byte,
         @Field("thread_id") threadId: Long,
         @Field("from") from: String? = null,
@@ -102,31 +103,60 @@ interface ApiService {
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
-    suspend fun signIn(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiAccountData>>
+    suspend fun signIn(
+        @Field("method") method: String = "login",
+        @Field("email") email: String,
+        @Field("password") password: String,
+    ): Response<ApiResponse<ApiAccountData>>
 
     @FormUrlEncoded
     @POST(UPDATES_SERVER_URL)
-    suspend fun getAreaModifiedTime(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiAreaLastUpdateTime>>
+    suspend fun getAreaModifiedTime(
+        @Field("method") method: String = "getAreaModifiedTime",
+        @Field("type") type: Byte,
+        @Field("object_id") objectId: Long,
+    ): Response<ApiResponse<ApiAreaLastUpdateTime>>
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
-    suspend fun getMapObjects(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiMapObjects>>
+    suspend fun getMapObjects(
+        @Field("method") method: String = "getMapObjects",
+        @Field("types") types: String,
+    ): Response<ApiResponse<ApiMapObjects>>
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
-    suspend fun savePost(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiSavedPost>>
+    suspend fun savePost(
+        @Field("method") method: String = "savePost",
+        @Field("thread_type") threadType: Byte,
+        @Field("thread_id") threadId: Long,
+        @Field("post_id") postId: Long?,
+        @Field("post_content") postContent: String,
+        @Field("answer_to") answerTo: Long?,
+    ): Response<ApiResponse<ApiSavedPost>>
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
-    suspend fun removePost(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<Unit>>
+    suspend fun removePost(
+        @Field("method") method: String = "removePost",
+        @Field("thread_type") threadType: Byte,
+        @Field("thread_id") threadId: Long,
+        @Field("post_id") postId: Long?,
+    ): Response<ApiResponse<Unit>>
+
+    // TODO изменить формат, чтобы метод API определялся внутри определения функции?
+    @FormUrlEncoded
+    @POST(BASE_SERVER_URL)
+    suspend fun setPushToken(
+        @FieldMap params: HashMap<String?, String?>
+    ): Response<Unit>
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
-    suspend fun setPushToken(@FieldMap params: HashMap<String?, String?>): Response<Unit>
-
-    @FormUrlEncoded
-    @POST(BASE_SERVER_URL)
-    suspend fun getUserProfile(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiUserProfile>>
+    suspend fun getUserProfile(
+        @Field("method") method: String = "getUserProfile",
+        @Field("user_id") userId: Long,
+    ): Response<ApiResponse<ApiUserProfile>>
 
 }
 

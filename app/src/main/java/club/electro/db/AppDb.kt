@@ -17,7 +17,7 @@ import club.electro.entity.*
     UserEntity::class,
     FeedPostEntity::class,
     ThreadEntity::class
- ], version = 99, exportSchema = false)
+ ], version = 100, exportSchema = false)
 @TypeConverters(DBTypeConverters::class)
 abstract class AppDb : RoomDatabase() {
     abstract fun postDao(): PostDao

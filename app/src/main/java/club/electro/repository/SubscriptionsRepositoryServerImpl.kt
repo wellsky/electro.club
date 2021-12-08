@@ -26,10 +26,7 @@ class SubscriptionsRepositoryServerImpl(diContainer: DependencyContainer) : Subs
     override suspend fun getAll() {
         appAuth.myToken()?.let { myToken ->
             try {
-                val response = apiService.getSubscriptions(
-                    access_token = resources.getString(R.string.electro_club_access_token),
-                    user_token = myToken
-                )
+                val response = apiService.getSubscriptions()
 
                 if (!response.isSuccessful) {
                     throw ApiError(response.code(), response.message())

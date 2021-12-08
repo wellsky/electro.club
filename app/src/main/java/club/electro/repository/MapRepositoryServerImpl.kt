@@ -25,12 +25,9 @@ class MapRepositoryServerImpl(diContainer: DependencyContainer): MapRepository {
 
     override suspend fun getAll() {
         try {
-            val params = HashMap<String?, String?>()
-            params["access_token"] = resources.getString(R.string.electro_club_access_token)
-            params["user_token"] = appAuth.myToken()
-            params["method"] = "getMapObjects"
-            params["types"] = "6"
-            val response = apiService.getMapObjects(params)
+            val response = apiService.getMapObjects(
+                types = "6"
+            )
 
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())

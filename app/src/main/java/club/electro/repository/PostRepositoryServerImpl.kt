@@ -66,8 +66,6 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
     override suspend fun getRemoteById(threadType: Byte, threadId: Long, id: Long): Post? {
         try {
             val response = apiService.getThreadPosts(
-                access_token = resources.getString(R.string.electro_club_access_token),
-                user_token = appAuth.myToken(),
                 threadType = threadType,
                 threadId = threadId,
                 from = id.toString(),
@@ -165,20 +163,14 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
         entity?.let { entity ->
             println("Saving work for post: " + entity.localId)
             try {
-                val params = HashMap<String?, String?>()
-                params["access_token"] = resources.getString(R.string.electro_club_access_token)
-                params["user_token"] = appAuth.myToken()
-                params["method"] = "savePost"
-                params["thread_type"] = entity.threadType.toString()
-                params["thread_id"] = entity.threadId.toString()
-                params["post_id"] = entity.id.toString()
-                params["post_content"] = entity.content
+                val response = apiService.savePost(
+                    threadType = entity.threadType,
+                    threadId = entity.threadId,
+                    postId = entity.id,
+                    postContent = entity.content,
+                    answerTo = entity.answerTo
+                )
 
-                entity.answerTo?.let {
-                    params["answer_to"] = it.toString()
-                }
-
-                val response = apiService.savePost(params)
                 if (!response.isSuccessful) {
                     throw ApiError(response.code(), response.message())
                 }
@@ -211,15 +203,12 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
         dao.insert(removingPost)
 
         try {
-            val params = HashMap<String?, String?>()
-            params["access_token"] = resources.getString(R.string.electro_club_access_token)
-            params["user_token"] = appAuth.myToken()
-            params["method"] = "removePost"
-            params["thread_type"] = post.threadType.toString()
-            params["thread_id"] = post.threadId.toString()
-            params["post_id"] = post.id.toString()
+            val response = apiService.removePost(
+                threadType = post.threadType,
+                threadId = post.threadId,
+                postId = post.id
+            )
 
-            val response = apiService.removePost(params)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }

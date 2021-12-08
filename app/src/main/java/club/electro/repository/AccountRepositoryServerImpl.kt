@@ -17,13 +17,10 @@ class AccountRepositoryServerImpl(diContainer: DependencyContainer): AccountRepo
     private val appAuth = diContainer.appAuth
 
     override suspend fun signIn(login: String, password: String): Boolean {
-        val params = HashMap<String?, String?>()
-        params["access_token"] = resources.getString(R.string.electro_club_access_token)
-        params["method"] = "login"
-        params["email"] = login
-        params["password"] = password
-
-        val response = apiService.signIn(params)
+        val response = apiService.signIn(
+            email = login,
+            password = password
+        )
         val body = response.body() ?: throw ApiError(response.code(), response.message())
         body.data.user?.let {
             appAuth.setAuth(it.user_id, it.user_token, it.nickname,it.thumbnail)

@@ -53,8 +53,6 @@ class ThreadRepositoryServerImpl(
         appAuth.myToken()?.let { myToken ->
             try {
                 val response = apiService.getThread(
-                    access_token = resources.getString(R.string.electro_club_access_token),
-                    user_token = myToken,
                     threadType = threadType,
                     threadId = threadId
                 )
@@ -99,14 +97,10 @@ class ThreadRepositoryServerImpl(
         while (true) {
             delay(2_000L)
 
-            val params = HashMap<String?, String?>()
-            params["access_token"] = resources.getString(R.string.electro_club_access_token)
-            params["user_token"] = appAuth.myToken()
-            params["method"] = "getAreaModifiedTime"
-            params["type"] = threadType.toString()
-            params["object_id"] = threadId.toString()
-
-            val response = apiService.getAreaModifiedTime(params)
+            val response = apiService.getAreaModifiedTime(
+                type = threadType,
+                objectId = threadId
+            )
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
