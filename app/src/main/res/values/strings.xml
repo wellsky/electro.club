@@ -40,4 +40,5 @@
     <string name="post_status_removing">Removing...</string>
 
     <string name="subscribers_count">Subscribers</string>
+    <string name="transport_not_set">Primary transport is not set</string>
 </resources>

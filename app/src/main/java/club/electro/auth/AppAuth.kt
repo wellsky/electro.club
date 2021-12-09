@@ -22,10 +22,11 @@ class AppAuth private constructor(context: Context, diContainer: DependencyConta
     private val tokenKey = "token"
     private val nameKey = "name"
     private val avatarKey = "avatar"
+    private val transportNameKey = "transportName"
+    private val transportImageKey = "transportImage"
 
     private val _authStateFlow: MutableStateFlow<AuthState>
 
-    private val resources = diContainer.context.resources
     private val apiService = diContainer.apiService
 
     init {
@@ -33,6 +34,8 @@ class AppAuth private constructor(context: Context, diContainer: DependencyConta
         val token = prefs.getString(tokenKey, null)
         val name = prefs.getString(nameKey, null)
         val avatar = prefs.getString(avatarKey, null)
+        val transportName = prefs.getString(transportNameKey, null)
+        val transportImage = prefs.getString(transportImageKey, null)
 
         if (id == 0L || token == null) {
             _authStateFlow = MutableStateFlow(AuthState())
@@ -41,7 +44,7 @@ class AppAuth private constructor(context: Context, diContainer: DependencyConta
                 apply()
             }
         } else {
-            _authStateFlow = MutableStateFlow(AuthState(id, token, name, avatar))
+            _authStateFlow = MutableStateFlow(AuthState(id, token, name, avatar, transportName, transportImage))
         }
         sendPushToken()
     }
@@ -66,16 +69,16 @@ class AppAuth private constructor(context: Context, diContainer: DependencyConta
     }
 
     @Synchronized
-    fun setAuth(id: Long, token: String, name: String, avatar: String) {
-        _authStateFlow.value = AuthState(id, token, name, avatar)
+    fun setAuth(id: Long, token: String, name: String, avatar: String, transportName: String?, transportImage: String?) {
+        _authStateFlow.value = AuthState(id, token, name, avatar, transportName, transportImage)
         with(prefs.edit()) {
             putLong(idKey, id)
             putString(tokenKey, token)
             putString(nameKey, name)
             putString(avatarKey, avatar)
+            putString(transportNameKey, transportName)
+            putString(transportImageKey, transportImage)
             apply()
-
-            //authState.value = _authStateFlow.value
         }
         sendPushToken()
     }
@@ -130,4 +133,11 @@ class AppAuth private constructor(context: Context, diContainer: DependencyConta
     }
 }
 
-data class AuthState(val id: Long = 0, val token: String? = null, val name: String? = null, val avatar: String? = null)
+data class AuthState(
+    val id: Long = 0,
+    val token: String? = null,
+    val name: String? = null,
+    val avatar: String? = null,
+    val transportName: String? = null,
+    val transportImage: String? = null
+)

@@ -89,7 +89,10 @@ class MainActivity : AppCompatActivity() {
                     .into(headerImage)
 
                 textLine1.setText(it.name)
-                textLine2.setText("My default transport")
+                textLine2.setText(getString(R.string.transport_not_set))
+                it.transportName?.let {
+                    textLine2.setText(it)
+                }
             } else {
                 headerImage.setImageResource(R.drawable.electro_club_icon_white_256)
                 textLine1.setText(R.string.nav_header_title)

@@ -23,7 +23,7 @@ class AccountRepositoryServerImpl(diContainer: DependencyContainer): AccountRepo
         )
         val body = response.body() ?: throw ApiError(response.code(), response.message())
         body.data.user?.let {
-            appAuth.setAuth(it.user_id, it.user_token, it.nickname,it.thumbnail)
+            appAuth.setAuth(it.user_id, it.user_token, it.nickname,it.thumbnail, it.transport_name, it.transport_image)
             return true
         }
         return false

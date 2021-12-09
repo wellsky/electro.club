@@ -29,14 +29,14 @@ val addTokensInterceptor = Interceptor {
 
     val diContainer = DependencyContainer.getInstance()
 
-    val accessToken = diContainer.accessToken
-    val userToken = if (diContainer.appAuth.myToken() != null) "&user_token=" + diContainer.appAuth.myToken() else ""
+    val accessTokenString = "&access_token=" + diContainer.accessToken
+    val userTokenString = if (diContainer.appAuth.myToken() != null) "&user_token=" + diContainer.appAuth.myToken() else ""
 
     val newRequest = request.newBuilder()
         .post(
             RequestBody.create(
                 body?.contentType(),
-                body.bodyToString() + "&access_token=" + accessToken + "&user_token=" + userToken
+                body.bodyToString() + accessTokenString + userTokenString
             )
         )
         .build()
@@ -74,7 +74,6 @@ interface ApiService {
         @Field("url") url: String ,
     ): Response<ApiResponse<UrlDataResult>>
 
-    //TODO перервести остальные запросы на такой формат вместо HashMap
     @FormUrlEncoded
     @POST(UPDATES_SERVER_URL)
     suspend fun getSubscriptions(
@@ -201,6 +200,8 @@ data class ApiAccountUserData (
     val thumbnail: String,
     val account_created: Long,
     val last_visit: Long,
+    val transport_name: String?,
+    val transport_image: String?
 )
 
 data class ApiMapObjects(
