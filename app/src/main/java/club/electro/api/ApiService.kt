@@ -53,7 +53,7 @@ fun RequestBody?.bodyToString(): String {
 
 val okhttp = OkHttpClient.Builder()
         .addInterceptor(addTokensInterceptor)
-        .addInterceptor(logging)
+//        .addInterceptor(logging)
         .build()
 
 val retrofit = Retrofit.Builder()

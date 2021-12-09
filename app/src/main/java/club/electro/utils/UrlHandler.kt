@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import club.electro.R
 import club.electro.di.DependencyContainer
 import club.electro.error.ApiError
+import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.ui.user.UserProfileFragment.Companion.userId
@@ -115,6 +116,7 @@ class UrlHandler(val context: Context, val navController: NavController) {
                     Bundle().apply {
                         threadType = data.thread_type!!
                         threadId = data.thread_id!!
+                        postId = data.post_id!!
                     }
                 )
             }

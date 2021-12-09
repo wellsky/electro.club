@@ -40,6 +40,7 @@ class ThreadFragment : Fragment() {
     companion object {
         var Bundle.threadType: Byte by ByteArg
         var Bundle.threadId: Long by LongArg
+        var Bundle.postId: Long by LongArg
     }
 
     private lateinit var viewModel: ThreadViewModel
@@ -87,29 +88,26 @@ class ThreadFragment : Fragment() {
     ): View? {
         val threadType = requireArguments().threadType
         val threadId =  requireArguments().threadId
+        val postId = requireArguments().postId
 
-
-        // TODO явно есть более красивый способ
-//        threadName?.let {
-//            (activity as AppCompatActivity?)!!.supportActionBar!!.title = it
-//        }
-
+        // TODO как сделать, чтобы передаваемые аргументы во фрагмент могли быть nullable. Сейчас если LongArg не передан, то возвращает 0
+        currentTargetPost = if (postId != 0L)
+            ThreadLoadTarget(targetPostId = postId)
+        else
+            ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST)
 
         viewModel = ThreadViewModel(
-            requireActivity().getApplication(),
-            threadType!!,
-            threadId!!
+            application = requireActivity().getApplication(),
+            threadType = threadType,
+            threadId = threadId,
+            targetPost = currentTargetPost!!
         )
 
         viewModel.getThread()
-//        viewModel.loadPosts()
 
         _binding = FragmentThreadBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        //val context1 = requireContext()
-
-        val threadFragment = this
 
         val adapter = PostAdapter(object : PostInteractionListener {
             override fun onEditClicked(post: Post) {
@@ -155,16 +153,20 @@ class ThreadFragment : Fragment() {
             viewModel.posts.collectLatest {
 
                 currentTargetPost?.let {
+                    if (it.targetPostId != null) {
+                        setGravityTop()
+                        //binding.postsList.scrollToPosition((binding.postsList.getAdapter()!!.getItemCount()))
+                    }
                     if (it.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_FIRST) {
                         setGravityTop()
-                        binding.postsList.scrollToPosition((binding.postsList.getAdapter()!!.getItemCount() - 1))
+                        //binding.postsList.smoothScrollToPosition((binding.postsList.getAdapter()!!.getItemCount() - 1))
                         scrolledToTop = true
                         binding.buttonScrollToBegin.isVisible = false
 
                     }
                     if (it.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_LAST) {
                         setGravityBottom()
-                        binding.postsList.smoothScrollToPosition(0)
+                        //binding.postsList.smoothScrollToPosition(0)
                         scrolledToBottom = true
                         binding.buttonScrollToEnd.isVisible = false
                     }
@@ -337,7 +339,13 @@ class ThreadFragment : Fragment() {
             adapter.refresh()
         }
 
-        setGravityBottom()
+
+        if (postId != 0L) {
+            setGravityTop()
+            //viewModel.unfreshThread()
+        } else {
+            setGravityBottom()
+        }
 
         return root
     }

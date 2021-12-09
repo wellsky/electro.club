@@ -15,7 +15,8 @@ import java.io.IOException
 class ThreadRepositoryServerImpl(
             val diContainer: DependencyContainer,
             val threadType: Byte,
-            val threadId: Long
+            val threadId: Long,
+            val targetPost: ThreadLoadTarget = ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST)
         ) : ThreadRepository {
 
     private val threadDao = diContainer.appDb.threadDao()
@@ -30,7 +31,7 @@ class ThreadRepositoryServerImpl(
     private val updaterJob = startCheckUpdates()
 
     // https://stackoverflow.com/questions/64692260/paging-3-0-list-with-new-params-in-kotlin?noredirect=1&lq=1
-    var targetFlow = MutableStateFlow(value = ThreadLoadTarget(targetPostPosition = "last"))
+    var targetFlow = MutableStateFlow(value = targetPost)
 
     override val posts = targetFlow.flatMapLatest { refreshTarget ->
         @OptIn(ExperimentalPagingApi::class)
@@ -70,11 +71,17 @@ class ThreadRepositoryServerImpl(
         }
     }
 
+//    override suspend fun unfreshThread() {
+//        postDao.unfreshThread(threadType = threadType, threadId = threadId)
+//    }
+
     override fun reloadPosts(target: ThreadLoadTarget) {
+        changeTargetPost(target)
+
         // https://stackoverflow.com/questions/64715949/update-current-page-or-update-data-in-paging-3-library-android-kotlin
         println("reloadPosts()")
         //postDao.pagingSource(threadType, threadId).invalidate()
-        targetFlow.value = target
+        // targetFlow.value = target
     }
 
     override fun changeTargetPost(target: ThreadLoadTarget) {
@@ -135,7 +142,7 @@ class ThreadRepositoryServerImpl(
  */
 class ThreadLoadTarget (
     val targetPostId: Long? = null,
-    val targetPostPosition: String? = TARGET_POSITION_LAST,
+    val targetPostPosition: String? = null,
 
     val quiet: Boolean = false,
     val highlight: Boolean = false,

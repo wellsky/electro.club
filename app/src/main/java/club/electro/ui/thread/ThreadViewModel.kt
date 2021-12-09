@@ -8,9 +8,14 @@ import club.electro.repository.*
 import club.electro.utils.UrlHandler
 import kotlinx.coroutines.launch
 
-class ThreadViewModel(application: Application, val threadType: Byte, val threadId: Long) : AndroidViewModel(application) {
+class ThreadViewModel(
+        application: Application,
+        val threadType: Byte,
+        val threadId: Long,
+        val targetPost: ThreadLoadTarget
+) : AndroidViewModel(application) {
 
-    private val repository: ThreadRepository = ThreadRepositoryServerImpl((application as ElectroClubApp).diContainer, threadType, threadId)
+    private val repository: ThreadRepository = ThreadRepositoryServerImpl((application as ElectroClubApp).diContainer, threadType, threadId, targetPost)
 
     val thread = repository.thread.asLiveData()
     val posts = repository.posts
@@ -18,28 +23,16 @@ class ThreadViewModel(application: Application, val threadType: Byte, val thread
     val lastUpdateTime = repository.lastUpdateTime
 
     val editorPost = MutableLiveData(emptyPost) // Пост, который в данный момент в текстовом редакторе
-    val editedPost = MutableLiveData(emptyPost) // Исходный пост, который в данный момент редактируется
+    val editedPost = MutableLiveData(emptyPost) // Опубликованный пост, который в данный момент редактируется в текстовом редакторе
     val answerToPost = MutableLiveData(emptyPost) // Пост, на который в данный момент пишется ответ
 
-//    fun loadPosts() = viewModelScope.launch {
-//        try {
-//            repository.getThreadPosts()
-//        } catch (e: Exception) {
-//            //_dataState.value = FeedModelState(error = true)
-//        }
+//    fun unfreshThread() = viewModelScope.launch {
+//        repository.unfreshThread()
 //    }
+
     fun getThread() = viewModelScope.launch {
         repository.getThread()
     }
-
-
-//    fun loadThreadBegining() {
-//        repository.changeTargetPost(ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_FIRST))
-//    }
-//
-//    fun loadThreadEnd() {
-//        repository.changeTargetPost(ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST))
-//    }
 
     fun reloadPosts(target: ThreadLoadTarget) {
         repository.reloadPosts(target)
