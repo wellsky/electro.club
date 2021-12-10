@@ -8,6 +8,7 @@ import club.electro.entity.AreaEntity
 import club.electro.entity.toDto
 import club.electro.entity.toEntity
 import club.electro.error.*
+import club.electro.model.NetworkStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -18,7 +19,7 @@ class SubscriptionsRepositoryServerImpl(diContainer: DependencyContainer) : Subs
     val appDb = diContainer.appDb
     val apiService = diContainer.apiService
     val appAuth = diContainer.appAuth
-    val resources = diContainer.context.resources
+    val networkStatus = diContainer.networkStatus
 
     private val dao: AreaDao = appDb.areaDao()
     override val data: Flow<List<SubscriptionArea>> = dao.getAll().map(List<AreaEntity>::toDto).flowOn(Dispatchers.Default)
@@ -33,8 +34,9 @@ class SubscriptionsRepositoryServerImpl(diContainer: DependencyContainer) : Subs
                 }
                 val body = response.body() ?: throw ApiError(response.code(), response.message())
                 dao.insert(body.data.items.toEntity())
+                networkStatus.setStatus(NetworkStatus.STATUS_ONLINE)
             } catch (e: IOException) {
-                throw NetworkError
+                networkStatus.setStatus(NetworkStatus.STATUS_ERROR)
             } catch (e: Exception) {
                 throw UnknownError
             }

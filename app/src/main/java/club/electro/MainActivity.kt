@@ -20,6 +20,8 @@ import androidx.lifecycle.ViewModelProvider
 import club.electro.application.ElectroClubApp
 import club.electro.databinding.ActivityMainBinding
 import club.electro.di.DependencyContainer
+import club.electro.model.NetworkStatus
+import club.electro.ui.thread.ThreadViewModel
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -112,6 +114,18 @@ class MainActivity : AppCompatActivity() {
                 config.onClick()
             }
         })
+
+        viewModel.networkStatus.status.observe(this, {
+            val statusString = when (it) {
+               NetworkStatus.STATUS_ONLINE -> "Network status: online"
+               NetworkStatus.STATUS_ERROR -> "Network status: error"
+               else -> ""
+            }
+
+            Snackbar.make(binding.root, statusString, Snackbar.LENGTH_LONG)
+                .show()
+        })
+
 
 
         // Очистка БД для тестирования

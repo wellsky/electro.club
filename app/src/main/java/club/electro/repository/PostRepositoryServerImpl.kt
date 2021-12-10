@@ -8,17 +8,17 @@ import club.electro.dto.Post
 import club.electro.entity.PostEntity
 import club.electro.entity.toEntity
 import club.electro.error.ApiError
-import club.electro.error.NetworkError
 import club.electro.error.UnknownError
+import club.electro.model.NetworkStatus
 import club.electro.workers.SavePostWorker
 import kotlinx.coroutines.*
 import java.io.IOException
 
 class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository {
     private val dao = diContainer.appDb.postDao()
-    private val resources = diContainer.context.resources
     private val appAuth = diContainer.appAuth
     private val apiService = diContainer.apiService
+    private val networkStatus = diContainer.networkStatus
 
     lateinit var workManager: WorkManager
 
@@ -78,6 +78,8 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
 
+            networkStatus.setStatus(NetworkStatus.STATUS_ONLINE)
+
             return if (body.data.messages.size > 0) {
                 //TODO сервер не отдает посты из других тем. Надо отдавать, если threadType=2
                 body.data.messages[0]
@@ -85,7 +87,8 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
                 null
             }
         } catch (e: IOException) {
-            throw NetworkError
+            networkStatus.setStatus(NetworkStatus.STATUS_ERROR)
+            return null
         } catch (e: Exception) {
             throw UnknownError
         }
@@ -184,8 +187,9 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
                 prepareAndSaveLocal(newPost)
 
                 println("Have response new post id:" + body.data.message.id)
+                networkStatus.setStatus(NetworkStatus.STATUS_ONLINE)
             } catch (e: IOException) {
-                throw NetworkError
+                networkStatus.setStatus(NetworkStatus.STATUS_ERROR)
             } catch (e: Exception) {
                 throw UnknownError
             }
@@ -215,8 +219,9 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
 
             val body = response.body() ?: throw ApiError(response.code(), response.message())
             //dao.insert(PostEntity.fromDto(body))
+            networkStatus.setStatus(NetworkStatus.STATUS_ONLINE)
         } catch (e: IOException) {
-            throw NetworkError
+            networkStatus.setStatus(NetworkStatus.STATUS_ERROR)
         } catch (e: Exception) {
             throw UnknownError
         }

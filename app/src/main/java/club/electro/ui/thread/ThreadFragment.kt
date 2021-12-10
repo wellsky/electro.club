@@ -318,7 +318,6 @@ class ThreadFragment : Fragment() {
             viewModel.cancelAnswerPost()
         }
 
-        // TODO добавить swipeToRefresh перетягиванием вниз и вызовом adapter.refresh()
         binding.swiperefresh.setOnRefreshListener {
             adapter.refresh()
         }

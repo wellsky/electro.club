@@ -8,6 +8,7 @@ import club.electro.api.Api
 import club.electro.api.ApiService
 import club.electro.auth.AppAuth
 import club.electro.db.AppDb
+import club.electro.model.NetworkStatus
 import club.electro.repository.PostRepository
 import club.electro.repository.PostRepositoryServerImpl
 import club.electro.repository.UserRepository
@@ -23,7 +24,8 @@ class DependencyContainer private constructor(val context: Context) {
     val appAuth: AppAuth = AppAuth.initApp(context, this)
 
     val postDao = appDb.postDao()
-    val userDao = appDb.userDao()
+
+    val networkStatus = NetworkStatus.getInstance()
 
     val postRepository: PostRepository = PostRepositoryServerImpl(this)
     val userRepository: UserRepository = UserRepositoryServerImpl(this)

@@ -8,6 +8,7 @@ import club.electro.dto.Post
 import club.electro.dto.PostsThread
 import club.electro.entity.toEntity
 import club.electro.error.*
+import club.electro.model.NetworkStatus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.IOException
@@ -21,11 +22,10 @@ class ThreadRepositoryServerImpl(
 
     private val threadDao = diContainer.appDb.threadDao()
     private val postDao = diContainer.appDb.postDao()
-    private val userDao = diContainer.appDb.userDao()
-    private val resources = diContainer.context.resources
     private val apiService = diContainer.apiService
     private val appAuth = diContainer.appAuth
     private val postRepository = diContainer.postRepository
+    private val networkStatus = diContainer.networkStatus
 
     override val lastUpdateTime: MutableLiveData<Long> = MutableLiveData(0L)
     private val updaterJob = startCheckUpdates()
@@ -63,8 +63,10 @@ class ThreadRepositoryServerImpl(
                 }
                 val body = response.body() ?: throw ApiError(response.code(), response.message())
                 threadDao.insert(body.data.thread.toEntity())
+                networkStatus.setStatus(NetworkStatus.STATUS_ONLINE)
             } catch (e: IOException) {
-                throw NetworkError
+                //throw NetworkError
+                networkStatus.setStatus(NetworkStatus.STATUS_ERROR)
             } catch (e: Exception) {
                 throw UnknownError
             }
@@ -103,21 +105,27 @@ class ThreadRepositoryServerImpl(
     override suspend fun checkForUpdates()  {
         while (true) {
             delay(2_000L)
+            try {
+                val response = apiService.getAreaModifiedTime(
+                    type = threadType,
+                    objectId = threadId
+                )
+                if (!response.isSuccessful) {
+                    throw ApiError(response.code(), response.message())
+                }
 
-            val response = apiService.getAreaModifiedTime(
-                type = threadType,
-                objectId = threadId
-            )
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
-            }
+                val body = response.body() ?: throw ApiError(response.code(), response.message())
 
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
+                val newTime = body.data.time
 
-            val newTime = body.data.time
-
-            if (newTime > lastUpdateTime.value!!) {
-                lastUpdateTime.postValue(newTime)
+                if (newTime > lastUpdateTime.value!!) {
+                    lastUpdateTime.postValue(newTime)
+                }
+                networkStatus.setStatus(NetworkStatus.STATUS_ONLINE)
+            }  catch (e: IOException) {
+                networkStatus.setStatus(NetworkStatus.STATUS_ERROR)
+            } catch (e: Exception) {
+                throw UnknownError
             }
         }
     }
