@@ -58,8 +58,8 @@ class PostRemoteMediator(
                         threadType = threadType,
                         threadId = threadId,
                         from = from,
+                        included = 1, //Включая указанный в from пост //if (target.targetPostId != null) 1 else 0
                         count = count,
-                        included = if (target.targetPostId != null) 1 else 0
                     )
                 }
 

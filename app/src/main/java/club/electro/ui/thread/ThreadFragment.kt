@@ -48,7 +48,7 @@ class ThreadFragment : Fragment() {
 
     private val binding get() = _binding!!
 
-    private var currentTargetPost: ThreadLoadTarget? = null
+    private var currentTargetPost: ThreadLoadTarget? = null // Задается при вызове загрузки постов и сбрасывается в null при первом поступлении новых данных
 
     private var firstUpdateTimeReceived = false
 
@@ -94,7 +94,7 @@ class ThreadFragment : Fragment() {
         currentTargetPost = if (postId != 0L)
             ThreadLoadTarget(targetPostId = postId)
         else
-            ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST)
+            ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD)
 
         viewModel = ThreadViewModel(
             application = requireActivity().getApplication(),
@@ -153,23 +153,7 @@ class ThreadFragment : Fragment() {
             viewModel.posts.collectLatest {
 
                 currentTargetPost?.let {
-                    if (it.targetPostId != null) {
-                        setGravityTop()
-                        //binding.postsList.scrollToPosition((binding.postsList.getAdapter()!!.getItemCount()))
-                    }
-                    if (it.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_FIRST) {
-                        setGravityTop()
-                        //binding.postsList.smoothScrollToPosition((binding.postsList.getAdapter()!!.getItemCount() - 1))
-                        scrolledToTop = true
-                        binding.buttonScrollToBegin.isVisible = false
-
-                    }
-                    if (it.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_LAST) {
-                        setGravityBottom()
-                        //binding.postsList.smoothScrollToPosition(0)
-                        scrolledToBottom = true
-                        binding.buttonScrollToEnd.isVisible = false
-                    }
+                    setGravityForTarget(it)
                     currentTargetPost = null
                 }
 
@@ -181,7 +165,7 @@ class ThreadFragment : Fragment() {
             // https://stackoverflow.com/questions/51889154/recycler-view-not-scrolling-to-the-top-after-adding-new-item-at-the-top-as-chan
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 // TODO нужен нормальный метод для определения публикации новых постов
-                val newPostsPublished = ((positionStart == 0) and (itemCount == 1))
+                val newPostsPublished = false //((positionStart == 0) and (itemCount == 1))
 
                 if (newPostsPublished) {
                     if (binding.postsList.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
@@ -339,12 +323,8 @@ class ThreadFragment : Fragment() {
             adapter.refresh()
         }
 
-
-        if (postId != 0L) {
-            setGravityTop()
-            //viewModel.unfreshThread()
-        } else {
-            setGravityBottom()
+        currentTargetPost?.let {
+            setGravityForTarget(it)
         }
 
         return root
@@ -353,15 +333,15 @@ class ThreadFragment : Fragment() {
     // TODO не работает. Надо сделать сохранение текущей позиции.
     // https://stackoverflow.com/questions/27816217/how-to-save-recyclerviews-scroll-position-using-recyclerview-state/61609823#61609823
     // adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT
-    override fun onPause() {
-        super.onPause()
-        lastFirstVisiblePosition = (binding.postsList.getLayoutManager() as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        (binding.postsList.getLayoutManager() as LinearLayoutManager).scrollToPosition(lastFirstVisiblePosition)
-    }
+//    override fun onPause() {
+//        super.onPause()
+//        lastFirstVisiblePosition = (binding.postsList.getLayoutManager() as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
+//    }
+//
+//    override fun onResume() {
+//        super.onResume()
+//        (binding.postsList.getLayoutManager() as LinearLayoutManager).scrollToPosition(lastFirstVisiblePosition)
+//    }
 
 
     /**
@@ -395,6 +375,36 @@ class ThreadFragment : Fragment() {
         linearLayoutManager.reverseLayout = true
         linearLayoutManager.stackFromEnd = false
         binding.postsList.setLayoutManager(linearLayoutManager)
+    }
+
+    /**
+     * Устанавливает гравитацию в зависимости от целевого поста
+     */
+    fun setGravityForTarget(target: ThreadLoadTarget) {
+        if (target.targetPostId != null) {
+            setGravityTop()
+            //binding.postsList.scrollToPosition((binding.postsList.getAdapter()!!.getItemCount()))
+        }
+        if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD) {
+            setGravityTop()
+            //binding.postsList.smoothScrollToPosition((binding.postsList.getAdapter()!!.getItemCount() - 1))
+            scrolledToTop = true
+            binding.buttonScrollToBegin.isVisible = false
+
+        }
+        if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_FIRST) {
+            setGravityTop()
+            //binding.postsList.smoothScrollToPosition((binding.postsList.getAdapter()!!.getItemCount() - 1))
+            scrolledToTop = true
+            binding.buttonScrollToBegin.isVisible = false
+
+        }
+        if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_LAST) {
+            setGravityBottom()
+            //binding.postsList.smoothScrollToPosition(0)
+            scrolledToBottom = true
+            binding.buttonScrollToEnd.isVisible = false
+        }
     }
 
 }

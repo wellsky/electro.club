@@ -17,9 +17,9 @@ const val BASE_SERVER_URL = "https://electro.club/api/v1/"
 const val UPDATES_SERVER_URL = "https://srv1.electro.club/api/"
 
 val logging = HttpLoggingInterceptor().apply {
-    if (BuildConfig.DEBUG) {
+    //if (BuildConfig.DEBUG) {
         level = HttpLoggingInterceptor.Level.BODY
-    }
+   //}
 }
 
 // https://stackoverflow.com/questions/34791244/retrofit2-modifying-request-body-in-okhttp-interceptor
@@ -53,7 +53,7 @@ fun RequestBody?.bodyToString(): String {
 
 val okhttp = OkHttpClient.Builder()
         .addInterceptor(addTokensInterceptor)
-//        .addInterceptor(logging)
+        .addInterceptor(logging)
         .build()
 
 val retrofit = Retrofit.Builder()

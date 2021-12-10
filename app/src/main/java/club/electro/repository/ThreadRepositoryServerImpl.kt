@@ -143,13 +143,11 @@ class ThreadRepositoryServerImpl(
 class ThreadLoadTarget (
     val targetPostId: Long? = null,
     val targetPostPosition: String? = null,
-
-    val quiet: Boolean = false,
-    val highlight: Boolean = false,
 ) {
     companion object {
         val TARGET_POSITION_FIRST = "first"
         val TARGET_POSITION_LAST = "last"
+        val TARGET_POSITION_FIRST_UNREAD = "first_unread"
     }
 
     fun targetApiParameter():String {
