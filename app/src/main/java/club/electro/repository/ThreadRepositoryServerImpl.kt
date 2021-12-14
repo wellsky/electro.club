@@ -63,27 +63,18 @@ class ThreadRepositoryServerImpl(
                 }
                 val body = response.body() ?: throw ApiError(response.code(), response.message())
                 threadDao.insert(body.data.thread.toEntity())
-                networkStatus.setStatus(NetworkStatus.STATUS_ONLINE)
+                networkStatus.setStatus(NetworkStatus.Status.ONLINE)
             } catch (e: IOException) {
                 //throw NetworkError
-                networkStatus.setStatus(NetworkStatus.STATUS_ERROR)
+                networkStatus.setStatus(NetworkStatus.Status.ERROR)
             } catch (e: Exception) {
                 throw UnknownError
             }
         }
     }
 
-//    override suspend fun unfreshThread() {
-//        postDao.unfreshThread(threadType = threadType, threadId = threadId)
-//    }
-
     override fun reloadPosts(target: ThreadLoadTarget) {
         changeTargetPost(target)
-
-        // https://stackoverflow.com/questions/64715949/update-current-page-or-update-data-in-paging-3-library-android-kotlin
-        println("reloadPosts()")
-        //postDao.pagingSource(threadType, threadId).invalidate()
-        // targetFlow.value = target
     }
 
     override fun changeTargetPost(target: ThreadLoadTarget) {
@@ -114,18 +105,21 @@ class ThreadRepositoryServerImpl(
                     throw ApiError(response.code(), response.message())
                 }
 
-                val body = response.body() ?: throw ApiError(response.code(), response.message())
+                val body = response.body() //?: throw ApiError(response.code(), response.message())
 
-                val newTime = body.data.time
+                body?.let {
+                    val newTime = body.data.time
 
-                if (newTime > lastUpdateTime.value!!) {
-                    lastUpdateTime.postValue(newTime)
+                    if (newTime > lastUpdateTime.value!!) {
+                        lastUpdateTime.postValue(newTime)
+                    }
+
+                    networkStatus.setStatus(NetworkStatus.Status.ONLINE)
                 }
-                networkStatus.setStatus(NetworkStatus.STATUS_ONLINE)
             }  catch (e: IOException) {
-                networkStatus.setStatus(NetworkStatus.STATUS_ERROR)
+                networkStatus.setStatus(NetworkStatus.Status.ERROR)
             } catch (e: Exception) {
-                throw UnknownError
+                // throw UnknownError
             }
         }
     }

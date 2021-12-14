@@ -34,9 +34,9 @@ class SubscriptionsRepositoryServerImpl(diContainer: DependencyContainer) : Subs
                 }
                 val body = response.body() ?: throw ApiError(response.code(), response.message())
                 dao.insert(body.data.items.toEntity())
-                networkStatus.setStatus(NetworkStatus.STATUS_ONLINE)
+                networkStatus.setStatus(NetworkStatus.Status.ONLINE)
             } catch (e: IOException) {
-                networkStatus.setStatus(NetworkStatus.STATUS_ERROR)
+                networkStatus.setStatus(NetworkStatus.Status.ERROR)
             } catch (e: Exception) {
                 throw UnknownError
             }

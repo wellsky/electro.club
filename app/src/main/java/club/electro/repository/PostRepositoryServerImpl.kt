@@ -78,7 +78,7 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
 
-            networkStatus.setStatus(NetworkStatus.STATUS_ONLINE)
+            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
 
             return if (body.data.messages.size > 0) {
                 //TODO сервер не отдает посты из других тем. Надо отдавать, если threadType=2
@@ -87,7 +87,7 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
                 null
             }
         } catch (e: IOException) {
-            networkStatus.setStatus(NetworkStatus.STATUS_ERROR)
+            networkStatus.setStatus(NetworkStatus.Status.ERROR)
             return null
         } catch (e: Exception) {
             throw UnknownError
@@ -187,9 +187,9 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
                 prepareAndSaveLocal(newPost)
 
                 println("Have response new post id:" + body.data.message.id)
-                networkStatus.setStatus(NetworkStatus.STATUS_ONLINE)
+                networkStatus.setStatus(NetworkStatus.Status.ONLINE)
             } catch (e: IOException) {
-                networkStatus.setStatus(NetworkStatus.STATUS_ERROR)
+                networkStatus.setStatus(NetworkStatus.Status.ERROR)
             } catch (e: Exception) {
                 throw UnknownError
             }
@@ -219,9 +219,9 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
 
             val body = response.body() ?: throw ApiError(response.code(), response.message())
             //dao.insert(PostEntity.fromDto(body))
-            networkStatus.setStatus(NetworkStatus.STATUS_ONLINE)
+            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
         } catch (e: IOException) {
-            networkStatus.setStatus(NetworkStatus.STATUS_ERROR)
+            networkStatus.setStatus(NetworkStatus.Status.ERROR)
         } catch (e: Exception) {
             throw UnknownError
         }

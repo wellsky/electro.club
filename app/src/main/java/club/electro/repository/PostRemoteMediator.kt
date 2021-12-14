@@ -181,11 +181,10 @@ class PostRemoteMediator(
 //                ).prepareAll()
             }
 
-
+            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
             return MediatorResult.Success(endOfPaginationReached = body.data.messages.isEmpty())
-            networkStatus.setStatus(NetworkStatus.STATUS_ONLINE)
         } catch (e: IOException) {
-            networkStatus.setStatus(NetworkStatus.STATUS_ERROR)
+            networkStatus.setStatus(NetworkStatus.Status.ERROR)
             return MediatorResult.Error(e)
         } catch (e: Exception) {
             return MediatorResult.Error(e)

@@ -117,9 +117,9 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.networkStatus.status.observe(this, {
             val statusString = when (it) {
-               NetworkStatus.STATUS_ONLINE -> "Network status: online"
-               NetworkStatus.STATUS_ERROR -> "Network status: error"
-               else -> ""
+               NetworkStatus.Status.ONLINE -> "Network status: online"
+               NetworkStatus.Status.OFFLINE -> "Network status: offline"
+               NetworkStatus.Status.ERROR -> "Network status: error"
             }
 
             Snackbar.make(binding.root, statusString, Snackbar.LENGTH_LONG)

@@ -3,12 +3,13 @@ package club.electro.model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
-class NetworkStatus {
-    companion object {
-        val STATUS_ONLINE: Byte = 0
-        val STATUS_OFFLINE: Byte  = 1
-        val STATUS_ERROR: Byte  = 2
 
+class NetworkStatus {
+    enum class Status {
+        ONLINE, OFFLINE, ERROR
+    }
+
+    companion object {
         @Volatile
         private var instance: NetworkStatus? = null
 
@@ -19,11 +20,11 @@ class NetworkStatus {
         }
     }
 
-    val _status = MutableLiveData(STATUS_ONLINE)
-    val status: LiveData<Byte>
+    val _status = MutableLiveData(Status.ONLINE)
+    val status: LiveData<Status>
         get() = _status
 
-    fun setStatus(status: Byte) {
+    fun setStatus(status: Status) {
         if (status != _status.value) {
             _status.postValue(status)
         }
