@@ -83,10 +83,9 @@ class ThreadFragment : Fragment() {
         } ?: throw Throwable("Invalid activity")
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
         val threadType = requireArguments().threadType
         val threadId =  requireArguments().threadId
         val postId = requireArguments().postId
@@ -97,13 +96,6 @@ class ThreadFragment : Fragment() {
         else
             ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD)
 
-//        viewModel = ThreadViewModel(
-//            application = requireActivity().getApplication(),
-//            threadType = threadType,
-//            threadId = threadId,
-//            targetPost = currentTargetPost!!
-//        )
-
         viewModel = ViewModelProvider(this, ThreadViewModelFactory(
             requireActivity().getApplication(),
             threadType,
@@ -112,10 +104,14 @@ class ThreadFragment : Fragment() {
         )).get(ThreadViewModel::class.java)
 
         viewModel.getThread()
+    }
 
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         _binding = FragmentThreadBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
 
         val adapter = PostAdapter(object : PostInteractionListener {
             override fun onEditClicked(post: Post) {
@@ -159,7 +155,6 @@ class ThreadFragment : Fragment() {
 
         lifecycleScope.launchWhenCreated {
             viewModel.posts.collectLatest {
-
                 currentTargetPost?.let {
                     setGravityForTarget(it)
                     currentTargetPost = null
@@ -167,7 +162,16 @@ class ThreadFragment : Fragment() {
 
                 adapter.submitData(it)
             }
+
+            adapter.loadStateFlow.collectLatest { state ->
+                binding.swiperefresh.isRefreshing =
+                    state.refresh is LoadState.Loading
+//                    state.prepend is LoadState.Loading ||
+//                    state.append is LoadState.Loading
+            }
         }
+
+        adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
             // https://stackoverflow.com/questions/51889154/recycler-view-not-scrolling-to-the-top-after-adding-new-item-at-the-top-as-chan
@@ -188,14 +192,14 @@ class ThreadFragment : Fragment() {
             }
         })
 
-        lifecycleScope.launchWhenCreated {
-            adapter.loadStateFlow.collectLatest { state ->
-                binding.swiperefresh.isRefreshing =
-                    state.refresh is LoadState.Loading
-//                    state.prepend is LoadState.Loading ||
-//                    state.append is LoadState.Loading
-            }
-        }
+//        lifecycleScope.launchWhenCreated {
+//            adapter.loadStateFlow.collectLatest { state ->
+//                binding.swiperefresh.isRefreshing =
+//                    state.refresh is LoadState.Loading
+////                    state.prepend is LoadState.Loading ||
+////                    state.append is LoadState.Loading
+//            }
+//        }
 
         // TODO реализовано криво. Вообще логику обновления лучше не выносить за репозиторий.
         // Но только adapter.refresh() может указать медиатору на текущий видимый пост
@@ -216,16 +220,9 @@ class ThreadFragment : Fragment() {
                 binding.editedPostContent.text = StripTags(it.content).toString()
 
                 with (binding.editorPostContent) {
-                    requestFocus()
-                    //setText(HtmlCompat.fromHtml(it.content, HtmlCompat.FROM_HTML_MODE_LEGACY))
-//                    val editorText = PostTextPreparator(it.content)
-//                        .prepareBasicTags()
-//                        .prepareEmojies()
-//                        .preparePlainText()
-//                        .get()
                     val editorText = it.content
-
                     setText(editorText)
+                    requestFocus()
                 }
             } else {
                 binding.editedPostGroup.visibility = View.GONE
@@ -330,16 +327,12 @@ class ThreadFragment : Fragment() {
             adapter.refresh()
         }
 
-        currentTargetPost?.let {
-            setGravityForTarget(it)
-        }
-
         return root
     }
 
     // TODO не работает. Надо сделать сохранение текущей позиции.
     // https://stackoverflow.com/questions/27816217/how-to-save-recyclerviews-scroll-position-using-recyclerview-state/61609823#61609823
-    // adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT
+
 //    override fun onPause() {
 //        super.onPause()
 //        lastFirstVisiblePosition = (binding.postsList.getLayoutManager() as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
@@ -389,10 +382,12 @@ class ThreadFragment : Fragment() {
      */
     fun setGravityForTarget(target: ThreadLoadTarget) {
         if (target.targetPostId != null) {
+            println("gravity1")
             setGravityTop()
             //binding.postsList.scrollToPosition((binding.postsList.getAdapter()!!.getItemCount()))
         }
         if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD) {
+            println("gravity2")
             setGravityTop()
             //binding.postsList.smoothScrollToPosition((binding.postsList.getAdapter()!!.getItemCount() - 1))
             scrolledToTop = true
@@ -400,6 +395,7 @@ class ThreadFragment : Fragment() {
 
         }
         if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_FIRST) {
+            println("gravity3")
             setGravityTop()
             //binding.postsList.smoothScrollToPosition((binding.postsList.getAdapter()!!.getItemCount() - 1))
             scrolledToTop = true
@@ -407,6 +403,7 @@ class ThreadFragment : Fragment() {
 
         }
         if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_LAST) {
+            println("gravity4")
             setGravityBottom()
             //binding.postsList.smoothScrollToPosition(0)
             scrolledToBottom = true
