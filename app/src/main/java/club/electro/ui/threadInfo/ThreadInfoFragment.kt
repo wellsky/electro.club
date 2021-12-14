@@ -11,6 +11,9 @@ import club.electro.MainViewModel
 import club.electro.R
 import club.electro.ToolBarConfig
 import club.electro.databinding.FragmentThreadInfoBinding
+import club.electro.ui.thread.ThreadViewModel
+import club.electro.ui.thread.ThreadViewModelFactory
+import club.electro.ui.threadInfo.ThreadInfoViewModelFactory
 import club.electro.utils.ByteArg
 import club.electro.utils.LongArg
 import com.bumptech.glide.Glide
@@ -54,11 +57,17 @@ class ThreadInfoFragment : Fragment() {
         val threadType = requireArguments().threadInfoType
         val threadId = requireArguments().threadInfoId
 
-        viewModel = ThreadInfoViewModel(
+//        viewModel = ThreadInfoViewModel(
+//            requireActivity().getApplication(),
+//            threadType,
+//            threadId,
+//        )
+
+        viewModel = ViewModelProvider(this, ThreadInfoViewModelFactory(
             requireActivity().getApplication(),
             threadType,
             threadId,
-        )
+        )).get(ThreadInfoViewModel::class.java)
 
         viewModel.getThread()
 

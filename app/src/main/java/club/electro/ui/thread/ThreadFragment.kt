@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.collectLatest
 import androidx.core.view.isVisible
 import club.electro.ToolBarConfig
 import club.electro.repository.ThreadLoadTarget
+import club.electro.ui.subscriptions.SubscriptionsViewModel
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
 import club.electro.utils.StripTags
@@ -96,12 +97,19 @@ class ThreadFragment : Fragment() {
         else
             ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD)
 
-        viewModel = ThreadViewModel(
-            application = requireActivity().getApplication(),
-            threadType = threadType,
-            threadId = threadId,
-            targetPost = currentTargetPost!!
-        )
+//        viewModel = ThreadViewModel(
+//            application = requireActivity().getApplication(),
+//            threadType = threadType,
+//            threadId = threadId,
+//            targetPost = currentTargetPost!!
+//        )
+
+        viewModel = ViewModelProvider(this, ThreadViewModelFactory(
+            requireActivity().getApplication(),
+            threadType,
+            threadId,
+            currentTargetPost
+        )).get(ThreadViewModel::class.java)
 
         viewModel.getThread()
 
