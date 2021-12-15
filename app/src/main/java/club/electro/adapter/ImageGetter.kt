@@ -5,6 +5,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.text.Html
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -27,14 +28,15 @@ class ImageGetter(
         // Coroutine Scope to download image in Background
         GlobalScope.launch(Dispatchers.IO) {
             runCatching {
-
-                // downloading image in bitmap format using [Picasso] Library
-                val bitmap = Picasso.get().load(url).get()
-                val drawable = BitmapDrawable(res, bitmap)
-
                 // To make sure Images don't go out of screen , Setting width less
                 // than screen width, You can change image size if you want
                 val width = getScreenWidth() - 130
+
+
+                // downloading image in bitmap format using [Picasso] Library
+                val bitmap = Picasso.get().load(url).resize(width, 0).get()
+
+                val drawable = BitmapDrawable(res, bitmap)
 
                 // Images may stretch out if you will only resize width,
                 // hence resize height to according to aspect ratio

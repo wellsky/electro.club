@@ -41,7 +41,7 @@ class ThreadFragment : Fragment() {
     companion object {
         var Bundle.threadType: Byte by ByteArg
         var Bundle.threadId: Long by LongArg
-        var Bundle.postId: Long by LongArg
+        var Bundle.postId: Long by LongArg // Может быть -1 (загрузить с последнего сообщения) и -2 (с первого непрочитанного)
     }
 
     private lateinit var viewModel: ThreadViewModel
@@ -53,7 +53,6 @@ class ThreadFragment : Fragment() {
 
     private var firstUpdateTimeReceived = false
 
-    private var lastFirstVisiblePosition = 0
     private var scrolledToTop: Boolean = true
     private var scrolledToBottom: Boolean = true
 
@@ -91,10 +90,12 @@ class ThreadFragment : Fragment() {
         val postId = requireArguments().postId
 
         // TODO как сделать, чтобы передаваемые аргументы во фрагмент могли быть nullable. Сейчас если LongArg не передан, то возвращает 0
-        currentTargetPost = if (postId != 0L)
-            ThreadLoadTarget(targetPostId = postId)
-        else
-            ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD)
+        currentTargetPost = when (postId) {
+             0L -> ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST)
+            -1L -> ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST)
+            -2L -> ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD)
+            else -> ThreadLoadTarget(targetPostId = postId)
+        }
 
         viewModel = ViewModelProvider(this, ThreadViewModelFactory(
             requireActivity().getApplication(),

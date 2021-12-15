@@ -14,6 +14,7 @@ import club.electro.adapter.SubscriptionAreaAdapter
 import club.electro.adapter.SubscriptionAreaInteractionListener
 import club.electro.databinding.FragmentSubscriptionsBinding
 import club.electro.dto.SubscriptionArea
+import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 
@@ -52,6 +53,7 @@ class SubscriptionsFragment : Fragment() {
                     Bundle().apply {
                         threadType = area.type
                         threadId = area.object_id
+                        postId = if (area.count > 0) -2 else 0 // Если есть непрочитанные, то грузить с первого непрочитанного, иначе с последнего сообщения в теме
                     }
                 )
             }
