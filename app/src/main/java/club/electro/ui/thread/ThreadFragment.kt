@@ -89,7 +89,6 @@ class ThreadFragment : Fragment() {
         val threadId =  requireArguments().threadId
         val postId = requireArguments().postId
 
-        // TODO как сделать, чтобы передаваемые аргументы во фрагмент могли быть nullable. Сейчас если LongArg не передан, то возвращает 0
         currentTargetPost = when (postId) {
              0L -> ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST)
             -1L -> ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST)

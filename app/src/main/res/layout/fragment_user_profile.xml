@@ -28,7 +28,8 @@
                     android:layout_width="110dp"
                     android:layout_height="110dp"
                     android:layout_gravity="left"
-                    android:src="@drawable/electro_club_icon_white_256" />
+                    tools:src="@drawable/electro_club_icon_white_256"
+                    />
 
                 <ImageView
                     android:id="@+id/transportImage"
@@ -36,7 +37,7 @@
                     android:layout_height="60dp"
                     android:layout_marginLeft="-30dp"
                     android:layout_marginTop="50dp"
-                    android:src="@drawable/electro_club_icon_white_256"
+                    tools:src="@drawable/electro_club_icon_white_256"
                     />
 
                 <LinearLayout
@@ -44,20 +45,21 @@
                     android:layout_height="100dp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="5dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    >
 
                     <TextView
                         android:id="@+id/name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
                         android:text="User Nickname"
                         android:textColor="#fff"
                         android:textSize="24sp"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/transport"
+                        android:id="@+id/transportName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"

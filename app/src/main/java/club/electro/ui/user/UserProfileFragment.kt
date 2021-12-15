@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.core.view.marginLeft
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -53,8 +54,11 @@ class UserProfileFragment : Fragment() {
                 messages.text = user.messages.toString()
                 rating.text = user.rating.toString()
 
+                transportName.isVisible = false
+                transportImage.isVisible = false
+
                 user.primaryTransport?.let { primaryTransport ->
-                    transport.text = primaryTransport.name
+                    transportName.text = primaryTransport.name
                     primaryTransport.image?.let {
                         Glide.with(transportImage.context)
                             .load(it)
@@ -64,6 +68,8 @@ class UserProfileFragment : Fragment() {
                             .error(R.drawable.ic_error_100dp)
                             .into(transportImage)
                     }
+                    transportName.isVisible = true
+                    transportImage.isVisible = true
                 }
 
                 user.avatar?.let {

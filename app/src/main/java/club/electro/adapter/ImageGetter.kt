@@ -32,7 +32,6 @@ class ImageGetter(
                 // than screen width, You can change image size if you want
                 val width = getScreenWidth() - 130
 
-
                 // downloading image in bitmap format using [Picasso] Library
                 val bitmap = Picasso.get().load(url).resize(width, 0).get()
 

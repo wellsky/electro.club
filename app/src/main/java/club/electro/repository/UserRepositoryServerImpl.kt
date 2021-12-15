@@ -21,12 +21,8 @@ import java.io.IOException
 class UserRepositoryServerImpl(
     private val diContainer: DependencyContainer,
 ) : UserRepository {
-    private val resources = diContainer.context.resources
-    private val appAuth = diContainer.appAuth
     private val apiService = diContainer.apiService
     private val dao = diContainer.appDb.userDao()
-
-    //override val currentProfile: Flow<User> = dao.getById(12343545).map(UserEntity::toDto).flowOn(Dispatchers.Default)
 
     var currentProfileFlow = MutableStateFlow(0L)
 

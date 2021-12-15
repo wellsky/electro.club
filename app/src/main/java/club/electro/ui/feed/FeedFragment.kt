@@ -39,8 +39,7 @@ class FeedFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        feedViewModel =
-            ViewModelProvider(this).get(FeedViewModel::class.java)
+        feedViewModel = ViewModelProvider(this).get(FeedViewModel::class.java)
 
         _binding = FragmentFeedBinding.inflate(inflater, container, false)
         val root: View = binding.root
