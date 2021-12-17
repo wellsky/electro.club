@@ -68,7 +68,8 @@ class ThreadRepositoryServerImpl(
                 //throw NetworkError
                 networkStatus.setStatus(NetworkStatus.Status.ERROR)
             } catch (e: Exception) {
-                throw UnknownError
+                // TODO
+                //throw UnknownError
             }
         }
     }

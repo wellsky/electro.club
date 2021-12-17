@@ -67,9 +67,8 @@ class FeedPostViewHolder(
             }
 
 
-
-            titleImage.setOnClickListener {
-                //onInteractionListener.onLike(post, like.isChecked) // В этой строке isChecked уже изменился после нажатия!!
+            root.setOnClickListener {
+                onInteractionListener.onClick(feedPost) // В этой строке isChecked уже изменился после нажатия!!
             }
         }
     }

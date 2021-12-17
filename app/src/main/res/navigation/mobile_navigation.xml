@@ -9,7 +9,11 @@
         android:id="@+id/nav_feed"
         android:name="club.electro.ui.feed.FeedFragment"
         android:label="@string/menu_feed"
-        tools:layout="@layout/fragment_feed" />
+        tools:layout="@layout/fragment_feed" >
+        <action
+            android:id="@+id/action_nav_feed_to_threadFragment"
+            app:destination="@id/threadFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_subscriptions"

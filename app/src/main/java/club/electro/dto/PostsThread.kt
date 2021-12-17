@@ -8,3 +8,8 @@ data class PostsThread (
     val messages: Long,
     val subscribersCount: Long,
 )
+
+const val THREAD_TYPE_PERSONAL_CHAT: Byte = 1
+const val THREAD_TYPE_PUBLIC_CHAT: Byte = 2
+const val THREAD_TYPE_CHANNEL: Byte = 3
+const val THREAD_TYPE_POST_WITH_COMMENTS: Byte = 4

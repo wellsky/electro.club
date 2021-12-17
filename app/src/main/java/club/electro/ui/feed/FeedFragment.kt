@@ -6,12 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import club.electro.MainViewModel
 import club.electro.R
 import club.electro.ToolBarConfig
 import club.electro.adapter.*
 import club.electro.databinding.FragmentFeedBinding
 import club.electro.dto.FeedPost
+import club.electro.dto.SubscriptionArea
+import club.electro.dto.THREAD_TYPE_POST_WITH_COMMENTS
+import club.electro.ui.thread.ThreadFragment.Companion.postId
+import club.electro.ui.thread.ThreadFragment.Companion.threadId
+import club.electro.ui.thread.ThreadFragment.Companion.threadType
 
 class FeedFragment : Fragment() {
 
@@ -46,6 +52,14 @@ class FeedFragment : Fragment() {
 
         val adapter = FeedPostAdapter(object : OnFeedPostInteractionListener {
             override fun onClick(feedPost: FeedPost) {
+                findNavController().navigate(
+                    R.id.action_nav_feed_to_threadFragment,
+                    Bundle().apply {
+                        threadType = THREAD_TYPE_POST_WITH_COMMENTS
+                        threadId = feedPost.id
+                        postId = -1L
+                    }
+                )
             }
         })
 

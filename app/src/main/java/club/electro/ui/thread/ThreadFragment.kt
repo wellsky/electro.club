@@ -91,7 +91,7 @@ class ThreadFragment : Fragment() {
 
         currentTargetPost = when (postId) {
              0L -> ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST)
-            -1L -> ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST)
+            -1L -> ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_FIRST)
             -2L -> ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD)
             else -> ThreadLoadTarget(targetPostId = postId)
         }
