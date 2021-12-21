@@ -9,7 +9,7 @@ import club.electro.entity.toDto
 import club.electro.entity.toEntity
 import club.electro.error.*
 import club.electro.model.NetworkStatus
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -24,6 +24,9 @@ class SubscriptionsRepositoryServerImpl(diContainer: DependencyContainer) : Subs
     private val dao: AreaDao = appDb.areaDao()
     override val data: Flow<List<SubscriptionArea>> = dao.getAll().map(List<AreaEntity>::toDto).flowOn(Dispatchers.Default)
 
+    private var lastEventTime = 0L
+    private lateinit var updaterJob: Job
+
     override suspend fun getAll() {
         appAuth.myToken()?.let { myToken ->
             try {
@@ -34,6 +37,8 @@ class SubscriptionsRepositoryServerImpl(diContainer: DependencyContainer) : Subs
                 }
                 val body = response.body() ?: throw ApiError(response.code(), response.message())
                 dao.insert(body.data.items.toEntity())
+                lastEventTime = body.data.lastEventTime
+
                 networkStatus.setStatus(NetworkStatus.Status.ONLINE)
             } catch (e: IOException) {
                 networkStatus.setStatus(NetworkStatus.Status.ERROR)
@@ -41,5 +46,43 @@ class SubscriptionsRepositoryServerImpl(diContainer: DependencyContainer) : Subs
                 throw UnknownError
             }
         }
+    }
+
+    override suspend fun checkForUpdates()  {
+        while (true) {
+            delay(2_000L)
+            try {
+                val response = apiService.getSubscriptions(
+                    lastEventTime = lastEventTime
+                )
+
+                if (!response.isSuccessful) {
+                    throw ApiError(response.code(), response.message())
+                }
+                val body = response.body() ?: throw ApiError(response.code(), response.message())
+
+                body?.let {
+                    if (it.data.items.isNotEmpty()) {
+                        dao.insert(body.data.items.toEntity())
+                        lastEventTime = body.data.lastEventTime
+                        networkStatus.setStatus(NetworkStatus.Status.ONLINE)
+                    }
+                }
+            }  catch (e: IOException) {
+                networkStatus.setStatus(NetworkStatus.Status.ERROR)
+            } catch (e: Exception) {
+                // throw UnknownError
+            }
+        }
+    }
+
+    override fun startCheckUpdates() {
+        updaterJob = CoroutineScope(Dispatchers.Default).launch {
+            checkForUpdates()
+        }
+    }
+
+    override fun stopCheckUpdates() {
+        updaterJob.cancel()
     }
 }

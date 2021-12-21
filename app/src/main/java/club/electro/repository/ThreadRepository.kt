@@ -24,6 +24,6 @@ interface ThreadRepository {
     fun reloadPosts(target: ThreadLoadTarget)
     fun changeTargetPost(target: ThreadLoadTarget)
 
-    fun startCheckUpdates(): Job
+    fun startCheckUpdates()
     fun stopCheckUpdates()
 }

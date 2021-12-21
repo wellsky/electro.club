@@ -78,7 +78,7 @@ interface ApiService {
     @POST(UPDATES_SERVER_URL)
     suspend fun getSubscriptions(
         @Field("method") method: String = "whatsUp",
-        @Field("last_event_time") last_event_time: Long = 0
+        @Field("lastEventTime") lastEventTime: Long = 0
     ): Response<ApiResponse<ApiSubscriptionsData>>
 
     @FormUrlEncoded
@@ -172,8 +172,8 @@ data class ApiResponse<D> (
 
 data class ApiSubscriptionsData (
     val method: String,
-    val lastEventTime: String,
-    val items: List<SubscriptionArea>
+    val lastEventTime: Long,
+    val items: List<SubscriptionArea> = emptyList()
 )
 
 data class ApiThreadData (

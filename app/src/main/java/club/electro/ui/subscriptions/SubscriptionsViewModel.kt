@@ -16,17 +16,18 @@ class SubscriptionsViewModel(application: Application) : AndroidViewModel(applic
     val data = repository.data.asLiveData(Dispatchers.Default)
 
     init {
-        loadPosts()
+        loadSubscriptions()
     }
 
+    fun loadSubscriptions() = viewModelScope.launch {
+        repository.getAll()
+    }
 
-    fun loadPosts() = viewModelScope.launch {
-        try {
-            //_dataState.value = FeedModelState(loading = true)
-            repository.getAll()
-            //_dataState.value = FeedModelState()
-        } catch (e: Exception) {
-            //_dataState.value = FeedModelState(error = true)
-        }
+    fun startCheckUpdates() {
+        repository.startCheckUpdates()
+    }
+
+    fun stopCheckUpdates() {
+        repository.stopCheckUpdates()
     }
 }

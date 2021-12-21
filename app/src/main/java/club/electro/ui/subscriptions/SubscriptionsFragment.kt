@@ -36,13 +36,16 @@ class SubscriptionsFragment : Fragment() {
         } ?: throw Throwable("Invalid activity")
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this).get(SubscriptionsViewModel::class.java)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewModel = ViewModelProvider(this).get(SubscriptionsViewModel::class.java)
-
         _binding = FragmentSubscriptionsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
@@ -63,19 +66,24 @@ class SubscriptionsFragment : Fragment() {
 
         viewModel.data.observe(viewLifecycleOwner, { items ->
             adapter.submitList(items)
+            binding.swiperefresh.setRefreshing(false)
         })
 
         binding.swiperefresh.setOnRefreshListener {
-            binding.swiperefresh.setRefreshing(false)
             //binding.progress.isVisible = true
             //binding.newPostsButton.isVisible = false
-            viewModel.loadPosts()
+            viewModel.loadSubscriptions()
         }
+
+        viewModel.loadSubscriptions()
+
+        viewModel.startCheckUpdates()
 
         return root
     }
 
     override fun onDestroyView() {
+        viewModel.stopCheckUpdates()
         super.onDestroyView()
         _binding = null
     }

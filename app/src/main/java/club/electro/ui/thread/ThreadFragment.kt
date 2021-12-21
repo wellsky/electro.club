@@ -327,6 +327,8 @@ class ThreadFragment : Fragment() {
             adapter.refresh()
         }
 
+        viewModel.startCheckUpdates()
+
         return root
     }
 

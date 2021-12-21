@@ -28,7 +28,8 @@ class ThreadRepositoryServerImpl(
     private val networkStatus = diContainer.networkStatus
 
     override val lastUpdateTime: MutableLiveData<Long> = MutableLiveData(0L)
-    private val updaterJob = startCheckUpdates()
+
+    private lateinit var updaterJob: Job
 
     // https://stackoverflow.com/questions/64692260/paging-3-0-list-with-new-params-in-kotlin?noredirect=1&lq=1
     var targetFlow = MutableStateFlow(value = targetPost)
@@ -125,11 +126,10 @@ class ThreadRepositoryServerImpl(
         }
     }
 
-    override fun startCheckUpdates(): Job {
-        val job = CoroutineScope(Dispatchers.Default).launch {
+    override fun startCheckUpdates() {
+        updaterJob = CoroutineScope(Dispatchers.Default).launch {
             checkForUpdates()
         }
-        return job
     }
 
     override fun stopCheckUpdates() {

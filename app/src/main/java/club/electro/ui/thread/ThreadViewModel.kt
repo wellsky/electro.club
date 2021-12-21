@@ -88,6 +88,10 @@ class ThreadViewModel(
         editorPost.value = editorPost.value?.copy(answerTo = null)
     }
 
+    fun startCheckUpdates() {
+        repository.startCheckUpdates()
+    }
+
     fun stopCheckUpdates() {
         repository.stopCheckUpdates()
     }
