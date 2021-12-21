@@ -46,22 +46,11 @@ class ThreadInfoFragment : Fragment() {
         } ?: throw Throwable("Invalid activity")
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentThreadInfoBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         val threadType = requireArguments().threadInfoType
         val threadId = requireArguments().threadInfoId
-
-//        viewModel = ThreadInfoViewModel(
-//            requireActivity().getApplication(),
-//            threadType,
-//            threadId,
-//        )
 
         viewModel = ViewModelProvider(this, ThreadInfoViewModelFactory(
             requireActivity().getApplication(),
@@ -70,6 +59,15 @@ class ThreadInfoFragment : Fragment() {
         )).get(ThreadInfoViewModel::class.java)
 
         viewModel.getThread()
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentThreadInfoBinding.inflate(inflater, container, false)
+        val root: View = binding.root
 
         viewModel.thread.observe(viewLifecycleOwner) { thread ->
             with (binding) {
@@ -103,9 +101,7 @@ class ThreadInfoFragment : Fragment() {
             }
         }
 
-//        arguments?.userId?.let {
-//            viewModel.getUserProfile(it)
-//        }
+        viewModel.startCheckUpdates()
 
         return root
     }

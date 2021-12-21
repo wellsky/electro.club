@@ -14,47 +14,25 @@ import android.text.method.LinkMovementMethod
 import android.text.style.QuoteSpan
 import android.text.style.URLSpan
 import android.text.util.Linkify
-import android.text.util.Linkify.ALL
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.text.HtmlCompat
-import androidx.core.text.util.LinkifyCompat
 import androidx.core.view.isVisible
-import androidx.navigation.fragment.NavHostFragment.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import club.electro.R
 import club.electro.databinding.PostItemBinding
 import club.electro.dto.Post
-import club.electro.ui.thread.ThreadFragment.Companion.threadId
-import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import com.bumptech.glide.Glide
 import club.electro.utils.trimWhiteSpaces
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.logging.Level.ALL
 import android.text.SpannableStringBuilder
-
-import android.text.Html
-
 import android.widget.TextView
-
 import android.text.style.ClickableSpan
-import androidx.core.content.ContextCompat.startActivity
 
-import android.content.Intent
-import android.net.Uri
-import club.electro.utils.UrlHandler
-import retrofit2.http.Url
 
 
 interface PostInteractionListener {

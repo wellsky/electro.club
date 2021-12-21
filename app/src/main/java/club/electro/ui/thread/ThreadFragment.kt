@@ -1,10 +1,8 @@
 package club.electro.ui.thread
 
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import club.electro.adapter.PostAdapter
 import club.electro.adapter.PostInteractionListener
@@ -44,6 +42,9 @@ class ThreadFragment : Fragment() {
         var Bundle.postId: Long by LongArg // Может быть -1 (загрузить с последнего сообщения) и -2 (с первого непрочитанного)
     }
 
+    private var threadType: Byte = 0
+    private var threadId: Long = 0
+
     private lateinit var viewModel: ThreadViewModel
     private var _binding: FragmentThreadBinding? = null
 
@@ -82,11 +83,37 @@ class ThreadFragment : Fragment() {
         } ?: throw Throwable("Invalid activity")
     }
 
+    // https://www.vogella.com/tutorials/AndroidActionBar/article.html
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        menu.clear()
+        activity?.run {
+            menuInflater.inflate(R.menu.menu_thread, menu)
+        }
+        super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.getItemId()) {
+            R.id.thread_settings -> {
+                findNavController().navigate(
+                    R.id.action_threadFragment_to_threadInfoFragment,
+                    Bundle().apply {
+                        threadInfoType = this@ThreadFragment.threadType
+                        threadInfoId = this@ThreadFragment.threadId
+                    }
+                )
+                return true
+            }
+        }
+        return false
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val threadType = requireArguments().threadType
-        val threadId =  requireArguments().threadId
+        threadType = requireArguments().threadType
+        threadId =  requireArguments().threadId
+
         val postId = requireArguments().postId
 
         currentTargetPost = when (postId) {
@@ -328,6 +355,8 @@ class ThreadFragment : Fragment() {
         }
 
         viewModel.startCheckUpdates()
+
+        setHasOptionsMenu(true)
 
         return root
     }

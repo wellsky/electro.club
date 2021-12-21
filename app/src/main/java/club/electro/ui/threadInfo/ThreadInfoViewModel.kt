@@ -18,14 +18,12 @@ class ThreadInfoViewModel(application: Application, threadType: Byte, threadId: 
     var thread: LiveData<PostsThread> = repository.thread.asLiveData()
     val lastUpdateTime = repository.lastUpdateTime
 
-    fun getThread() {
-        viewModelScope.launch {
-            try {
-                repository.getThread()
-            } catch (e: Exception) {
+    fun getThread() = viewModelScope.launch {
+        repository.getThread()
+    }
 
-            }
-        }
+    fun startCheckUpdates() {
+        repository.startCheckUpdates()
     }
 
     fun stopCheckUpdates() {

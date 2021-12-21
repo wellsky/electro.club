@@ -1,9 +1,8 @@
 package club.electro.ui.subscriptions
 
+import android.app.ActionBar
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -78,6 +77,8 @@ class SubscriptionsFragment : Fragment() {
         viewModel.loadSubscriptions()
 
         viewModel.startCheckUpdates()
+
+        setHasOptionsMenu(true)
 
         return root
     }
