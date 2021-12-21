@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import club.electro.R
+import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -44,7 +45,7 @@ class MapFragment : Fragment() {
         // val sydney = LatLng(-34.0, 151.0)
         //googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(cameraPosition))
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(cameraPosition.lat, cameraPosition.lng), cameraPosition.zoom))
 
         viewModel.data.observe(viewLifecycleOwner) {
             val icon = BitmapDescriptorFactory.fromResource(R.drawable.socket);
@@ -55,11 +56,11 @@ class MapFragment : Fragment() {
         }
 
         googleMap.setOnCameraMoveListener {
-            viewModel.saveCameraState(
+            viewModel.saveCameraState(MapCameraPosition(
                 lat = googleMap.cameraPosition.target.latitude,
                 lng = googleMap.cameraPosition.target.longitude,
                 zoom = googleMap.cameraPosition.zoom,
-            )
+            ))
         }
     }
 
@@ -77,3 +78,10 @@ class MapFragment : Fragment() {
         mapFragment?.getMapAsync(callback)
     }
 }
+
+data class MapCameraPosition (
+    val lat: Double,
+    val lng: Double,
+    val zoom: Float
+)
+

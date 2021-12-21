@@ -27,19 +27,22 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
         repository.getAll()
     }
 
-    fun saveCameraState(lat: Double, lng: Double, zoom: Float) {
+    // TODO можно ли во viewModel сохранять и загружать sharedPrefs с т.ч. архитектуры?
+    fun saveCameraState(position: MapCameraPosition) {
         with(prefs.edit()) {
-            putDouble(latKey, lat)
-            putDouble(lngKey, lng)
-            putFloat(zoomKey, zoom)
+            putDouble(latKey, position.lat)
+            putDouble(lngKey, position.lng)
+            putFloat(zoomKey, position.zoom)
             apply()
         }
     }
 
-    fun loadCameraState(): LatLng {
-        val lat = prefs.getDouble(latKey, 0.0)
-        val lng = prefs.getDouble(lngKey, 0.0)
-        return LatLng(lat, lng)
+    fun loadCameraState(): MapCameraPosition {
+        return MapCameraPosition(
+            lat = prefs.getDouble(latKey, 0.0),
+            lng = prefs.getDouble(lngKey, 0.0),
+            zoom = prefs.getFloat(zoomKey, 0F),
+        )
     }
 }
 
