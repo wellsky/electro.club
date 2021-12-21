@@ -29,7 +29,11 @@
         android:id="@+id/nav_map"
         android:name="club.electro.ui.map.MapFragment"
         android:label="@string/menu_map"
-        tools:layout="@layout/fragment_map" />
+        tools:layout="@layout/fragment_map" >
+        <action
+            android:id="@+id/action_nav_map_to_socketFragment"
+            app:destination="@id/socketFragment" />
+    </fragment>
     <fragment
         android:id="@+id/threadFragment"
         android:name="club.electro.ui.thread.ThreadFragment"
@@ -67,4 +71,8 @@
     <action
         android:id="@+id/action_global_threadFragment"
         app:destination="@id/threadFragment" />
+    <fragment
+        android:id="@+id/socketFragment"
+        android:name="club.electro.ui.map.socket.SocketFragment"
+        android:label="SocketFragment" />
 </navigation>

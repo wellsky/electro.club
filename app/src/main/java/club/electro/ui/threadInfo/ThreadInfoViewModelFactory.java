@@ -1,12 +1,8 @@
 package club.electro.ui.threadInfo;
 
 import android.app.Application;
-
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-
-import club.electro.repository.ThreadLoadTarget;
-import club.electro.ui.thread.ThreadViewModel;
 import club.electro.ui.user.ThreadInfoViewModel;
 
 // https://stackoverflow.com/questions/46283981/android-viewmodel-additional-arguments

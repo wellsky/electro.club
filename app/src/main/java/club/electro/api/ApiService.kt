@@ -125,6 +125,13 @@ interface ApiService {
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
+    suspend fun getSocketDetails(
+        @Field("method") method: String = "getSocketDetails",
+        @Field("socket_id") socketId: Long,
+    ): Response<ApiResponse<ApiSocketDetails>>
+
+    @FormUrlEncoded
+    @POST(BASE_SERVER_URL)
     suspend fun savePost(
         @Field("method") method: String = "savePost",
         @Field("thread_type") threadType: Byte,
@@ -218,6 +225,10 @@ data class ApiUserProfile (
 
 data class ApiSavedPost (
     val message: Post
+)
+
+data class ApiSocketDetails (
+    val socket: Socket
 )
 
 // TODO от API надо все получать не в CamelCase

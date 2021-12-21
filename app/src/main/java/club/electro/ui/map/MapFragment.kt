@@ -6,7 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import club.electro.R
+import club.electro.dto.MapMarker
+import club.electro.ui.map.socket.SocketFragment.Companion.socketId
 import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -42,16 +45,16 @@ class MapFragment : Fragment() {
         viewModel.getAllMarkers()
 
         val cameraPosition = viewModel.loadCameraState()
-        // val sydney = LatLng(-34.0, 151.0)
-        //googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(cameraPosition.lat, cameraPosition.lng), cameraPosition.zoom))
 
         viewModel.data.observe(viewLifecycleOwner) {
             val icon = BitmapDescriptorFactory.fromResource(R.drawable.socket);
             it.forEach {
-                val marker = LatLng(it.lat, it.lng)
-                googleMap.addMarker(MarkerOptions().position(marker).title("Marker").icon(icon))
+                val coords = LatLng(it.lat, it.lng)
+                val marker = googleMap.addMarker(MarkerOptions().position(coords).title("Marker").icon(icon)) // TODO title
+                marker?.tag = it
+
             }
         }
 
@@ -61,6 +64,17 @@ class MapFragment : Fragment() {
                 lng = googleMap.cameraPosition.target.longitude,
                 zoom = googleMap.cameraPosition.zoom,
             ))
+        }
+
+        googleMap.setOnMarkerClickListener {
+            val marker = it.tag as MapMarker
+            findNavController().navigate(
+                R.id.action_nav_map_to_socketFragment,
+                Bundle().apply {
+                    socketId = marker.id
+                }
+            )
+            true
         }
     }
 
