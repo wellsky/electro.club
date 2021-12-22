@@ -8,18 +8,7 @@ import club.electro.repository.UserRepository
 import club.electro.repository.UserRepositoryServerImpl
 import kotlinx.coroutines.launch
 
-class UserProfileViewModel(application: Application) : AndroidViewModel(application) {
+class UserProfileViewModel(application: Application, userId: Long) : AndroidViewModel(application) {
     private val repository: UserRepository = UserRepositoryServerImpl((application as ElectroClubApp).diContainer)
-
-    var currentProfile: LiveData<User> = repository.currentProfile.asLiveData()
-
-    fun setCurrentProfile(id: Long) {
-        viewModelScope.launch {
-            try {
-                repository.setCurrentProfile(id)
-            } catch (e: Exception) {
-
-            }
-        }
-    }
+    var currentProfile: LiveData<User> = repository.getUserProfile(userId).asLiveData()
 }

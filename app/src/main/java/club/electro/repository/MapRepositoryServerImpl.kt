@@ -47,7 +47,10 @@ class MapRepositoryServerImpl(diContainer: DependencyContainer): MapRepository {
     }
 
     override fun getSocket(id: Long): Flow<Socket> = flow {
-        emit(socketDao.get(id))
+        socketDao.get(id)?.let {
+            emit(it)
+        }
+
         try {
             val response = apiService.getSocketDetails(
                 socketId = id
