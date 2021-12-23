@@ -16,6 +16,7 @@ import club.electro.ui.thread.ThreadViewModelFactory
 import club.electro.ui.threadInfo.ThreadInfoViewModelFactory
 import club.electro.utils.ByteArg
 import club.electro.utils.LongArg
+import club.electro.utils.loadCircleCrop
 import com.bumptech.glide.Glide
 
 class ThreadInfoFragment : Fragment() {
@@ -77,13 +78,7 @@ class ThreadInfoFragment : Fragment() {
                 subscribers.text = thread.subscribersCount.toString()
 
                 thread.image?.let {
-                    Glide.with(threadImage.context)
-                        .load(it)
-                        .circleCrop()
-                        .timeout(5_000)
-                        .placeholder(R.drawable.ic_loading_100dp)
-                        .error(R.drawable.ic_error_100dp)
-                        .into(threadImage)
+                    threadImage.loadCircleCrop(it)
                 }
             }
         }

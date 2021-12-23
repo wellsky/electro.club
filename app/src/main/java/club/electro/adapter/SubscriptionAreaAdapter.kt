@@ -2,7 +2,6 @@ package club.electro.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -10,7 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import club.electro.R
 import club.electro.databinding.SubscriptionItemBinding
 import club.electro.dto.SubscriptionArea
-import club.electro.utils.StripTags
+import club.electro.utils.HtmlToText
+import club.electro.utils.loadCircleCrop
 import com.bumptech.glide.Glide
 
 interface SubscriptionAreaInteractionListener {
@@ -42,7 +42,7 @@ class SubscriptionAreaViewHolder(
             val date = java.util.Date(area.last_time * 1000)
 
             areaName.text = area.name
-            areaLastMessage.text = StripTags(area.last_text).toString()
+            areaLastMessage.text = HtmlToText(area.last_text)
             areaLastName.text = area.last_name + ": "
             areaLastMessageTime.text = sdf.format(date).toString()
 
@@ -50,13 +50,7 @@ class SubscriptionAreaViewHolder(
             areaUnreadMessagesCount.text = area.count.toString()
 
             if (!area.image.isEmpty()) {
-                Glide.with(areaImage.context)
-                    .load(area.image)
-                    .circleCrop()
-                    .timeout(5_000)
-                    .placeholder(R.drawable.ic_loading_100dp)
-                    .error(R.drawable.ic_error_100dp)
-                    .into(areaImage)
+                areaImage.loadCircleCrop(area.image)
             }
 
             root.setOnClickListener {

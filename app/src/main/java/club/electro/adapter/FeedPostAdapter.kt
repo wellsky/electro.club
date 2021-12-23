@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import club.electro.R
 import club.electro.databinding.FeedPostItemBinding
 import club.electro.dto.FeedPost
+import club.electro.utils.load
+import club.electro.utils.loadCircleCrop
 import com.bumptech.glide.Glide
 
 interface OnFeedPostInteractionListener {
@@ -48,22 +50,11 @@ class FeedPostViewHolder(
             comments.setText(feedPost.comments.toString())
 
             if (!feedPost.channelAvatar.isEmpty()) {
-                Glide.with(channelAvatar.context)
-                    .load(feedPost.channelAvatar)
-                    .circleCrop()
-                    .timeout(5_000)
-                    .placeholder(R.drawable.ic_loading_100dp)
-                    .error(R.drawable.ic_error_100dp)
-                    .into(channelAvatar)
+                channelAvatar.loadCircleCrop(feedPost.channelAvatar)
             }
 
             if (!feedPost.image.isEmpty()) {
-                Glide.with(titleImage.context)
-                    .load(feedPost.image)
-                    .timeout(5_000)
-                    .placeholder(R.drawable.ic_loading_100dp)
-                    .error(R.drawable.ic_error_100dp)
-                    .into(titleImage)
+                titleImage.load(feedPost.image)
             }
 
 

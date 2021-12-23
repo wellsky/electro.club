@@ -14,6 +14,7 @@ import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.viewmodel.LoginFormState
 import ru.netology.nmedia.viewmodel.LoginViewModel
 import androidx.fragment.app.activityViewModels
+import club.electro.utils.loadCircleCrop
 
 
 class LoginFragment : Fragment() {
@@ -52,13 +53,7 @@ class LoginFragment : Fragment() {
                     binding.userName.text = appAuth.myName()
 
                     appAuth.myAvatar()?.let {
-                        Glide.with(binding.userAvatar.context)
-                            .load(appAuth.myAvatar())
-                            .circleCrop()
-                            .timeout(5_000)
-                            .placeholder(R.drawable.ic_loading_100dp)
-                            .error(R.drawable.ic_error_100dp)
-                            .into(binding.userAvatar)
+                        binding.userAvatar.loadCircleCrop(appAuth.myAvatar())
                     }
                 }
                 LoginFormState.SUCCESS -> {

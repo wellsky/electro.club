@@ -22,6 +22,7 @@ import club.electro.databinding.ActivityMainBinding
 import club.electro.di.DependencyContainer
 import club.electro.model.NetworkStatus
 import club.electro.ui.thread.ThreadViewModel
+import club.electro.utils.loadCircleCrop
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -82,13 +83,7 @@ class MainActivity : AppCompatActivity() {
 
         appAuth.authState.observe(this, {
             if (it.id != 0L) {
-                Glide.with(headerImage.context)
-                    .load(it.avatar)
-                    .circleCrop()
-                    .timeout(5_000)
-                    .placeholder(R.drawable.ic_loading_100dp)
-                    .error(R.drawable.ic_error_100dp)
-                    .into(headerImage)
+                headerImage.loadCircleCrop(it.avatar)
 
                 textLine1.setText(it.name)
                 textLine2.setText(getString(R.string.transport_not_set))

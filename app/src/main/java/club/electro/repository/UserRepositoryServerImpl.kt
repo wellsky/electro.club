@@ -1,12 +1,7 @@
 package club.electro.repository
 
-import androidx.lifecycle.MutableLiveData
-import club.electro.R
 import club.electro.di.DependencyContainer
 import club.electro.dto.*
-import club.electro.entity.MapMarkerEntity
-import club.electro.entity.UserEntity
-import club.electro.entity.toDto
 import club.electro.entity.toEntity
 import club.electro.error.ApiError
 import club.electro.error.NetworkError
@@ -20,14 +15,6 @@ class UserRepositoryServerImpl(
 ) : UserRepository {
     private val apiService = diContainer.apiService
     private val dao = diContainer.appDb.userDao()
-
-//    var currentProfileFlow = MutableStateFlow(0L)
-
-//    override val currentProfile: Flow<User> = currentProfileFlow.flatMapLatest {
-//        dao.flowById(it).map {
-//            it?.toDto() ?: EmptyUserProfile()
-//        }.flowOn(Dispatchers.Default)
-//    }
 
     override suspend fun getLocalById(id: Long, onLoadedCallback:  (suspend () -> Unit)?): User? {
         return dao.getById(id)?.let {
@@ -51,7 +38,7 @@ class UserRepositoryServerImpl(
         }
     }
 
-
+    // TODO по сути выполняет то же самое, что getLocalById, но через Flow, а не через callback
     override fun getUserProfile(id: Long): Flow<User> = flow {
         dao.getById(id)?.let {
             emit(it.toDto())
@@ -61,11 +48,6 @@ class UserRepositoryServerImpl(
         emit(user)
     }.flowOn(Dispatchers.Default)
 
-//    override suspend fun setCurrentProfile(id: Long) {
-//        currentProfileFlow.value = id
-//        val user = getRemoteById(id)
-//        dao.insert(user.toEntity())
-//    }
 
     override suspend fun getRemoteById(id: Long): User {
         try {

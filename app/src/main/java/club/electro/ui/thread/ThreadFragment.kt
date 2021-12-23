@@ -25,14 +25,10 @@ import kotlinx.coroutines.flow.collectLatest
 import androidx.core.view.isVisible
 import club.electro.ToolBarConfig
 import club.electro.repository.ThreadLoadTarget
-import club.electro.ui.subscriptions.SubscriptionsViewModel
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
-import club.electro.utils.StripTags
+import club.electro.utils.HtmlToText
 import club.electro.utils.UrlHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class ThreadFragment : Fragment() {
@@ -244,7 +240,7 @@ class ThreadFragment : Fragment() {
         viewModel.editedPost.observe(viewLifecycleOwner) {
             if (it.id != 0L) {
                 binding.editedPostGroup.visibility = View.VISIBLE
-                binding.editedPostContent.text = StripTags(it.content).toString()
+                binding.editedPostContent.text = HtmlToText(it.content)
 
                 with (binding.editorPostContent) {
                     val editorText = it.content
@@ -260,7 +256,7 @@ class ThreadFragment : Fragment() {
         viewModel.answerToPost.observe(viewLifecycleOwner) {
             if (it.id != 0L) {
                 binding.answerPostGroup.visibility = View.VISIBLE
-                binding.answerToContent.text = StripTags(it.content).toString()
+                binding.answerToContent.text = HtmlToText(it.content)
             } else {
                 binding.answerPostGroup.visibility = View.GONE
             }

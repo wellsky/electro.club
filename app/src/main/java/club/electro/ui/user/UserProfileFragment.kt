@@ -16,6 +16,7 @@ import club.electro.di.DependencyContainer
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.utils.LongArg
+import club.electro.utils.loadCircleCrop
 import com.bumptech.glide.Glide
 
 class UserProfileFragment : Fragment() {
@@ -62,26 +63,15 @@ class UserProfileFragment : Fragment() {
                 user.primaryTransport?.let { primaryTransport ->
                     transportName.text = primaryTransport.name
                     primaryTransport.image?.let {
+                        transportImage.loadCircleCrop(it)
                         Glide.with(transportImage.context)
-                            .load(it)
-                            .circleCrop()
-                            .timeout(5_000)
-                            .placeholder(R.drawable.ic_loading_100dp)
-                            .error(R.drawable.ic_error_100dp)
-                            .into(transportImage)
                     }
                     transportName.isVisible = true
                     transportImage.isVisible = true
                 }
 
                 user.avatar?.let {
-                Glide.with(avatar.context)
-                   .load(it)
-                   .circleCrop()
-                   .timeout(5_000)
-                   .placeholder(R.drawable.ic_loading_100dp)
-                   .error(R.drawable.ic_error_100dp)
-                   .into(avatar)
+                    avatar.loadCircleCrop(it)
                }
 
                 chat.isVisible = false
