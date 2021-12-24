@@ -58,7 +58,7 @@ class LoginFragment : Fragment() {
                 }
                 LoginFormState.SUCCESS -> {
                     AndroidUtils.hideKeyboard(requireView())
-                    Snackbar.make(binding.root, "Success!", Snackbar.LENGTH_LONG)
+                    Snackbar.make(binding.root, R.string.success_auth, Snackbar.LENGTH_LONG)
                         .show()
                     //findNavController().navigateUp()
                 }

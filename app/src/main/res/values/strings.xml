@@ -44,4 +44,6 @@
     <string name="action_subscribe">Subscribe</string>
     <string name="action_unsubscribe">Unsubscribe</string>
     <string name="action_mute">Mute</string>
+    <string name="success_auth">Successful authorization</string>
+    <string name="short_days">d.</string>
 </resources>

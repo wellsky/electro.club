@@ -28,12 +28,13 @@
 
     <TextView
         android:id="@+id/socketDescription"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/authorName"
         app:layout_constraintStart_toEndOf="@id/authorAvatar"
+        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginLeft="16dp"
-        tools:text="Socket text"
+        tools:text="Вдоль рядов есть ресторанчик Легендарное Кафе у окон которого расположены 3 розетки, так же рядом BingoBoom для ореинтира. Напротив этого кафе уличная библиотека, есть где присесть пока заряжаетесь."
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

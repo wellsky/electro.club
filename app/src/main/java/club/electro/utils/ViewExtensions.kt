@@ -18,9 +18,3 @@ fun ImageView.load(url: String?, vararg transforms: BitmapTransformation = empty
 fun ImageView.loadCircleCrop(url: String?, vararg transforms: BitmapTransformation = emptyArray()) =
     load(url, CircleCrop(), *transforms)
 
-//                    .load(area.image)
-//                    .circleCrop()
-//                    .timeout(5_000)
-//                    .placeholder(R.drawable.ic_loading_100dp)
-//                    .error(R.drawable.ic_error_100dp)
-//                    .into(areaImage)

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import club.electro.R
 import club.electro.databinding.SubscriptionItemBinding
 import club.electro.dto.SubscriptionArea
+import club.electro.utils.AreaLastActivityTime
 import club.electro.utils.HtmlToText
 import club.electro.utils.loadCircleCrop
 import com.bumptech.glide.Glide
@@ -38,13 +39,10 @@ class SubscriptionAreaViewHolder(
 
     fun bind(area: SubscriptionArea) {
         binding.apply {
-            val sdf = java.text.SimpleDateFormat("HH:mm")
-            val date = java.util.Date(area.last_time * 1000)
-
             areaName.text = area.name
             areaLastMessage.text = HtmlToText(area.last_text)
             areaLastName.text = area.last_name + ": "
-            areaLastMessageTime.text = sdf.format(date).toString()
+            areaLastMessageTime.text = AreaLastActivityTime(area.last_time, this.root.context)
 
             areaUnreadMessagesCount.isVisible = (area.count > 0)
             areaUnreadMessagesCount.text = area.count.toString()
@@ -59,6 +57,8 @@ class SubscriptionAreaViewHolder(
         }
     }
 }
+
+
 
 class SubscriptionAreaDiffCallback : DiffUtil.ItemCallback<SubscriptionArea>() {
     override fun areItemsTheSame(oldItem: SubscriptionArea, newItem: SubscriptionArea): Boolean {
