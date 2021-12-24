@@ -24,6 +24,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import androidx.core.view.isVisible
 import club.electro.ToolBarConfig
+import club.electro.di.DependencyContainer
 import club.electro.repository.ThreadLoadTarget
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
@@ -53,6 +54,7 @@ class ThreadFragment : Fragment() {
     private var scrolledToTop: Boolean = true
     private var scrolledToBottom: Boolean = true
 
+    private val appAuth = DependencyContainer.getInstance().appAuth
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -253,6 +255,10 @@ class ThreadFragment : Fragment() {
             }
         }
 
+        appAuth.authState.observe(viewLifecycleOwner) {
+            binding.bottomPanel.isVisible = it.authorized
+        }
+
         binding.postsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -386,30 +392,26 @@ class ThreadFragment : Fragment() {
      */
     fun setGravityForTarget(target: ThreadLoadTarget) {
         if (target.targetPostId != null) {
-            println("gravity1")
+            //println("gravity1")
             setGravityTop()
-            //binding.postsList.scrollToPosition((binding.postsList.getAdapter()!!.getItemCount()))
         }
         if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD) {
-            println("gravity2")
+            //println("gravity2")
             setGravityTop()
-            //binding.postsList.smoothScrollToPosition((binding.postsList.getAdapter()!!.getItemCount() - 1))
             scrolledToTop = true
             binding.buttonScrollToBegin.isVisible = false
 
         }
         if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_FIRST) {
-            println("gravity3")
+            //println("gravity3")
             setGravityTop()
-            //binding.postsList.smoothScrollToPosition((binding.postsList.getAdapter()!!.getItemCount() - 1))
             scrolledToTop = true
             binding.buttonScrollToBegin.isVisible = false
 
         }
         if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_LAST) {
-            println("gravity4")
+            //println("gravity4")
             setGravityBottom()
-            //binding.postsList.smoothScrollToPosition(0)
             scrolledToBottom = true
             binding.buttonScrollToEnd.isVisible = false
         }

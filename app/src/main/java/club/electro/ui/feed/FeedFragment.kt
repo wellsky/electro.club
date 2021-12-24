@@ -62,7 +62,12 @@ class FeedFragment : Fragment() {
 
         feedViewModel.data.observe(viewLifecycleOwner, { posts ->
             adapter.submitList(posts)
+            binding.swiperefresh.setRefreshing(false)
         })
+
+        binding.swiperefresh.setOnRefreshListener {
+            feedViewModel.getFeedPosts()
+        }
 
         feedViewModel.getFeedPosts()
 

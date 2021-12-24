@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         val appAuth = DependencyContainer.getInstance().appAuth
 
         appAuth.authState.observe(this, {
-            if (it.id != 0L) {
+            if (it.authorized) {
                 headerImage.loadCircleCrop(it.avatar)
 
                 textLine1.setText(it.name)

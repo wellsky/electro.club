@@ -92,8 +92,8 @@ class PostViewHolder(
                     published.setText(R.string.post_status_removing)
                 }
                 Post.STATUS_PUBLISHED -> {
-                    published.setText(sdf.format(date).toString() + " (id: " + post.id + ")")
-                    //published.setText(sdf.format(date).toString())
+                    //published.setText(sdf.format(date).toString() + " (id: " + post.id + ")")
+                    published.setText(sdf.format(date).toString())
                     content.setTextColor(getColor(this.root.context, R.color.postTextColor))
                     menu.isVisible = true
                 }
