@@ -26,10 +26,6 @@ class ThreadViewModel(
     val editedPost = MutableLiveData(emptyPost) // Опубликованный пост, который в данный момент редактируется в текстовом редакторе
     val answerToPost = MutableLiveData(emptyPost) // Пост, на который в данный момент пишется ответ
 
-//    fun unfreshThread() = viewModelScope.launch {
-//        repository.unfreshThread()
-//    }
-
     fun getThread() = viewModelScope.launch {
         repository.getThread()
     }

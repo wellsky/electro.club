@@ -14,8 +14,8 @@ class NetworkStatus {
         private var instance: NetworkStatus? = null
 
         fun getInstance(): NetworkStatus {
-            return NetworkStatus.instance ?: synchronized(this) {
-                NetworkStatus.instance ?: NetworkStatus().also { NetworkStatus.instance = it }
+            return instance ?: synchronized(this) {
+                instance ?: NetworkStatus().also { instance = it }
             }
         }
     }

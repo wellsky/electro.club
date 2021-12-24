@@ -93,6 +93,7 @@ class PostViewHolder(
                 }
                 Post.STATUS_PUBLISHED -> {
                     published.setText(sdf.format(date).toString() + " (id: " + post.id + ")")
+                    //published.setText(sdf.format(date).toString())
                     content.setTextColor(getColor(this.root.context, R.color.postTextColor))
                     menu.isVisible = true
                 }

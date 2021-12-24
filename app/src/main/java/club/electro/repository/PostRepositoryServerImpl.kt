@@ -81,7 +81,6 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
             networkStatus.setStatus(NetworkStatus.Status.ONLINE)
 
             return if (body.data.messages.size > 0) {
-                //TODO сервер не отдает посты из других тем. Надо отдавать, если threadType=2
                 body.data.messages[0]
             } else {
                 null
@@ -131,7 +130,7 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
                 authorId = appAuth.myId(),
                 authorName = appAuth.myName() ?: "",
                 authorAvatar = appAuth.myAvatar() ?: "",
-                preparedContent = post.content, //TODO стоит сразу пропускать через Preparator?
+                preparedContent = post.content,
                 fresh = true
             )
         } else {

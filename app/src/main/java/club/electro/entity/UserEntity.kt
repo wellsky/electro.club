@@ -53,17 +53,3 @@ data class UserEntity(
 fun List<UserEntity>.toDto(): List<User> = map(UserEntity::toDto)
 fun List<User>.toEntity(): List<UserEntity> = map(UserEntity::fromDto)
 fun User.toEntity(): UserEntity = UserEntity.fromDto(this)
-
-//data class UserPrimaryTransportEmbeddable(
-//    var id: Long,
-//    var name: String,
-//    val image: String
-//) {
-//    fun toDto() = UserPrimaryTransport(id, name, image)
-//
-//    companion object {
-//        fun fromDto(dto: UserPrimaryTransport?) = dto?.let {
-//            UserPrimaryTransportEmbeddable(it.id, it.name, it.image)
-//        }
-//    }
-//}

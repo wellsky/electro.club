@@ -24,13 +24,8 @@ class FeedFragment : Fragment() {
     private lateinit var feedViewModel: FeedViewModel
     private var _binding: FragmentFeedBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
-//    private val viewModel: FeedViewModel by viewModels (
-//        ownerProducer = ::requireParentFragment
-//    )
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
@@ -71,10 +66,6 @@ class FeedFragment : Fragment() {
 
         feedViewModel.getFeedPosts()
 
-//        val textView: TextView = binding.textHome
-//        feedViewModel.text.observe(viewLifecycleOwner, Observer {
-//            textView.text = it
-//        })
         return root
     }
 

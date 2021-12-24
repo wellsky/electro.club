@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 // TODO попробовать переписать, чтобы работал с Glide, а не Picasso ?
-// TODO доработать растяжение изображения до ширины сообщения, а не экрана - 150
+// TODO доработать растяжение изображения до ширины сообщения, а не экрана
 // Class to download Images which extends [Html.ImageGetter]
 class ImageGetter(
     private val res: Resources,

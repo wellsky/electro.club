@@ -66,11 +66,9 @@ class ThreadRepositoryServerImpl(
                 threadDao.insert(body.data.thread.toEntity())
                 networkStatus.setStatus(NetworkStatus.Status.ONLINE)
             } catch (e: IOException) {
-                //throw NetworkError
                 networkStatus.setStatus(NetworkStatus.Status.ERROR)
             } catch (e: Exception) {
-                // TODO
-                //throw UnknownError
+
             }
         }
     }
@@ -139,7 +137,7 @@ class ThreadRepositoryServerImpl(
 
 
 /**
- * Класс, описывающий задачу для загрузки поста
+ * Класс, описывающий задачу для загрузки чата, начиная с определенного поста
  * Передается в RemoteMediator чтобы загрузить посты от указанного в настройках
  * А также используется во фрагменте, чтобы после загрузки отобразить соответствующий пост
  */

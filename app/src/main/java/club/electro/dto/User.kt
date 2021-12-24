@@ -10,15 +10,6 @@ open class User(
     val myChat: ThreadLink? = null
 )
 
-// TODO правильно ли так наследоваться, делая UserProfile open? Или как лучше описать пустой профиль?
-class EmptyUserProfile: User(
-    id = 0,
-    name = "",
-    avatar = null,
-    messages = 0,
-    rating = 0
-)
-
 class UserPrimaryTransport (
     val id: Long,
     val name: String,

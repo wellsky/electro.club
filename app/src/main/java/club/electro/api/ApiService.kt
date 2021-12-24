@@ -17,9 +17,9 @@ const val BASE_SERVER_URL = "https://electro.club/api/v1/"
 const val UPDATES_SERVER_URL = "https://srv1.electro.club/api/"
 
 val logging = HttpLoggingInterceptor().apply {
-    //if (BuildConfig.DEBUG) {
+    if (BuildConfig.DEBUG) {
         level = HttpLoggingInterceptor.Level.BODY
-   //}
+    }
 }
 
 // https://stackoverflow.com/questions/34791244/retrofit2-modifying-request-body-in-okhttp-interceptor
@@ -150,7 +150,6 @@ interface ApiService {
         @Field("post_id") postId: Long?,
     ): Response<ApiResponse<Unit>>
 
-    // TODO изменить формат, чтобы метод API определялся внутри определения функции?
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
     suspend fun setPushToken(
@@ -231,8 +230,6 @@ data class ApiSocketDetails (
     val socket: Socket
 )
 
-// TODO от API надо все получать не в CamelCase
-// Еще возможно использовать аннотацию @SerializedName("nickname")
 data class ApiUserProfileData (
     val user_id: Long,
     val nickname: String,
@@ -254,22 +251,3 @@ data class ApiUserProfileData (
         myChat = myChat
     )
 }
-
-
-/**
-Типы запросов:
-https://stackoverflow.com/questions/47392832/retrofit2-use-body-vs-query
-
-Версия с любыми параметрами:
-@FormUrlEncoded
-@POST(UPDATES_SERVER_URL)
-suspend fun getSubscriptions(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiSubscriptionsData>>
-
-Как вызывать:
-val params = HashMap<String?, String?>()
-params["access_token"] = resources.getString(R.string.electro_club_access_token)
-params["user_token"] = appAuth.myToken()
-params["method"] = "whatsUp"
-params["last_event_time"] = "0"
-val response = apiService.getSubscriptions(params)
- */

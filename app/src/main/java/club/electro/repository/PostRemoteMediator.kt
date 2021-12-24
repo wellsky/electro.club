@@ -68,17 +68,12 @@ class PostRemoteMediator(
                         threadType = threadType,
                         threadId = threadId,
                         from = from,
-                        included = 1, //Включая указанный в from пост //if (target.targetPostId != null) 1 else 0
+                        included = 1, //Включая указанный в from пост
                         count = count,
                     )
                 }
 
-                // TODO поменять логику PREPEND и APPEND чтобы соответствовала значению слов?
                 LoadType.PREPEND -> {
-//                    val item = state.firstItemOrNull() ?: return MediatorResult.Success(
-//                        endOfPaginationReached = false
-//                    )
-//                    val id = item.id
                     val id =
                         postRemoteKeyDao.max(threadType, threadId) ?: return MediatorResult.Success(
                             endOfPaginationReached = false
@@ -92,10 +87,6 @@ class PostRemoteMediator(
                     )
                 }
                 LoadType.APPEND -> {
-//                    val item = state.lastItemOrNull() ?: return MediatorResult.Success(
-//                        endOfPaginationReached = false
-//                    )
-//                    val id = item.id
                     val id =
                         postRemoteKeyDao.min(threadType, threadId) ?: return MediatorResult.Success(
                             endOfPaginationReached = false
@@ -119,8 +110,6 @@ class PostRemoteMediator(
                 response.message(),
             )
 
-            //postDao.insert(body.data.messages.toEntity())
-
             db.withTransaction {
                 when (loadType) {
                     LoadType.REFRESH -> {
@@ -141,7 +130,6 @@ class PostRemoteMediator(
                                 ),
                             )
                         )
-//                        postDao.removeThread(threadType = threadType, threadId = threadId)
                         postDao.unfreshThread(threadType = threadType, threadId = threadId)
                     }
                     LoadType.PREPEND -> {
@@ -169,16 +157,6 @@ class PostRemoteMediator(
                 }
 
                 repository.prepareAndSaveLocal(freshEntities)
-
-//                MultiplePostEntityPreparator(
-//                    postsEntities = freshEntities,
-//                    onFirstResult = {
-//                        postDao.insert(it)
-//                    },
-//                    onEveryDataUpdate = {
-//                        postDao.updatePreparedContent(it.threadType, it.threadId, it.id, it.preparedContent ?: "")
-//                    }
-//                ).prepareAll()
             }
 
             networkStatus.setStatus(NetworkStatus.Status.ONLINE)

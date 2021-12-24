@@ -215,15 +215,6 @@ class ThreadFragment : Fragment() {
             }
         })
 
-//        lifecycleScope.launchWhenCreated {
-//            adapter.loadStateFlow.collectLatest { state ->
-//                binding.swiperefresh.isRefreshing =
-//                    state.refresh is LoadState.Loading
-////                    state.prepend is LoadState.Loading ||
-////                    state.append is LoadState.Loading
-//            }
-//        }
-
         // TODO реализовано криво. Вообще логику обновления лучше не выносить за репозиторий.
         // Но только adapter.refresh() может указать медиатору на текущий видимый пост
         viewModel.lastUpdateTime.observe(viewLifecycleOwner) {
@@ -356,20 +347,6 @@ class ThreadFragment : Fragment() {
 
         return root
     }
-
-    // TODO не работает. Надо сделать сохранение текущей позиции.
-    // https://stackoverflow.com/questions/27816217/how-to-save-recyclerviews-scroll-position-using-recyclerview-state/61609823#61609823
-
-//    override fun onPause() {
-//        super.onPause()
-//        lastFirstVisiblePosition = (binding.postsList.getLayoutManager() as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
-//    }
-//
-//    override fun onResume() {
-//        super.onResume()
-//        (binding.postsList.getLayoutManager() as LinearLayoutManager).scrollToPosition(lastFirstVisiblePosition)
-//    }
-
 
     /**
      * Необходимо остановить корутину в репозитории, которая опрашивает сервер об обновлениях в текущем thread

@@ -22,8 +22,6 @@ class SubscriptionsFragment : Fragment() {
     private lateinit var viewModel: SubscriptionsViewModel
     private var _binding: FragmentSubscriptionsBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -69,8 +67,6 @@ class SubscriptionsFragment : Fragment() {
         })
 
         binding.swiperefresh.setOnRefreshListener {
-            //binding.progress.isVisible = true
-            //binding.newPostsButton.isVisible = false
             viewModel.loadSubscriptions()
         }
 

@@ -16,7 +16,6 @@ import club.electro.repository.UserRepositoryServerImpl
 
 class DependencyContainer private constructor(val context: Context) {
     val resources = context.resources
-
     val accessToken = resources.getString(R.string.electro_club_access_token)
 
     val appDb = AppDb.getInstance(context = context)
@@ -32,7 +31,7 @@ class DependencyContainer private constructor(val context: Context) {
     val workManager = WorkManager.getInstance(context)
 
     init {
-        // TODO криво реализованная взаимная инъекция
+        // TODO криво реализованная взаимная инъекция?
         postRepository.setupWorkManager(workManager)
     }
 

@@ -21,7 +21,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     val state: LiveData<LoginFormState>
         get() = _state
 
-    //val appAuth = application.diContainer //AppAuth.getInstance()
     val appAuth = (application as ElectroClubApp).diContainer.appAuth
 
     private val repository: AccountRepository = AccountRepositoryServerImpl((application as ElectroClubApp).diContainer)

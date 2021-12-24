@@ -19,8 +19,6 @@ interface ThreadRepository {
     suspend fun removePost(post: Post)
     suspend fun checkForUpdates()
 
-//    suspend fun unfreshThread()
-
     fun reloadPosts(target: ThreadLoadTarget)
     fun changeTargetPost(target: ThreadLoadTarget)
 
