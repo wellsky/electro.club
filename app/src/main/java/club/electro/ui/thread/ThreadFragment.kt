@@ -149,12 +149,12 @@ class ThreadFragment : Fragment() {
 
             override fun onRemoveClicked(post: Post) {
                 val builder = AlertDialog.Builder(requireContext())
-                builder.setMessage("Are you sure you want to Delete?")
+                builder.setMessage(getString(R.string.delete_post_confirm_text))
                     .setCancelable(false)
-                    .setPositiveButton("Yes") { dialog, id ->
+                    .setPositiveButton(getString(R.string.delete_post_confirm_yes)) { dialog, id ->
                         viewModel.removePost(post)
                     }
-                    .setNegativeButton("No") { dialog, id ->
+                    .setNegativeButton(getString(R.string.delete_post_confirm_no)) { dialog, id ->
                         dialog.dismiss()
                     }
                 val alert = builder.create()
@@ -174,29 +174,29 @@ class ThreadFragment : Fragment() {
                 UrlHandler(requireContext(), findNavController()).setUrl(url).open()
             }
         })
+        adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         binding.postsList.adapter = adapter
 
-
+        // TODO непонятный баг. Функция, переданная в LaunchWhenCreated вызывается, даже когда фрагмент восстанавливается, а не только создается
+        // При этом есди использовать lifecycleScope а не viewLifecycleOwner.lifecycleScope, то каждый раз создаются дубликаты Load
+        // В итоге когда пользователь возвращается в чат из "следующего" фрагмента, то все посты перезагружаются с сервера и сбивается текущая позиция скроллинга
+        //viewLifecycleOwner.lifecycleScope.launchWhenCreated {
         lifecycleScope.launchWhenCreated {
+            println("LaunchWhenCreated")
             viewModel.posts.collectLatest {
                 currentTargetPost?.let {
                     setGravityForTarget(it)
                     currentTargetPost = null
                 }
-
                 adapter.submitData(it)
             }
 
             adapter.loadStateFlow.collectLatest { state ->
                 binding.swiperefresh.isRefreshing =
                     state.refresh is LoadState.Loading
-//                    state.prepend is LoadState.Loading ||
-//                    state.append is LoadState.Loading
             }
         }
-
-        adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
             // https://stackoverflow.com/questions/51889154/recycler-view-not-scrolling-to-the-top-after-adding-new-item-at-the-top-as-chan
@@ -327,7 +327,6 @@ class ThreadFragment : Fragment() {
                 AndroidUtils.hideKeyboard(it)
                 currentTargetPost = ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST)
             }
-            //binding.editMessageGroup.visibility = View.GONE
         }
 
         binding.cancelEdit.setOnClickListener {
@@ -392,25 +391,21 @@ class ThreadFragment : Fragment() {
      */
     fun setGravityForTarget(target: ThreadLoadTarget) {
         if (target.targetPostId != null) {
-            //println("gravity1")
             setGravityTop()
         }
         if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD) {
-            //println("gravity2")
             setGravityTop()
             scrolledToTop = true
             binding.buttonScrollToBegin.isVisible = false
 
         }
         if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_FIRST) {
-            //println("gravity3")
             setGravityTop()
             scrolledToTop = true
             binding.buttonScrollToBegin.isVisible = false
 
         }
         if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_LAST) {
-            //println("gravity4")
             setGravityBottom()
             scrolledToBottom = true
             binding.buttonScrollToEnd.isVisible = false
@@ -418,13 +413,3 @@ class ThreadFragment : Fragment() {
     }
 
 }
-
-//      Перехват изменения состояния скроллинга
-//        binding.postsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-//            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-//                super.onScrollStateChanged(recyclerView, newState)
-//                if (newState === RecyclerView.SCROLL_STATE_IDLE) {
-//                    println(getCurrentItem())
-//                }
-//            }
-//        })

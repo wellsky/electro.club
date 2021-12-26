@@ -35,6 +35,8 @@ class ThreadRepositoryServerImpl(
     var targetFlow = MutableStateFlow(value = targetPost)
 
     override val posts = targetFlow.flatMapLatest { refreshTarget ->
+        println("Creating pager")
+
         @OptIn(ExperimentalPagingApi::class)
         Pager(
             config = PagingConfig(pageSize = 20),
