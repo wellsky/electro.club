@@ -13,7 +13,6 @@ import club.electro.ToolBarConfig
 import club.electro.adapter.*
 import club.electro.databinding.FragmentFeedBinding
 import club.electro.dto.FeedPost
-import club.electro.dto.SubscriptionArea
 import club.electro.dto.THREAD_TYPE_POST_WITH_COMMENTS
 import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId

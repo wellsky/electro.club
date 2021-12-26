@@ -14,6 +14,7 @@ data class ThreadEntity(
     val image: String,
     val messages: Long,
     val subscribersCount: Long,
+    val subscriptionStatus: Byte,
 ) {
     fun toDto() = PostsThread(
         id = id,
@@ -21,7 +22,8 @@ data class ThreadEntity(
         name = name,
         image = image,
         messages = messages,
-        subscribersCount = subscribersCount
+        subscribersCount = subscribersCount,
+        subscriptionStatus = subscriptionStatus
     )
 
     companion object {
@@ -32,7 +34,8 @@ data class ThreadEntity(
                 name = dto.name,
                 image = dto.image,
                 messages = dto.messages,
-                subscribersCount = dto.subscribersCount
+                subscribersCount = dto.subscribersCount,
+                subscriptionStatus = dto.subscriptionStatus
             )
     }
 }

@@ -25,6 +25,8 @@ import kotlinx.coroutines.flow.collectLatest
 import androidx.core.view.isVisible
 import club.electro.ToolBarConfig
 import club.electro.di.DependencyContainer
+import club.electro.dto.SUBSCRIPTION_STATUS_NONE
+import club.electro.dto.SUBSCRIPTION_STATUS_SUBSCRIBED
 import club.electro.repository.ThreadLoadTarget
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
@@ -84,8 +86,17 @@ class ThreadFragment : Fragment() {
     // https://www.vogella.com/tutorials/AndroidActionBar/article.html
     override fun onPrepareOptionsMenu(menu: Menu) {
         menu.clear()
+
         activity?.run {
-            menuInflater.inflate(R.menu.menu_thread, menu)
+            viewModel.thread.value?.let { thread ->
+                menuInflater.inflate(R.menu.menu_thread, menu)
+                if (thread.subscriptionStatus.equals(SUBSCRIPTION_STATUS_NONE)) {
+                    menu.findItem(R.id.thread_unsubscribe).isVisible = false
+                    menu.findItem(R.id.thread_mute).isVisible = false
+                } else {
+                    menu.findItem(R.id.thread_subscribe).isVisible = false
+                }
+            }
         }
         super.onPrepareOptionsMenu(menu)
     }
@@ -256,7 +267,13 @@ class ThreadFragment : Fragment() {
         }
 
         appAuth.authState.observe(viewLifecycleOwner) {
-            binding.bottomPanel.isVisible = it.authorized
+            requireActivity().invalidateOptionsMenu()
+            updateBottomPanel()
+        }
+
+        viewModel.thread.observe(viewLifecycleOwner) {
+            requireActivity().invalidateOptionsMenu()
+            updateBottomPanel()
         }
 
         binding.postsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -351,6 +368,18 @@ class ThreadFragment : Fragment() {
         setHasOptionsMenu(true)
 
         return root
+    }
+
+    fun updateBottomPanel() {
+        var showBottomPanel = false
+        viewModel.thread.value?.let {
+            if (it.subscriptionStatus.equals(SUBSCRIPTION_STATUS_SUBSCRIBED)) {
+                if (appAuth.authorized()) {
+                    showBottomPanel = true
+                }
+            }
+        }
+        binding.bottomPanel.isVisible = showBottomPanel
     }
 
     /**

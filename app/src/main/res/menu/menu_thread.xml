@@ -5,23 +5,21 @@
         android:id="@+id/thread_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
+        android:visible="false"
         app:showAsAction="never" />
     <item
         android:id="@+id/thread_subscribe"
         android:orderInCategory="100"
         android:title="@string/action_subscribe"
-        android:visible="false"
         app:showAsAction="never" />
     <item
         android:id="@+id/thread_unsubscribe"
         android:orderInCategory="100"
         android:title="@string/action_unsubscribe"
-        android:visible="false"
         app:showAsAction="never" />
     <item
         android:id="@+id/thread_mute"
         android:orderInCategory="100"
         android:title="@string/action_mute"
-        android:visible="false"
         app:showAsAction="never" />
 </menu>

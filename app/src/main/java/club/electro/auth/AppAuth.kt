@@ -68,6 +68,10 @@ class AppAuth private constructor(context: Context, diContainer: DependencyConta
         return authStateFlow.value.avatar
     }
 
+    fun authorized():Boolean {
+        return (myId() != 0L)
+    }
+
     @Synchronized
     fun setAuth(id: Long, token: String, name: String, avatar: String, transportName: String?, transportImage: String?) {
         _authStateFlow.value = AuthState(id, token, name, avatar, transportName, transportImage)
