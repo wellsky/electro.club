@@ -152,6 +152,15 @@ interface ApiService {
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
+    suspend fun changeSubscription(
+        @Field("method") method: String = "changeSubscription",
+        @Field("thread_type") threadType: Byte,
+        @Field("thread_id") threadId: Long,
+        @Field("status") status: Byte,
+    ): Response<ApiResponse<ApiThreadData>>
+
+    @FormUrlEncoded
+    @POST(BASE_SERVER_URL)
     suspend fun setPushToken(
         @FieldMap params: HashMap<String?, String?>
     ): Response<Unit>

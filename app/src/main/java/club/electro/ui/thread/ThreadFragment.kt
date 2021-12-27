@@ -7,7 +7,6 @@ import androidx.appcompat.app.AlertDialog
 import club.electro.adapter.PostAdapter
 import club.electro.adapter.PostInteractionListener
 import club.electro.databinding.FragmentThreadBinding
-import club.electro.dto.Post
 import club.electro.utils.LongArg
 import club.electro.utils.ByteArg
 import androidx.lifecycle.ViewModelProvider
@@ -25,8 +24,7 @@ import kotlinx.coroutines.flow.collectLatest
 import androidx.core.view.isVisible
 import club.electro.ToolBarConfig
 import club.electro.di.DependencyContainer
-import club.electro.dto.SUBSCRIPTION_STATUS_NONE
-import club.electro.dto.SUBSCRIPTION_STATUS_SUBSCRIBED
+import club.electro.dto.*
 import club.electro.repository.ThreadLoadTarget
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
@@ -89,12 +87,14 @@ class ThreadFragment : Fragment() {
 
         activity?.run {
             viewModel.thread.value?.let { thread ->
-                menuInflater.inflate(R.menu.menu_thread, menu)
-                if (thread.subscriptionStatus.equals(SUBSCRIPTION_STATUS_NONE)) {
-                    menu.findItem(R.id.thread_unsubscribe).isVisible = false
-                    menu.findItem(R.id.thread_mute).isVisible = false
-                } else {
-                    menu.findItem(R.id.thread_subscribe).isVisible = false
+                if (thread.type == THREAD_TYPE_PUBLIC_CHAT) {
+                    menuInflater.inflate(R.menu.menu_thread, menu)
+                    if (thread.subscriptionStatus.equals(SUBSCRIPTION_STATUS_NONE)) {
+                        menu.findItem(R.id.thread_unsubscribe).isVisible = false
+                        menu.findItem(R.id.thread_mute).isVisible = false
+                    } else {
+                        menu.findItem(R.id.thread_subscribe).isVisible = false
+                    }
                 }
             }
         }
@@ -111,6 +111,18 @@ class ThreadFragment : Fragment() {
                         threadInfoId = this@ThreadFragment.threadId
                     }
                 )
+                return true
+            }
+            R.id.thread_subscribe -> {
+                viewModel.changeSubscription(SUBSCRIPTION_STATUS_SUBSCRIBED)
+                return true
+            }
+            R.id.thread_unsubscribe -> {
+                viewModel.changeSubscription(SUBSCRIPTION_STATUS_NONE)
+                return true
+            }
+            R.id.thread_mute -> {
+                viewModel.changeSubscription(SUBSCRIPTION_STATUS_MUTED)
                 return true
             }
         }

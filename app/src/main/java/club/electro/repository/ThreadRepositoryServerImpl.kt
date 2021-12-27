@@ -75,6 +75,29 @@ class ThreadRepositoryServerImpl(
         }
     }
 
+    override suspend fun changeSubscription(newStatus: Byte) {
+        appAuth.myToken()?.let { myToken ->
+            try {
+                val response = apiService.changeSubscription(
+                    threadType = threadType,
+                    threadId = threadId,
+                    status = newStatus
+                )
+
+                if (!response.isSuccessful) {
+                    throw ApiError(response.code(), response.message())
+                }
+                val body = response.body() ?: throw ApiError(response.code(), response.message())
+                threadDao.insert(body.data.thread.toEntity())
+                networkStatus.setStatus(NetworkStatus.Status.ONLINE)
+            } catch (e: IOException) {
+                networkStatus.setStatus(NetworkStatus.Status.ERROR)
+            } catch (e: Exception) {
+
+            }
+        }
+    }
+
     override fun reloadPosts(target: ThreadLoadTarget) {
         changeTargetPost(target)
     }

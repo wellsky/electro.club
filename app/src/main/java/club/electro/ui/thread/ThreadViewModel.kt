@@ -30,6 +30,10 @@ class ThreadViewModel(
         repository.getThread()
     }
 
+    fun changeSubscription(newStatus: Byte) = viewModelScope.launch {
+        repository.changeSubscription(newStatus)
+    }
+
     fun reloadPosts(target: ThreadLoadTarget) {
         repository.reloadPosts(target)
     }

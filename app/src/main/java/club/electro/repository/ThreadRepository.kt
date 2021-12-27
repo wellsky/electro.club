@@ -13,6 +13,7 @@ interface ThreadRepository {
     val lastUpdateTime: MutableLiveData<Long>
 
     suspend fun getThread()
+    suspend fun changeSubscription(newStatus: Byte)
 
     suspend fun savePostToServer(post: Post)
 
