@@ -1,10 +1,9 @@
 package club.electro.entity
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import club.electro.dto.MapMarker
-import club.electro.dto.SubscriptionArea
+import club.electro.dto.MarkerCustomData
 
 @Entity
 data class MapMarkerEntity(
@@ -12,13 +11,17 @@ data class MapMarkerEntity(
     val id: Long,
     val type: Byte,
     val lat: Double,
-    val lng: Double
+    val lng: Double,
+    val icon: String?,
+    val data: MarkerCustomData?
 ) {
     fun toDto() = MapMarker(
         id = id,
         type = type,
         lat = lat,
-        lng = lng
+        lng = lng,
+        icon = icon,
+        data = data,
     )
 
     companion object {
@@ -28,7 +31,8 @@ data class MapMarkerEntity(
                 type = dto.type,
                 lat = dto.lat,
                 lng = dto.lng,
-
+                icon = dto.icon,
+                data = dto.data,
             )
     }
 }

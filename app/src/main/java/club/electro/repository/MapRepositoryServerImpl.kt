@@ -1,6 +1,8 @@
 package club.electro.repository
 
 import club.electro.di.DependencyContainer
+import club.electro.dto.MARKER_TYPE_GROUP
+import club.electro.dto.MARKER_TYPE_SOCKET
 import club.electro.dto.MapMarker
 import club.electro.dto.Socket
 import club.electro.entity.MapMarkerEntity
@@ -24,14 +26,13 @@ class MapRepositoryServerImpl(diContainer: DependencyContainer): MapRepository {
     val markerDao =diContainer.appDb.mapMarkerDao()
     val socketDao =diContainer.appDb.socketDao()
 
-    val MARKER_TYPE_SOCKET: Int = 6
-
     override val data: Flow<List<MapMarker>> = markerDao.getAll().map(List<MapMarkerEntity>::toDto).flowOn(Dispatchers.Default)
 
     override suspend fun getAll() {
         try {
             val response = apiService.getMapObjects(
-                types = MARKER_TYPE_SOCKET.toString()
+                //types = MARKER_TYPE_SOCKET.toString() + "+" + MARKER_TYPE_GROUP.toString()
+                types = MARKER_TYPE_GROUP.toString()
             )
 
             if (!response.isSuccessful) {

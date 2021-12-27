@@ -11,6 +11,7 @@ import club.electro.R
 import club.electro.di.DependencyContainer
 import club.electro.dto.THREAD_TYPE_POST_WITH_COMMENTS
 import club.electro.error.ApiError
+import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST
 import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
@@ -107,7 +108,7 @@ class UrlHandler(val context: Context, val navController: NavController) {
                     Bundle().apply {
                         threadType = data.thread_type!!
                         threadId = data.thread_id!!
-                        postId = if (data.thread_type.equals(THREAD_TYPE_POST_WITH_COMMENTS)) -1L else 0L //
+                        postId = if (data.thread_type.equals(THREAD_TYPE_POST_WITH_COMMENTS)) TARGET_POSITION_FIRST else TARGET_POSITION_FIRST
                     }
                 )
             }

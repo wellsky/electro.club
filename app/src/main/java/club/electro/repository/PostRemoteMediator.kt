@@ -40,7 +40,7 @@ class PostRemoteMediator(
 
                     // Если надо начать от последнего сообщения, то при рефреше загружаем отрицательное число постов (т.е. вверх по списку)
                     var count =
-                        if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_LAST)
+                        if (target.targetPostId == ThreadLoadTarget.TARGET_POSITION_LAST)
                             -state.config.pageSize else state.config.pageSize
 
 
@@ -49,13 +49,13 @@ class PostRemoteMediator(
                         println(
                             "anchor: " + state.anchorPosition + " postId: " + state.closestItemToPosition(
                                 it
-                            )?.id + " gravity: " + target.targetPostPosition
+                            )?.id + " gravity: " + target.targetPostId
                         )
 
                         // В зависимости от "гравитации" ближайший видимый пост будет либо выше, либо ниже видимой области экрана
                         // Значит загрузку надо начать с сообщений либо до либо после этого поста
                         count =
-                            if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_LAST)
+                            if (target.targetPostId == ThreadLoadTarget.TARGET_POSITION_LAST)
                                 state.config.pageSize else -state.config.pageSize
 
                         state.closestItemToPosition(it)?.id.toString()

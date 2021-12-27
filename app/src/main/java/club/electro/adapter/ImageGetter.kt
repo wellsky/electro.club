@@ -15,6 +15,8 @@ import kotlinx.coroutines.withContext
 // TODO попробовать переписать, чтобы работал с Glide, а не Picasso ?
 // TODO доработать растяжение изображения до ширины сообщения, а не экрана
 // Class to download Images which extends [Html.ImageGetter]
+// https://stackoverflow.com/questions/8992964/android-load-from-url-to-bitmap
+// https://stackoverflow.com/questions/27394016/how-does-one-use-glide-to-download-an-image-into-a-bitmap
 class ImageGetter(
     private val res: Resources,
     private val htmlTextView: TextView,

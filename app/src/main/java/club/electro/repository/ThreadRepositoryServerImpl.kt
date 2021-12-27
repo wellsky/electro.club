@@ -9,6 +9,7 @@ import club.electro.dto.PostsThread
 import club.electro.entity.toEntity
 import club.electro.error.*
 import club.electro.model.NetworkStatus
+import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_LAST
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.IOException
@@ -17,7 +18,7 @@ class ThreadRepositoryServerImpl(
             val diContainer: DependencyContainer,
             val threadType: Byte,
             val threadId: Long,
-            val targetPost: ThreadLoadTarget = ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST)
+            val targetPost: ThreadLoadTarget = ThreadLoadTarget(TARGET_POSITION_LAST)
         ) : ThreadRepository {
 
     private val threadDao = diContainer.appDb.threadDao()
@@ -166,20 +167,19 @@ class ThreadRepositoryServerImpl(
  * Передается в RemoteMediator чтобы загрузить посты от указанного в настройках
  * А также используется во фрагменте, чтобы после загрузки отобразить соответствующий пост
  */
-class ThreadLoadTarget (
-    val targetPostId: Long? = null,
-    val targetPostPosition: String? = null,
-) {
+class ThreadLoadTarget(val targetPostId: Long) {
     companion object {
-        val TARGET_POSITION_FIRST = "first"
-        val TARGET_POSITION_LAST = "last"
-        val TARGET_POSITION_FIRST_UNREAD = "first_unread"
+        const val TARGET_POSITION_FIRST = -1L // Первое сообщение
+        const val TARGET_POSITION_LAST = -2L // Последнее сообщение
+        const val TARGET_POSITION_FIRST_UNREAD = -3L // Первое непрочитанное сообщение
     }
 
     fun targetApiParameter():String {
-        if (targetPostId != null) {
-            return targetPostId.toString()
+        return when (targetPostId) {
+            TARGET_POSITION_LAST -> "last"
+            TARGET_POSITION_FIRST -> "first"
+            TARGET_POSITION_FIRST_UNREAD -> "first_unread"
+            else -> targetPostId.toString()
         }
-        return targetPostPosition ?: TARGET_POSITION_LAST
     }
 }

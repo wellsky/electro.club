@@ -26,6 +26,9 @@ import club.electro.ToolBarConfig
 import club.electro.di.DependencyContainer
 import club.electro.dto.*
 import club.electro.repository.ThreadLoadTarget
+import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST
+import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST_UNREAD
+import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_LAST
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
 import club.electro.utils.HtmlToText
@@ -137,12 +140,14 @@ class ThreadFragment : Fragment() {
 
         val postId = requireArguments().postId
 
-        currentTargetPost = when (postId) {
-             0L -> ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST)
-            -1L -> ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_FIRST)
-            -2L -> ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD)
-            else -> ThreadLoadTarget(targetPostId = postId)
-        }
+//        currentTargetPost = when (postId) {
+//             0L -> ThreadLoadTarget(ThreadLoadTarget.TARGET_POSITION_LAST)
+//            -1L -> ThreadLoadTarget(ThreadLoadTarget.TARGET_POSITION_FIRST)
+//            -2L -> ThreadLoadTarget(ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD)
+//            else -> ThreadLoadTarget(postId)
+//        }
+
+        currentTargetPost = ThreadLoadTarget(postId)
 
         viewModel = ViewModelProvider(this, ThreadViewModelFactory(
             requireActivity().getApplication(),
@@ -331,13 +336,13 @@ class ThreadFragment : Fragment() {
         }
 
         binding.buttonScrollToBegin.setOnClickListener {
-            currentTargetPost = ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_FIRST)
+            currentTargetPost = ThreadLoadTarget(TARGET_POSITION_FIRST)
             viewModel.reloadPosts(currentTargetPost!!)
 
         }
 
         binding.buttonScrollToEnd.setOnClickListener {
-            currentTargetPost = ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST)
+            currentTargetPost = ThreadLoadTarget(TARGET_POSITION_LAST)
             viewModel.reloadPosts(currentTargetPost!!)
         }
 
@@ -354,7 +359,7 @@ class ThreadFragment : Fragment() {
                 setText("")
                 clearFocus()
                 AndroidUtils.hideKeyboard(it)
-                currentTargetPost = ThreadLoadTarget(targetPostPosition = ThreadLoadTarget.TARGET_POSITION_LAST)
+                currentTargetPost = ThreadLoadTarget(TARGET_POSITION_LAST)
             }
         }
 
@@ -434,19 +439,19 @@ class ThreadFragment : Fragment() {
         if (target.targetPostId != null) {
             setGravityTop()
         }
-        if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD) {
+        if (target.targetPostId == TARGET_POSITION_FIRST_UNREAD) {
             setGravityTop()
             scrolledToTop = true
             binding.buttonScrollToBegin.isVisible = false
 
         }
-        if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_FIRST) {
+        if (target.targetPostId == TARGET_POSITION_FIRST) {
             setGravityTop()
             scrolledToTop = true
             binding.buttonScrollToBegin.isVisible = false
 
         }
-        if (target.targetPostPosition == ThreadLoadTarget.TARGET_POSITION_LAST) {
+        if (target.targetPostId == TARGET_POSITION_LAST) {
             setGravityBottom()
             scrolledToBottom = true
             binding.buttonScrollToEnd.isVisible = false
