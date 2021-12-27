@@ -17,6 +17,9 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: MapRepository = MapRepositoryServerImpl((application as ElectroClubApp).diContainer)
     val data = repository.data.asLiveData(Dispatchers.Default)
 
+    val _mapFilter = MutableLiveData(MapFilter())
+    val mapFilter: LiveData<MapFilter> = _mapFilter
+
     private val prefs = application.getSharedPreferences("map", Context.MODE_PRIVATE)
 
     private val latKey = "lat"
@@ -44,6 +47,18 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
             zoom = prefs.getFloat(zoomKey, 0F),
         )
     }
+
+    fun showGroups(show: Boolean) {
+        _mapFilter.value?.let {
+            _mapFilter.value =it.copy(showGroups = show)
+        }
+    }
+
+    fun showSockets(show: Boolean) {
+        _mapFilter.value?.let {
+            _mapFilter.value =it.copy(showSockets = show)
+        }
+    }
 }
 
 fun SharedPreferences.Editor.putDouble(key: String?, value: Double): SharedPreferences.Editor? {
@@ -58,3 +73,8 @@ fun SharedPreferences.getDouble(key: String?, defaultValue: Double): Double {
         )
     )
 }
+
+data class MapFilter(
+    val showGroups: Boolean = true,
+    val showSockets: Boolean = false
+)

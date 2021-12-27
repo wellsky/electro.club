@@ -1,9 +1,7 @@
 package club.electro.ui.feed
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -13,7 +11,9 @@ import club.electro.ToolBarConfig
 import club.electro.adapter.*
 import club.electro.databinding.FragmentFeedBinding
 import club.electro.dto.FeedPost
+import club.electro.dto.SUBSCRIPTION_STATUS_NONE
 import club.electro.dto.THREAD_TYPE_POST_WITH_COMMENTS
+import club.electro.dto.THREAD_TYPE_PUBLIC_CHAT
 import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType

@@ -87,9 +87,8 @@ class ThreadFragment : Fragment() {
     // https://www.vogella.com/tutorials/AndroidActionBar/article.html
     override fun onPrepareOptionsMenu(menu: Menu) {
         menu.clear()
-
-        activity?.run {
-            viewModel.thread.value?.let { thread ->
+        viewModel.thread.value?.let { thread ->
+            activity?.run {
                 if (thread.type == THREAD_TYPE_PUBLIC_CHAT) {
                     menuInflater.inflate(R.menu.menu_thread, menu)
                     if (thread.subscriptionStatus.equals(SUBSCRIPTION_STATUS_NONE)) {
@@ -285,12 +284,12 @@ class ThreadFragment : Fragment() {
 
         appAuth.authState.observe(viewLifecycleOwner) {
             requireActivity().invalidateOptionsMenu()
-            updateBottomPanel()
+            invalidateBottomPanel()
         }
 
         viewModel.thread.observe(viewLifecycleOwner) {
             requireActivity().invalidateOptionsMenu()
-            updateBottomPanel()
+            invalidateBottomPanel()
         }
 
         binding.postsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -387,7 +386,7 @@ class ThreadFragment : Fragment() {
         return root
     }
 
-    fun updateBottomPanel() {
+    fun invalidateBottomPanel() {
         var showBottomPanel = false
         viewModel.thread.value?.let {
             if (it.subscriptionStatus.equals(SUBSCRIPTION_STATUS_SUBSCRIBED)) {

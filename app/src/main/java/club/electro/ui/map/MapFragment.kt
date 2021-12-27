@@ -2,15 +2,10 @@ package club.electro.ui.map
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import club.electro.R
-import club.electro.dto.MARKER_TYPE_SOCKET
-import club.electro.dto.MapMarker
 import club.electro.ui.map.socket.SocketFragment.Companion.socketId
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -20,7 +15,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import android.graphics.BitmapFactory
 import android.graphics.Bitmap
-import club.electro.dto.MARKER_TYPE_GROUP
+import android.view.*
+import club.electro.dto.*
 import club.electro.repository.ThreadLoadTarget
 import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
@@ -127,6 +123,7 @@ class MapFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setHasOptionsMenu(true)
         return inflater.inflate(R.layout.fragment_map, container, false)
     }
 
@@ -134,6 +131,35 @@ class MapFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        menu.clear()
+        viewModel.mapFilter.value?.let { filter ->
+            activity?.run {
+                menuInflater.inflate(R.menu.menu_map, menu)
+
+                menu.findItem(R.id.show_groups).setChecked(filter.showGroups)
+                menu.findItem(R.id.show_sockets).setChecked(filter.showSockets)
+            }
+        }
+        super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.show_groups -> {
+                item.isChecked = !item.isChecked
+                viewModel.showGroups(item.isChecked)
+                true
+            }
+            R.id.show_sockets -> {
+                item.isChecked = !item.isChecked
+                viewModel.showSockets(item.isChecked)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }
 

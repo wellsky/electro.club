@@ -49,4 +49,6 @@
     <string name="delete_post_confirm_text">Are you sure you want to Delete?</string>
     <string name="delete_post_confirm_yes">Yes</string>
     <string name="delete_post_confirm_no">No</string>
+    <string name="map_filter_groups">Groups</string>
+    <string name="map_filter_sockets">Sockets</string>
 </resources>
