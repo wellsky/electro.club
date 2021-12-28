@@ -5,8 +5,11 @@ import club.electro.dto.Socket
 import kotlinx.coroutines.flow.Flow
 
 interface MapRepository {
-    val data: Flow<List<MapMarker>>
+    val markers: Flow<List<MapMarker>>
 
     suspend fun getAll()
+
+    fun setMerkersFilter(list: List<Byte>)
+
     fun getSocket(id: Long): Flow<Socket>
 }

@@ -12,10 +12,7 @@ import club.electro.error.ApiError
 import club.electro.error.NetworkError
 import club.electro.error.UnknownError
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import java.io.IOException
 
 class MapRepositoryServerImpl(diContainer: DependencyContainer): MapRepository {
@@ -26,13 +23,21 @@ class MapRepositoryServerImpl(diContainer: DependencyContainer): MapRepository {
     val markerDao =diContainer.appDb.mapMarkerDao()
     val socketDao =diContainer.appDb.socketDao()
 
-    override val data: Flow<List<MapMarker>> = markerDao.getAll().map(List<MapMarkerEntity>::toDto).flowOn(Dispatchers.Default)
+    var targetFlow = MutableStateFlow(value = listOf<Byte>())
+
+    override val markers = targetFlow.flatMapLatest { list ->
+        markerDao.getByTypes(list).map(List<MapMarkerEntity>::toDto).flowOn(Dispatchers.Default)
+    }
+
+    override fun setMerkersFilter(list: List<Byte>) {
+        targetFlow.value = list.toList() // Необходимо создавать копию списка, чтобы трегернуть flatMapLatest
+    }
 
     override suspend fun getAll() {
         try {
             val response = apiService.getMapObjects(
-                //types = MARKER_TYPE_SOCKET.toString() + "+" + MARKER_TYPE_GROUP.toString()
-                types = MARKER_TYPE_GROUP.toString()
+                types = MARKER_TYPE_SOCKET.toString() + "+" + MARKER_TYPE_GROUP.toString()
+                //types = MARKER_TYPE_GROUP.toString()
             )
 
             if (!response.isSuccessful) {

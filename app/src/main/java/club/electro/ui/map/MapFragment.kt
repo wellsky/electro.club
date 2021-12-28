@@ -13,7 +13,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import android.graphics.BitmapFactory
 import android.graphics.Bitmap
 import android.view.*
 import club.electro.dto.*
@@ -27,7 +26,6 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.google.android.gms.maps.model.Marker
 import com.bumptech.glide.request.target.Target
-import java.net.URL
 
 
 class MapFragment : Fragment() {
@@ -54,13 +52,16 @@ class MapFragment : Fragment() {
          * install it inside the SupportMapFragment. This method will only be triggered once the
          * user has installed Google Play services and returned to the app.
          */
+        viewModel.setFilter(MARKER_TYPE_GROUP, true)
         viewModel.getAllMarkers()
 
         val cameraPosition = viewModel.loadCameraState()
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(cameraPosition.lat, cameraPosition.lng), cameraPosition.zoom))
 
-        viewModel.data.observe(viewLifecycleOwner) {
+        viewModel.markers.observe(viewLifecycleOwner) {
+            googleMap.clear()
+
             val socketIcon = BitmapDescriptorFactory.fromResource(R.drawable.socket);
             val groupIcon = BitmapDescriptorFactory.fromResource(R.drawable.socket);
 
@@ -76,7 +77,6 @@ class MapFragment : Fragment() {
                 marker?.let { marker->
                     marker.tag = it
                     it.icon?.let { icon ->
-                        println("Loadicon " + icon)
                         marker.loadIcon(requireContext(), icon)
                     }
                 }
@@ -135,12 +135,11 @@ class MapFragment : Fragment() {
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         menu.clear()
-        viewModel.mapFilter.value?.let { filter ->
+        viewModel.markersFilter.let { filter ->
             activity?.run {
                 menuInflater.inflate(R.menu.menu_map, menu)
-
-                menu.findItem(R.id.show_groups).setChecked(filter.showGroups)
-                menu.findItem(R.id.show_sockets).setChecked(filter.showSockets)
+                menu.findItem(R.id.show_groups).setChecked(filter.contains(MARKER_TYPE_GROUP))
+                menu.findItem(R.id.show_sockets).setChecked(filter.contains(MARKER_TYPE_SOCKET))
             }
         }
         super.onPrepareOptionsMenu(menu)
@@ -150,12 +149,12 @@ class MapFragment : Fragment() {
         return when (item.itemId) {
             R.id.show_groups -> {
                 item.isChecked = !item.isChecked
-                viewModel.showGroups(item.isChecked)
+                viewModel.setFilter(MARKER_TYPE_GROUP, item.isChecked)
                 true
             }
             R.id.show_sockets -> {
                 item.isChecked = !item.isChecked
-                viewModel.showSockets(item.isChecked)
+                viewModel.setFilter(MARKER_TYPE_SOCKET, item.isChecked)
                 true
             }
             else -> super.onOptionsItemSelected(item)

@@ -10,6 +10,9 @@ interface MapMarkerDao {
     @Query("SELECT * FROM MapMarkerEntity")
     fun getAll(): Flow<List<MapMarkerEntity>>
 
+    @Query("SELECT * FROM MapMarkerEntity WHERE type IN(:types)")
+    fun getByTypes(types: List<Byte>): Flow<List<MapMarkerEntity>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(marker: MapMarkerEntity)
 

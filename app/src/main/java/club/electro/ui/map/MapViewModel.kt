@@ -15,10 +15,9 @@ import kotlinx.coroutines.launch
 
 class MapViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: MapRepository = MapRepositoryServerImpl((application as ElectroClubApp).diContainer)
-    val data = repository.data.asLiveData(Dispatchers.Default)
+    val markers = repository.markers.asLiveData(Dispatchers.Default)
 
-    val _mapFilter = MutableLiveData(MapFilter())
-    val mapFilter: LiveData<MapFilter> = _mapFilter
+    val markersFilter: MutableList<Byte>  = mutableListOf()
 
     private val prefs = application.getSharedPreferences("map", Context.MODE_PRIVATE)
 
@@ -30,7 +29,7 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
         repository.getAll()
     }
 
-    // TODO можно ли во viewModel сохранять и загружать sharedPrefs с т.ч. архитектуры?
+    // TODO можно ли во viewModel сохранять и загружать sharedPrefs с т.ч. чистой архитектуры?
     fun saveCameraState(position: MapCameraPosition) {
         with(prefs.edit()) {
             putDouble(latKey, position.lat)
@@ -48,16 +47,9 @@ class MapViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
-    fun showGroups(show: Boolean) {
-        _mapFilter.value?.let {
-            _mapFilter.value =it.copy(showGroups = show)
-        }
-    }
-
-    fun showSockets(show: Boolean) {
-        _mapFilter.value?.let {
-            _mapFilter.value =it.copy(showSockets = show)
-        }
+    fun setFilter(value: Byte, show: Boolean) {
+        if (show) markersFilter.add(value) else markersFilter.remove(value)
+        repository.setMerkersFilter(markersFilter)
     }
 }
 
@@ -73,8 +65,3 @@ fun SharedPreferences.getDouble(key: String?, defaultValue: Double): Double {
         )
     )
 }
-
-data class MapFilter(
-    val showGroups: Boolean = true,
-    val showSockets: Boolean = false
-)
