@@ -96,8 +96,8 @@ class PostEntityContentPreparator(
                 onEveryDataUpdate
             )
             val answerText = sourceMessage?.let {
-                "<blockquote><strong>Ответ " + sourceMessage.authorName + "</strong>: " + shortTextPreview(sourceMessage.content) + "</blockquote>"
-            } ?: "<blockquote><strong>Ответ на сообщение " + it + "</strong></blockquote>"
+                "<blockquote><strong>Ответ ${sourceMessage.authorName} </strong>: ${shortTextPreview(sourceMessage.content)}</blockquote>"
+            } ?: "<blockquote><strong>Ответ на сообщение $it</strong></blockquote>"
             text = answerText + text
         }
         return this
@@ -135,8 +135,8 @@ class PostEntityContentPreparator(
                         quotedMessageId.toLong(),
                         onEveryDataUpdate
                     )
-                    val author = ("<strong>" + sourceMessage?.authorName ?: "?") + "</strong>: "
-                    "<blockquote>" + author + quoteText + "</blockquote>"
+                    val author = "<strong>${sourceMessage?.authorName ?: "?"}</strong>:"
+                    "<blockquote>$author $quoteText</blockquote>"
                 }
             }
 
@@ -156,8 +156,7 @@ class PostEntityContentPreparator(
             runBlocking {
                 val (userId) = it.destructured
                 val author: User? = userRepository.getLocalById(userId.toLong(), onLoadedCallback = onEveryDataUpdate)
-                "<a href=\"https://electro.club/users/" + userId + "\">@" + (author?.name
-                    ?: "user" + userId) + "</a>"
+                "<a href=\"https://electro.club/users/$userId\">@${author?.name ?: "user" + userId}</a>"
             }
         }
 
@@ -174,16 +173,16 @@ class PostEntityContentPreparator(
         val result1 = Regex(pattern1).replace(text) {
             runBlocking {
                 val (quotedMessageAuthor, quoteText) = it.destructured
-                val author = "<strong>" + quotedMessageAuthor + "</strong>: "
-                "<blockquote>" + author + quoteText + "</blockquote>"
+                val author = "<strong>$quotedMessageAuthor</strong>:"
+                "<blockquote>$author $quoteText</blockquote>"
             }
         }
 
         val pattern2= """\[quote\](.*?)\[\/quote\]"""
         val result2 = Regex(pattern2).replace(result1) {
             val (quoteText) = it.destructured
-            val author = "<strong>Цитата: </strong>: "
-            "<blockquote>" + author + quoteText + "</blockquote>"
+            val author = "<strong>Цитата: </strong>:"
+            "<blockquote>$author $quoteText</blockquote>"
         }
 
         text = result2
@@ -195,7 +194,7 @@ class PostEntityContentPreparator(
 
         val result = Regex(pattern).replace(text) {
             val (url, anchor) = it.destructured
-            "<a href=\"" + url + "\">" + anchor + "</a>"
+            "<a href=\"$url\">$anchor</a>"
         }
 
         text = result

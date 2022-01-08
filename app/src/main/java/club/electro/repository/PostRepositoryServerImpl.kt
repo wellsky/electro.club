@@ -114,14 +114,6 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
         prepareAndSaveLocal(listOf(postEntity))
     }
 
-//    override suspend fun updateLocalPostPreparedContent(threadType: Byte, threadId: Long, id: Long, preparedContent: String) {
-//        dao.updatePreparedContent(threadType, threadId, id, preparedContent)
-//    }
-
-//    override suspend fun savePostToChache(post: Post) {
-//        dao.insert(post.toEntity())
-//    }
-
     override suspend fun savePostToServer(post: Post) {
         val savingEntity = if (post.id == 0L) {
             PostEntity.fromDto(post).copy(

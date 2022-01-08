@@ -5,6 +5,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.text.Html
 import android.widget.TextView
+import androidx.lifecycle.LifecycleCoroutineScope
 import com.bumptech.glide.Glide
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +21,7 @@ import kotlinx.coroutines.withContext
 class ImageGetter(
     private val res: Resources,
     private val htmlTextView: TextView,
+    private val lifecycleScope: LifecycleCoroutineScope
 ) : Html.ImageGetter {
 
     // Function needs to overridden when extending [Html.ImageGetter] ,
@@ -28,7 +30,7 @@ class ImageGetter(
         val holder = BitmapDrawablePlaceHolder(res, null)
 
         // Coroutine Scope to download image in Background
-        GlobalScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             runCatching {
                 // To make sure Images don't go out of screen , Setting width less
                 // than screen width, You can change image size if you want

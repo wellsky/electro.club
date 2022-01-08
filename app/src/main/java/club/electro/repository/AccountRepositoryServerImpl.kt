@@ -14,11 +14,17 @@ class AccountRepositoryServerImpl(diContainer: DependencyContainer): AccountRepo
             password = password
         )
         val body = response.body() ?: throw ApiError(response.code(), response.message())
-        body.data.user?.let {
-            appAuth.setAuth(it.user_id, it.user_token, it.nickname,it.thumbnail, it.transport_name, it.transport_image)
+        body.data.user.let {
+            appAuth.setAuth(
+                id = it.user_id,
+                token = it.user_token,
+                name = it.nickname,
+                avatar = it.thumbnail,
+                transportName = it.transport_name,
+                transportImage = it.transport_image
+            )
             return true
         }
-        return false
     }
 
     override suspend fun signOut() {

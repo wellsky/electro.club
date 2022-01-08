@@ -2,6 +2,8 @@ package club.electro.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -46,11 +48,17 @@ class FeedPostViewHolder(
             comments.text = feedPost.comments.toString()
 
             if (!feedPost.channelAvatar.isEmpty()) {
+                channelAvatar.isVisible = true
                 channelAvatar.loadCircleCrop(feedPost.channelAvatar)
+            } else {
+                channelAvatar.isVisible = false
             }
 
             if (!feedPost.image.isEmpty()) {
+                titleImage.isVisible = true
                 titleImage.load(feedPost.image)
+            } else {
+                titleImage.isVisible = false
             }
 
 

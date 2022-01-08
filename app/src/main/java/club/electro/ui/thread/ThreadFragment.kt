@@ -193,7 +193,7 @@ class ThreadFragment : Fragment() {
             override fun onUrlClicked(url: String?) {
                 UrlHandler(requireContext(), findNavController()).setUrl(url).open()
             }
-        })
+        }, lifecycleScope)
         adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         binding.postsList.adapter = adapter

@@ -27,7 +27,7 @@ import com.bumptech.glide.Glide
 import android.text.SpannableStringBuilder
 import android.widget.TextView
 import android.text.style.ClickableSpan
-
+import androidx.lifecycle.LifecycleCoroutineScope
 
 
 interface PostInteractionListener {
@@ -40,10 +40,11 @@ interface PostInteractionListener {
 
 class PostAdapter(
     private val onInteractionListener: PostInteractionListener,
+    private val lifecycleScope: LifecycleCoroutineScope
 ) : PagingDataAdapter<Post, PostViewHolder>(PostDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = PostItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PostViewHolder(binding, onInteractionListener)
+        return PostViewHolder(binding, onInteractionListener, lifecycleScope)
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
@@ -59,6 +60,7 @@ class PostAdapter(
 class PostViewHolder(
     private val binding: PostItemBinding,
     private val onInteractionListener: PostInteractionListener,
+    private val lifecycleScope: LifecycleCoroutineScope
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(post: Post) {
@@ -136,7 +138,7 @@ class PostViewHolder(
 
             val preparedContent = post.preparedContent ?: post.content
 
-            val imageGetter = ImageGetter(resources, content)
+            val imageGetter = ImageGetter(resources, content, lifecycleScope)
 
             //Initial span from HtmlCompat will link anchor tags
             val htmlSpan = HtmlCompat.fromHtml(
@@ -178,7 +180,7 @@ class PostViewHolder(
     }
 
 
-    protected fun makeLinkClickable(strBuilder: SpannableStringBuilder, span: URLSpan?) {
+    private fun makeLinkClickable(strBuilder: SpannableStringBuilder, span: URLSpan?) {
         val start = strBuilder.getSpanStart(span)
         val end = strBuilder.getSpanEnd(span)
         val flags = strBuilder.getSpanFlags(span)
@@ -186,15 +188,14 @@ class PostViewHolder(
             override fun onClick(view: View) {
                 // Do something with span.getURL() to handle the link click...
                 onInteractionListener.onUrlClicked(span?.getURL())
-                //UrlHandler(span?.getURL(), binding.root.context).run()
             }
         }
         strBuilder.setSpan(clickable, start, end, flags)
         strBuilder.removeSpan(span)
     }
 
-    protected fun setTextViewHTML(text: TextView, html: CharSequence) {
-        val sequence = html //: CharSequence = Html.fromHtml(html)
+    private fun setTextViewHTML(text: TextView, html: CharSequence) {
+        val sequence = html
         val strBuilder = SpannableStringBuilder(sequence)
         val urls = strBuilder.getSpans(0, sequence.length, URLSpan::class.java)
         for (span in urls) {
