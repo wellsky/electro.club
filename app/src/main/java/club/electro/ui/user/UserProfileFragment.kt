@@ -31,10 +31,6 @@ class UserProfileFragment : Fragment() {
 
     private lateinit var viewModel: UserProfileViewModel
 
-//    private val viewModel: UserProfileViewModel by viewModels (
-//        ownerProducer = ::requireParentFragment
-//    )
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -89,16 +85,17 @@ class UserProfileFragment : Fragment() {
                 }
             }
 
-            activity?.run {
+            requireActivity().run {
                 val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
                 mainViewModel.updateActionBarTitle(ToolBarConfig(title1 = user.name))
-            } ?: throw Throwable("Invalid activity")
+            }
         }
 
-//        arguments?.userId?.let {
-//            viewModel.getUserProfile(it)
-//        }
-
         return root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

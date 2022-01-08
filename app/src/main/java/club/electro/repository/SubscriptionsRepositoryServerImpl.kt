@@ -63,13 +63,13 @@ class SubscriptionsRepositoryServerImpl(diContainer: DependencyContainer) : Subs
                 }
                 val body = response.body() ?: throw ApiError(response.code(), response.message())
 
-                body?.let {
+                body.let {
                     if (it.data.items.isNotEmpty()) {
                         dao.removeAll()
                         dao.insert(body.data.items.toEntity())
                         lastEventTime = body.data.lastEventTime
-                        networkStatus.setStatus(NetworkStatus.Status.ONLINE)
                     }
+                    networkStatus.setStatus(NetworkStatus.Status.ONLINE)
                 }
             }  catch (e: IOException) {
                 networkStatus.setStatus(NetworkStatus.Status.ERROR)

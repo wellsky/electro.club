@@ -31,7 +31,7 @@ import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST_
 import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_LAST
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
-import club.electro.utils.HtmlToText
+import club.electro.utils.htmlToText
 import club.electro.utils.UrlHandler
 
 
@@ -46,8 +46,8 @@ class ThreadFragment : Fragment() {
     private var threadId: Long = 0
 
     private lateinit var viewModel: ThreadViewModel
-    private var _binding: FragmentThreadBinding? = null
 
+    private var _binding: FragmentThreadBinding? = null
     private val binding get() = _binding!!
 
     private var currentTargetPost: ThreadLoadTarget? = null // Задается при вызове загрузки постов и сбрасывается в null при первом поступлении новых данных
@@ -62,7 +62,7 @@ class ThreadFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        activity?.run {
+        requireActivity().run {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
             viewModel.thread.observe(viewLifecycleOwner) {
                 it?.let {
@@ -81,14 +81,14 @@ class ThreadFragment : Fragment() {
                     ))
                 }
             }
-        } ?: throw Throwable("Invalid activity")
+        }
     }
 
     // https://www.vogella.com/tutorials/AndroidActionBar/article.html
     override fun onPrepareOptionsMenu(menu: Menu) {
         menu.clear()
         viewModel.thread.value?.let { thread ->
-            activity?.run {
+            requireActivity().run {
                 if (thread.type == THREAD_TYPE_PUBLIC_CHAT) {
                     menuInflater.inflate(R.menu.menu_thread, menu)
                     if (thread.subscriptionStatus.equals(SUBSCRIPTION_STATUS_NONE)) {
@@ -138,13 +138,6 @@ class ThreadFragment : Fragment() {
         threadId =  requireArguments().threadId
 
         val postId = requireArguments().postId
-
-//        currentTargetPost = when (postId) {
-//             0L -> ThreadLoadTarget(ThreadLoadTarget.TARGET_POSITION_LAST)
-//            -1L -> ThreadLoadTarget(ThreadLoadTarget.TARGET_POSITION_FIRST)
-//            -2L -> ThreadLoadTarget(ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD)
-//            else -> ThreadLoadTarget(postId)
-//        }
 
         currentTargetPost = ThreadLoadTarget(postId)
 
@@ -208,8 +201,8 @@ class ThreadFragment : Fragment() {
         // TODO непонятный баг. Функция, переданная в LaunchWhenCreated вызывается, даже когда фрагмент восстанавливается, а не только создается
         // При этом есди использовать lifecycleScope а не viewLifecycleOwner.lifecycleScope, то каждый раз создаются дубликаты Load
         // В итоге когда пользователь возвращается в чат из "следующего" фрагмента, то все посты перезагружаются с сервера и сбивается текущая позиция скроллинга
-        //viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-        lifecycleScope.launchWhenCreated {
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+        //lifecycleScope.launchWhenCreated {
             println("LaunchWhenCreated")
             viewModel.posts.collectLatest {
                 currentTargetPost?.let {
@@ -260,11 +253,10 @@ class ThreadFragment : Fragment() {
         viewModel.editedPost.observe(viewLifecycleOwner) {
             if (it.id != 0L) {
                 binding.editedPostGroup.visibility = View.VISIBLE
-                binding.editedPostContent.text = HtmlToText(it.content)
+                binding.editedPostContent.text = htmlToText(it.content)
 
                 with (binding.editorPostContent) {
-                    val editorText = it.content
-                    setText(editorText)
+                    setText(it.content)
                     requestFocus()
                 }
             } else {
@@ -276,7 +268,7 @@ class ThreadFragment : Fragment() {
         viewModel.answerToPost.observe(viewLifecycleOwner) {
             if (it.id != 0L) {
                 binding.answerPostGroup.visibility = View.VISIBLE
-                binding.answerToContent.text = HtmlToText(it.content)
+                binding.answerToContent.text = htmlToText(it.content)
             } else {
                 binding.answerPostGroup.visibility = View.GONE
             }
@@ -404,6 +396,7 @@ class ThreadFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.stopCheckUpdates()
+        _binding = null
     }
 
 

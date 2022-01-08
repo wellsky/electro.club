@@ -160,9 +160,7 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
     }
 
     override suspend fun savePostWork(localId: Long) {
-        val entity = dao.getByLocalId(localId)
-
-        entity?.let { entity ->
+        dao.getByLocalId(localId)?.let { entity ->
             println("Saving work for post: " + entity.localId)
             try {
                 val response = apiService.savePost(

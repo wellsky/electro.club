@@ -33,7 +33,7 @@ class ThreadRepositoryServerImpl(
     private lateinit var updaterJob: Job
 
     // https://stackoverflow.com/questions/64692260/paging-3-0-list-with-new-params-in-kotlin?noredirect=1&lq=1
-    var targetFlow = MutableStateFlow(value = targetPost)
+    val targetFlow = MutableStateFlow(value = targetPost)
 
     override val posts = targetFlow.flatMapLatest { refreshTarget ->
         println("Creating pager")

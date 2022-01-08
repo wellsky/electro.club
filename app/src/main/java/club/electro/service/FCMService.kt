@@ -19,7 +19,7 @@ import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.utils.GetCircleBitmap
-import club.electro.utils.HtmlToText
+import club.electro.utils.htmlToText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -113,9 +113,9 @@ class FCMService : FirebaseMessagingService() {
                 if (action.equals(ACTION_PERSONAL_MESSAGE)) {
                     notificationBuilder
                         .setContentTitle(
-                            HtmlToText(getString(R.string.notification_personal_message, data.authorName))
+                            htmlToText(getString(R.string.notification_personal_message, data.authorName))
                         )
-                        .setContentText(HtmlToText(data.postContent))
+                        .setContentText(htmlToText(data.postContent))
                         .setStyle(NotificationCompat.BigTextStyle()
                         .bigText(data.postContent))
                     //groupTitle = data.authorName
@@ -123,8 +123,8 @@ class FCMService : FirebaseMessagingService() {
 
                 if (action.equals(ACTION_THREAD_POST)) {
                     notificationBuilder
-                        .setContentTitle(HtmlToText(data.threadName))
-                        .setContentText(data.authorName + ": " + HtmlToText(data.postContent))
+                        .setContentTitle(htmlToText(data.threadName))
+                        .setContentText(data.authorName + ": " + htmlToText(data.postContent))
                         .setStyle(NotificationCompat.BigTextStyle()
                         .bigText(data.authorName + ": " + data.postContent))
                     //groupTitle = data.threadName

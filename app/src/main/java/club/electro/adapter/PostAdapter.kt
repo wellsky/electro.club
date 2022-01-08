@@ -3,10 +3,6 @@ package club.electro.adapter
 import ImageGetter
 import QuoteSpanClass
 import android.content.res.Resources
-import android.graphics.Color
-import android.graphics.Rect
-import android.os.Bundle
-import android.provider.Settings.Global.getString
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
@@ -28,7 +24,6 @@ import club.electro.R
 import club.electro.databinding.PostItemBinding
 import club.electro.dto.Post
 import com.bumptech.glide.Glide
-import club.electro.utils.trimWhiteSpaces
 import android.text.SpannableStringBuilder
 import android.widget.TextView
 import android.text.style.ClickableSpan
@@ -92,8 +87,8 @@ class PostViewHolder(
                     published.setText(R.string.post_status_removing)
                 }
                 Post.STATUS_PUBLISHED -> {
-                    //published.setText(sdf.format(date).toString() + " (id: " + post.id + ")")
-                    published.setText(sdf.format(date).toString())
+                    //published.text = sdf.format(date).toString() + " (id: " + post.id + ")"
+                    published.text = sdf.format(date).toString()
                     content.setTextColor(getColor(this.root.context, R.color.postTextColor))
                     menu.isVisible = true
                 }
@@ -151,7 +146,7 @@ class PostViewHolder(
                 null
             ) as Spannable
 
-            val trimmedPostText: CharSequence = trimWhiteSpaces(htmlSpan)
+            val trimmedPostText: CharSequence = htmlSpan.trim()
             val result = trimmedPostText
             replaceQuoteSpans(result as Spannable)
 
@@ -179,8 +174,6 @@ class PostViewHolder(
             }
 
             setTextViewHTML(content, restoreAnchorsSpan)
-
-            //content.setText(result)
         }
     }
 

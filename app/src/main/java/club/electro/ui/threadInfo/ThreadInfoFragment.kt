@@ -104,5 +104,6 @@ class ThreadInfoFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.stopCheckUpdates()
+        _binding = null
     }
 }

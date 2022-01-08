@@ -34,24 +34,6 @@ class MapFragment : Fragment() {
     )
 
     private val callback = OnMapReadyCallback { googleMap ->
-        /**
-         * Manipulates the map once available.
-         * This callback is triggered when the map is ready to be used.
-         * This is where we can add markers or lines, add listeners or move the camera.
-         * In this case, we just add a marker near Sydney, Australia.
-         * If Google Play services is not installed on the device, the user will be prompted to
-         * install it inside the SupportMapFragment. This method will only be triggered once the
-         * user has installed Google Play services and returned to the app.
-         */
-        /**
-         * Manipulates the map once available.
-         * This callback is triggered when the map is ready to be used.
-         * This is where we can add markers or lines, add listeners or move the camera.
-         * In this case, we just add a marker near Sydney, Australia.
-         * If Google Play services is not installed on the device, the user will be prompted to
-         * install it inside the SupportMapFragment. This method will only be triggered once the
-         * user has installed Google Play services and returned to the app.
-         */
         viewModel.setFilter(MARKER_TYPE_GROUP, true)
         viewModel.getAllMarkers()
 
@@ -59,27 +41,27 @@ class MapFragment : Fragment() {
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(cameraPosition.lat, cameraPosition.lng), cameraPosition.zoom))
 
-        viewModel.markers.observe(viewLifecycleOwner) {
+        viewModel.markers.observe(viewLifecycleOwner) { markersList ->
             googleMap.clear()
 
             val socketIcon = BitmapDescriptorFactory.fromResource(R.drawable.socket);
             val groupIcon = BitmapDescriptorFactory.fromResource(R.drawable.socket);
 
-            it.forEach {
-               val coords = LatLng(it.lat, it.lng)
+            markersList.forEach { marker ->
+               val coords = LatLng(marker.lat, marker.lng)
 
-               val marker = when (it.type) {
+               val mapMarker = when (marker.type) {
                     MARKER_TYPE_SOCKET -> googleMap.addMarker(MarkerOptions().position(coords).icon(socketIcon))
                     MARKER_TYPE_GROUP -> googleMap.addMarker(MarkerOptions().position(coords).icon(groupIcon))
                     else -> null
-                }
+               }
 
-                marker?.let { marker->
-                    marker.tag = it
-                    it.icon?.let { icon ->
-                        marker.loadIcon(requireContext(), icon)
+               mapMarker?.let { it ->
+                    it.tag = marker
+                    marker.icon?.let { icon ->
+                        mapMarker.loadIcon(requireContext(), icon)
                     }
-                }
+               }
             }
         }
 
@@ -173,6 +155,7 @@ fun Marker.loadIcon(context: Context, url: String?) {
     Glide.with(context)
         .asBitmap()
         .load(url)
+        .timeout(5_000)
         .error(R.drawable.socket) // to show a default icon in case of any errors
         .listener(object : RequestListener<Bitmap> {
             override fun onLoadFailed(

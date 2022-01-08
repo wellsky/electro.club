@@ -16,6 +16,7 @@ import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.ui.user.UserProfileFragment.Companion.userId
+import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -26,16 +27,17 @@ import java.net.URI
 
 
 class UrlHandler(val context: Context, val navController: NavController) {
-    private val PRIMARY_HOST = "electro.club"
-    private val PATH_USERS = "users"
+    companion object {
+        private val PRIMARY_HOST = "electro.club"
+        private val PATH_USERS = "users"
 
-    private val URL_TYPE_THREAD: Byte = 1
-    private val URL_TYPE_MESSAGE_IN_THREAD: Byte  = 2
-    private val URL_TYPE_USER_ACCOUNT: Byte  = 3
+        private val URL_TYPE_THREAD: Byte = 1
+        private val URL_TYPE_MESSAGE_IN_THREAD: Byte = 2
+        private val URL_TYPE_USER_ACCOUNT: Byte = 3
+    }
 
     private val diContainer = DependencyContainer.getInstance()
     private val apiService = diContainer.apiService
-    private val resources = diContainer.context.resources
 
     private var url: String? = ""
 
@@ -49,7 +51,7 @@ class UrlHandler(val context: Context, val navController: NavController) {
             val uri = URI(url)
             val host: String = uri.host
 
-            if (host.equals(PRIMARY_HOST)) {
+            if (host == PRIMARY_HOST) {
                 parseUriLocal(uri)?.let {
                     openUrlData(it)
                 } ?: parseUriRemoteAndOpen(uri)
@@ -70,7 +72,7 @@ class UrlHandler(val context: Context, val navController: NavController) {
 
                     return UrlDataResult(
                         type = URL_TYPE_USER_ACCOUNT,
-                        user_id = urlUserId
+                        userId = urlUserId
                     )
                 }
             }
@@ -97,7 +99,7 @@ class UrlHandler(val context: Context, val navController: NavController) {
                 navController.navigate(
                     R.id.action_global_userProfileFragment,
                     Bundle().apply {
-                        userId = data.user_id!!
+                        userId = data.userId!!
                     }
                 )
             }
@@ -106,9 +108,9 @@ class UrlHandler(val context: Context, val navController: NavController) {
                 navController.navigate(
                     R.id.action_global_threadFragment,
                     Bundle().apply {
-                        threadType = data.thread_type!!
-                        threadId = data.thread_id!!
-                        postId = if (data.thread_type.equals(THREAD_TYPE_POST_WITH_COMMENTS)) TARGET_POSITION_FIRST else TARGET_POSITION_FIRST
+                        threadType = data.threadType!!
+                        threadId = data.threadId!!
+                        postId = if (data.threadType == THREAD_TYPE_POST_WITH_COMMENTS) TARGET_POSITION_FIRST else TARGET_POSITION_FIRST
                     }
                 )
             }
@@ -117,9 +119,9 @@ class UrlHandler(val context: Context, val navController: NavController) {
                 navController.navigate(
                     R.id.action_global_threadFragment,
                     Bundle().apply {
-                        threadType = data.thread_type!!
-                        threadId = data.thread_id!!
-                        postId = data.post_id!!
+                        threadType = data.threadType!!
+                        threadId = data.threadId!!
+                        postId = data.postId!!
                     }
                 )
             }
@@ -143,11 +145,15 @@ class UrlHandler(val context: Context, val navController: NavController) {
     }
 }
 
-
-data class UrlDataResult (
+data class UrlDataResult(
+    @SerializedName("type")
     val type: Byte,
-    val thread_type: Byte? = null,
-    val thread_id: Long? = null,
-    val post_id: Long? = null,
-    val user_id: Long? = null,
+    @SerializedName("thread_type")
+    val threadType: Byte? = null,
+    @SerializedName("thread_id")
+    val threadId: Long? = null,
+    @SerializedName("post_id")
+    val postId: Long? = null,
+    @SerializedName("user_id")
+    val userId: Long? = null,
 )
