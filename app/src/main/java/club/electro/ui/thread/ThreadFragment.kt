@@ -87,15 +87,17 @@ class ThreadFragment : Fragment() {
     // https://www.vogella.com/tutorials/AndroidActionBar/article.html
     override fun onPrepareOptionsMenu(menu: Menu) {
         menu.clear()
-        viewModel.thread.value?.let { thread ->
-            requireActivity().run {
-                if (thread.type == THREAD_TYPE_PUBLIC_CHAT) {
-                    menuInflater.inflate(R.menu.menu_thread, menu)
-                    if (thread.subscriptionStatus.equals(SUBSCRIPTION_STATUS_NONE)) {
-                        menu.findItem(R.id.thread_unsubscribe).isVisible = false
-                        menu.findItem(R.id.thread_mute).isVisible = false
-                    } else {
-                        menu.findItem(R.id.thread_subscribe).isVisible = false
+        if (appAuth.authorized()) {
+            viewModel.thread.value?.let { thread ->
+                requireActivity().run {
+                    if (thread.type == THREAD_TYPE_PUBLIC_CHAT) {
+                        menuInflater.inflate(R.menu.menu_thread, menu)
+                        if (thread.subscriptionStatus.equals(SUBSCRIPTION_STATUS_NONE)) {
+                            menu.findItem(R.id.thread_unsubscribe).isVisible = false
+                            menu.findItem(R.id.thread_mute).isVisible = false
+                        } else {
+                            menu.findItem(R.id.thread_subscribe).isVisible = false
+                        }
                     }
                 }
             }
@@ -145,7 +147,7 @@ class ThreadFragment : Fragment() {
             requireActivity().getApplication(),
             threadType,
             threadId,
-            currentTargetPost
+            currentTargetPost!!
         )).get(ThreadViewModel::class.java)
 
         viewModel.getThread()
@@ -230,7 +232,6 @@ class ThreadFragment : Fragment() {
                             binding.postsList.smoothScrollToPosition(0);
                         } else {
                             //TODO Внизу появились новые сообщения
-                            println("new messages in bottom of the list")
                         }
                     }
                 }

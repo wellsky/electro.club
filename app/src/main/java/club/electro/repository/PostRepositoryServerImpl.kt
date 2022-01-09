@@ -153,7 +153,6 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
 
     override suspend fun savePostWork(localId: Long) {
         dao.getByLocalId(localId)?.let { entity ->
-            println("Saving work for post: " + entity.localId)
             try {
                 val response = apiService.savePost(
                     threadType = entity.threadType,
@@ -172,10 +171,8 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
 
                 val newPost = PostEntity.fromDto(body.data.message).copy(localId = localId, fresh = (currentCached?.fresh ?: false))
 
-                //dao.insert(newPost)
                 prepareAndSaveLocal(newPost)
 
-                println("Have response new post id:" + body.data.message.id)
                 networkStatus.setStatus(NetworkStatus.Status.ONLINE)
             } catch (e: IOException) {
                 networkStatus.setStatus(NetworkStatus.Status.ERROR)

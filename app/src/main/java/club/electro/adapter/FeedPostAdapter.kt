@@ -11,6 +11,7 @@ import club.electro.databinding.FeedPostItemBinding
 import club.electro.dto.FeedPost
 import club.electro.utils.load
 import club.electro.utils.loadCircleCrop
+import java.text.DateFormat.getDateTimeInstance
 
 interface OnFeedPostInteractionListener {
     fun onClick(feedPost: FeedPost) {}
