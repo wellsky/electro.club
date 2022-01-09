@@ -40,7 +40,7 @@
     <fragment
         android:id="@+id/threadFragment"
         android:name="club.electro.ui.thread.ThreadFragment"
-        android:label="fragment_thread"
+        android:label="Thread"
         tools:layout="@layout/fragment_thread" >
         <action
             android:id="@+id/action_threadFragment_to_userProfileFragment"
@@ -51,15 +51,15 @@
     </fragment>
     <fragment
         android:id="@+id/nav_login"
-        android:name="LoginFragment"
-        android:label="LoginFragment" />
+        android:name="club.electro.ui.login.LoginFragment"
+        android:label="Login" />
     <action
         android:id="@+id/action_global_nav_login"
         app:destination="@id/nav_login" />
     <fragment
         android:id="@+id/userProfileFragment"
         android:name="club.electro.ui.user.UserProfileFragment"
-        android:label="UserProfileFragment" >
+        android:label="User profile" >
         <action
             android:id="@+id/action_userProfileFragment_to_threadFragment"
             app:destination="@id/threadFragment" />
@@ -67,7 +67,7 @@
     <fragment
         android:id="@+id/threadInfoFragment"
         android:name="club.electro.ui.user.ThreadInfoFragment"
-        android:label="ThreadInfoFragment" />
+        android:label="Thread details" />
     <action
         android:id="@+id/action_global_userProfileFragment"
         app:destination="@id/userProfileFragment" />
@@ -77,5 +77,5 @@
     <fragment
         android:id="@+id/socketFragment"
         android:name="club.electro.ui.map.socket.SocketFragment"
-        android:label="SocketFragment" />
+        android:label="Power socket" />
 </navigation>

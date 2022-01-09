@@ -1,6 +1,5 @@
 package club.electro.ui.subscriptions
 
-import android.app.ActionBar
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -15,7 +14,6 @@ import club.electro.adapter.SubscriptionAreaInteractionListener
 import club.electro.databinding.FragmentSubscriptionsBinding
 import club.electro.dto.SubscriptionArea
 import club.electro.repository.ThreadLoadTarget
-import club.electro.ui.map.MapViewModel
 import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
