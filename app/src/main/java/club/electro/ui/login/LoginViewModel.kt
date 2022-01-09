@@ -1,6 +1,5 @@
 package ru.netology.nmedia.viewmodel
 
-import AccountRepositoryServerImpl
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -9,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import club.electro.application.ElectroClubApp
 import club.electro.repository.AccountRepository
 import kotlinx.coroutines.launch
-
+import javax.inject.Inject
 
 enum class LoginFormState {
     LOGGED, NOT_LOGGED, SUCCESS, ERROR
@@ -23,7 +22,8 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     val appAuth = (application as ElectroClubApp).diContainer.appAuth
 
-    private val repository: AccountRepository = AccountRepositoryServerImpl((application as ElectroClubApp).diContainer)
+    @Inject
+    lateinit var repository: AccountRepository
 
     init {
         if (appAuth.myId() == 0L) {

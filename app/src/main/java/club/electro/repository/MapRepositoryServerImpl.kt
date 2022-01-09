@@ -1,5 +1,9 @@
 package club.electro.repository
 
+import club.electro.api.ApiService
+import club.electro.auth.AppAuth
+import club.electro.dao.MapMarkerDao
+import club.electro.dao.SocketDao
 import club.electro.di.DependencyContainer
 import club.electro.dto.MARKER_TYPE_GROUP
 import club.electro.dto.MARKER_TYPE_SOCKET
@@ -14,14 +18,19 @@ import club.electro.error.UnknownError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import java.io.IOException
+import javax.inject.Inject
 
 class MapRepositoryServerImpl(diContainer: DependencyContainer): MapRepository {
-    val apiService = diContainer.apiService
-    val appAuth = diContainer.appAuth
-    val resources = diContainer.context
+    @Inject
+    lateinit var apiService: ApiService
+    @Inject
+    lateinit var markerDao: MapMarkerDao
+    @Inject
+    lateinit var socketDao: SocketDao
+    @Inject
+    lateinit var appAuth: AppAuth
 
-    val markerDao =diContainer.appDb.mapMarkerDao()
-    val socketDao =diContainer.appDb.socketDao()
+    val resources = diContainer.context
 
     var targetFlow = MutableStateFlow(value = listOf<Byte>())
 

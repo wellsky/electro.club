@@ -1,6 +1,9 @@
 package club.electro.repository
 
 import club.electro.R
+import club.electro.api.ApiService
+import club.electro.auth.AppAuth
+import club.electro.dao.FeedPostDao
 import club.electro.di.DependencyContainer
 import club.electro.dto.FeedPost
 import club.electro.entity.toEntity
@@ -8,45 +11,37 @@ import club.electro.error.ApiError
 import club.electro.error.NetworkError
 import club.electro.error.UnknownError
 import club.electro.model.NetworkStatus
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import java.io.IOException
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class FeedRepositoryServerImpl(diContainer: DependencyContainer): FeedRepository {
-    private val dao = diContainer.appDb.feedPostDao()
-    private val resources = diContainer.context.resources
-    private val apiService = diContainer.apiService
-    private val appAuth = diContainer.appAuth
-    private val networkStatus = diContainer.networkStatus
+@Singleton
+class FeedRepositoryServerImpl(): FeedRepository {
+    @Inject
+    lateinit var dao : FeedPostDao
+    @Inject
+    lateinit var apiService: ApiService
+    @Inject
+    lateinit var appAuth : AppAuth
+    @Inject
+    lateinit var networkStatus : NetworkStatus
 
     override var data: Flow<List<FeedPost>> = dao.flowFeedByPublshedDESC().map {
         it.map {
-            //println("Preparing post " + it.id)
             val post = it.toDto()
             post
-//            val preparedContent: String = PostTextPreparator(post.content)
-//                .prepareAll()
-//                .get()
-//
-//            val preparedPost = post.copy(content = preparedContent)
-//            preparedPost
         }
     }.flowOn(Dispatchers.Default)
 
     override suspend fun getFeedPosts() {
         try {
-            //println("Loading posts from server")
-            val params = HashMap<String?, String?>()
-            params["access_token"] = resources.getString(R.string.electro_club_access_token)
-            params["method"] = "getFeedPosts"
+            val response = apiService.getFeedPosts()
 
-            appAuth.myToken()?.let {
-                params["user_token"] = it
-            }
-
-            val response = apiService.getFeedPosts(params)
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }

@@ -20,13 +20,16 @@ import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.utils.GetCircleBitmap
 import club.electro.utils.htmlToText
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.net.URL
+import javax.inject.Inject
 import kotlin.random.Random
 
+@AndroidEntryPoint
 class FCMService : FirebaseMessagingService() {
     private val ACTION_THREAD_POST = "newThreadPost"
     private val ACTION_ANSWER = "newAnswer"
@@ -40,6 +43,9 @@ class FCMService : FirebaseMessagingService() {
     private val channelId = "remote"
 
     private val gson = Gson()
+
+    @Inject
+    lateinit var appAuth: AppAuth
 
     override fun onCreate() {
         super.onCreate()
@@ -56,14 +62,14 @@ class FCMService : FirebaseMessagingService() {
     }
 
     override fun onNewToken(token: String) {
-        AppAuth.getInstance().sendPushToken(token)
+        appAuth.sendPushToken(token)
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
         //println("Message invoked " + Gson().toJson(message))
 
         val recipient = message.data.get(recipientId)
-        val currenUserId = AppAuth.getInstance().myId()
+        val currenUserId = appAuth.myId()
 
         recipient?.let {
             if (it.toLong() == currenUserId) {
@@ -73,7 +79,7 @@ class FCMService : FirebaseMessagingService() {
                     println("Error: " + e.message.toString())
                 }
             } else {
-                AppAuth.getInstance().sendPushToken()
+                appAuth.sendPushToken()
             }
         }
     }

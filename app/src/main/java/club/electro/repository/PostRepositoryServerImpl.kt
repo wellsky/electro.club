@@ -1,8 +1,12 @@
 package club.electro.repository
 
+import android.content.Context
 import androidx.work.*
 import club.electro.R
 import club.electro.adapter.PostsEntitiesPreparator
+import club.electro.api.ApiService
+import club.electro.auth.AppAuth
+import club.electro.dao.PostDao
 import club.electro.di.DependencyContainer
 import club.electro.dto.Post
 import club.electro.entity.PostEntity
@@ -11,20 +15,24 @@ import club.electro.error.ApiError
 import club.electro.error.UnknownError
 import club.electro.model.NetworkStatus
 import club.electro.workers.SavePostWorker
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import java.io.IOException
+import javax.inject.Inject
 
-class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository {
-    private val dao = diContainer.appDb.postDao()
-    private val appAuth = diContainer.appAuth
-    private val apiService = diContainer.apiService
-    private val networkStatus = diContainer.networkStatus
+class PostRepositoryServerImpl @Inject constructor(
+    @ApplicationContext private val context : Context,
+): PostRepository {
+    @Inject
+    lateinit var dao : PostDao
+    @Inject
+    lateinit var apiService: ApiService
+    @Inject
+    lateinit var appAuth: AppAuth
+    @Inject
+    lateinit var networkStatus: NetworkStatus
 
-    lateinit var workManager: WorkManager
-
-    override fun setupWorkManager(workManager: WorkManager) {
-        this.workManager = workManager
-    }
+    private val workManager: WorkManager = WorkManager.getInstance(context)
 
     override suspend fun getLocalById(threadType: Byte, threadId:Long, id: Long, onLoadedCallback:  (suspend () -> Unit)?): Post? {
         return dao.getById(threadType, threadId, id)?.let {

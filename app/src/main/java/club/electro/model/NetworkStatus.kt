@@ -2,8 +2,11 @@ package club.electro.model
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class NetworkStatus {
+@Singleton
+class NetworkStatus @Inject constructor() {
     enum class Status {
         ONLINE, OFFLINE, ERROR
     }

@@ -2,6 +2,7 @@ package club.electro.adapter
 
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
+import club.electro.dao.PostDao
 import club.electro.di.DependencyContainer
 import club.electro.dto.Post
 import club.electro.dto.User
@@ -9,6 +10,8 @@ import club.electro.entity.PostEntity
 import club.electro.repository.PostRepository
 import club.electro.repository.UserRepository
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
+import javax.inject.Singleton
 
 class PostsEntitiesPreparator(
     val postsEntities: List<PostEntity>,
@@ -30,7 +33,8 @@ class PostsEntitiesPreparator(
     }
 }
 
-class PostEntityContentPreparator(
+@Singleton
+class PostEntityContentPreparator @Inject constructor(
     val postEntity: PostEntity,
     val onEveryDataUpdate: (suspend () -> Unit)? = null
 ) {
@@ -38,13 +42,12 @@ class PostEntityContentPreparator(
 
     var text = postEntity.content
 
-    val diContainer = DependencyContainer.getInstance()
-    val postDao = diContainer.postDao
-
-    val postRepository: PostRepository = diContainer.postRepository
-
-
-    val userRepository: UserRepository = diContainer.userRepository
+    @Inject
+    lateinit var postDao : PostDao
+    @Inject
+    lateinit var postRepository: PostRepository
+    @Inject
+    lateinit var userRepository: UserRepository
 
     fun getPrepared(): PostEntity {
         return postEntity.copy(preparedContent = text)

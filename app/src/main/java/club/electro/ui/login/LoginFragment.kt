@@ -16,8 +16,10 @@ import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.viewmodel.LoginFormState
 import ru.netology.nmedia.viewmodel.LoginViewModel
 import club.electro.utils.loadCircleCrop
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class LoginFragment : Fragment() {
     private val viewModel: LoginViewModel by viewModels (
         ownerProducer = ::requireParentFragment
@@ -25,6 +27,9 @@ class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
+
+    @Inject
+    lateinit var appAuth: AppAuth
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -81,7 +86,6 @@ class LoginFragment : Fragment() {
         binding.loggedUserGroup.isVisible = true
         binding.loginFormGroup.isVisible = false
 
-        val appAuth = AppAuth.getInstance()
         binding.userName.text = appAuth.myName()
 
         appAuth.myAvatar()?.let {

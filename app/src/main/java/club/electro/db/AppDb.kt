@@ -30,6 +30,7 @@ abstract class AppDb : RoomDatabase() {
     abstract fun threadDao(): ThreadDao
     abstract fun socketDao(): SocketDao
 
+    // TODO удалиьт после внедрения Hilt
     companion object {
         @Volatile
         private var instance: AppDb? = null

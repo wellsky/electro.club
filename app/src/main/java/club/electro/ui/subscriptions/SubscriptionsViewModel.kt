@@ -11,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SubscriptionsViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository: SubscriptionsRepository = SubscriptionsRepositoryServerImpl((application as ElectroClubApp).diContainer)
+    private val repository: SubscriptionsRepository = SubscriptionsRepositoryServerImpl()
 
     val data = repository.data.asLiveData(Dispatchers.Default)
 

@@ -6,6 +6,11 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import club.electro.R
+import club.electro.api.ApiService
+import club.electro.auth.AppAuth
+import club.electro.dao.PostDao
+import club.electro.dao.PostRemoteKeyDao
+import club.electro.db.AppDb
 import club.electro.di.DependencyContainer
 import club.electro.entity.PostEntity
 import club.electro.entity.PostRemoteKeyEntity
@@ -13,6 +18,7 @@ import club.electro.entity.toEntity
 import club.electro.error.ApiError
 import club.electro.model.NetworkStatus
 import java.io.IOException
+import javax.inject.Inject
 
 @OptIn(ExperimentalPagingApi::class)
 class PostRemoteMediator(
@@ -21,14 +27,20 @@ class PostRemoteMediator(
     val threadId: Long,
     val target: ThreadLoadTarget
 ) : RemoteMediator<Int, PostEntity>() {
-    val resources = diContainer.resources
-    val apiService = diContainer.apiService
-    val repository = diContainer.postRepository
-    val networkStatus = diContainer.networkStatus
-    val appAuth = diContainer.appAuth
-    val db = diContainer.appDb
-    val postDao = db.postDao()
-    val postRemoteKeyDao = db.postRemoteKeyDao()
+    @Inject
+    lateinit var apiService: ApiService
+    @Inject
+    lateinit var db: AppDb
+    @Inject
+    lateinit var appAuth: AppAuth
+    @Inject
+    lateinit var postDao: PostDao
+    @Inject
+    lateinit var postRemoteKeyDao: PostRemoteKeyDao
+    @Inject
+    lateinit var repository: PostRepository
+    @Inject
+    lateinit var networkStatus: NetworkStatus
 
     override suspend fun load(
         loadType: LoadType,

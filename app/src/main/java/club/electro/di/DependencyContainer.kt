@@ -1,11 +1,8 @@
 package club.electro.di
 
 import android.content.Context
-import androidx.room.Room
 import androidx.work.WorkManager
 import club.electro.R
-import club.electro.api.Api
-import club.electro.api.ApiService
 import club.electro.auth.AppAuth
 import club.electro.db.AppDb
 import club.electro.model.NetworkStatus
@@ -13,27 +10,38 @@ import club.electro.repository.PostRepository
 import club.electro.repository.PostRepositoryServerImpl
 import club.electro.repository.UserRepository
 import club.electro.repository.UserRepositoryServerImpl
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class DependencyContainer private constructor(val context: Context) {
+@Singleton
+class DependencyContainer @Inject constructor() {
+    @ApplicationContext lateinit var context: Context
+    @Inject lateinit var appAuth: AppAuth
+
     val resources = context.resources
     val accessToken = resources.getString(R.string.electro_club_access_token)
 
-    val appDb = AppDb.getInstance(context = context)
-    val apiService: ApiService = Api.service
-    val appAuth: AppAuth = AppAuth.initApp(context, this)
+    //val appDb = AppDb.getInstance(context = context)
 
-    val postDao = appDb.postDao()
+    //lateinit var apiService: ApiService = Api.service
 
-    val networkStatus = NetworkStatus.getInstance()
 
-    val postRepository: PostRepository = PostRepositoryServerImpl(this)
-    val userRepository: UserRepository = UserRepositoryServerImpl(this)
-    val workManager = WorkManager.getInstance(context)
+    //val postDao = appDb.postDao()
 
-    init {
-        // TODO криво реализованная взаимная инъекция?
-        postRepository.setupWorkManager(workManager)
-    }
+    // val networkStatus = NetworkStatus.getInstance()
+
+    //val postRepository: PostRepository = PostRepositoryServerImpl(this)
+    //val userRepository: UserRepository = UserRepositoryServerImpl(this)
+
+    //val workManager = WorkManager.getInstance(context)
+
+
+
+//    init {
+//        // TODO криво реализованная взаимная инъекция?
+//        postRepository.setupWorkManager(workManager)
+//    }
 
     companion object {
         @Volatile
@@ -45,10 +53,10 @@ class DependencyContainer private constructor(val context: Context) {
             )
         }
 
-        fun initContainer(context: Context): DependencyContainer = instance ?: synchronized(this) {
-            instance ?: buildDI(context).also { instance = it }
+        fun initContainer(): DependencyContainer = instance ?: synchronized(this) {
+            instance ?: buildDI().also { instance = it }
         }
 
-        private fun buildDI(context: Context): DependencyContainer = DependencyContainer(context)
+        private fun buildDI(): DependencyContainer = DependencyContainer()
     }
 }

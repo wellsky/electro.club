@@ -1,5 +1,7 @@
 package club.electro.repository
 
+import club.electro.api.ApiService
+import club.electro.dao.UserDao
 import club.electro.di.DependencyContainer
 import club.electro.dto.*
 import club.electro.entity.toEntity
@@ -9,12 +11,13 @@ import club.electro.error.UnknownError
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.IOException
+import javax.inject.Inject
 
-class UserRepositoryServerImpl(
-    private val diContainer: DependencyContainer,
-) : UserRepository {
-    private val apiService = diContainer.apiService
-    private val dao = diContainer.appDb.userDao()
+class UserRepositoryServerImpl() : UserRepository {
+    @Inject
+    lateinit var apiService: ApiService
+    @Inject
+    lateinit var dao: UserDao
 
     override suspend fun getLocalById(id: Long, onLoadedCallback:  (suspend () -> Unit)?): User? {
         return dao.getById(id)?.let {

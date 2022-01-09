@@ -3,6 +3,10 @@ package club.electro.repository
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.*
 import club.electro.R
+import club.electro.api.ApiService
+import club.electro.auth.AppAuth
+import club.electro.dao.PostDao
+import club.electro.dao.ThreadDao
 import club.electro.di.DependencyContainer
 import club.electro.dto.Post
 import club.electro.dto.PostsThread
@@ -13,6 +17,7 @@ import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_LAST
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.IOException
+import javax.inject.Inject
 
 class ThreadRepositoryServerImpl(
             val diContainer: DependencyContainer,
@@ -20,13 +25,18 @@ class ThreadRepositoryServerImpl(
             val threadId: Long,
             val targetPost: ThreadLoadTarget = ThreadLoadTarget(TARGET_POSITION_LAST)
         ) : ThreadRepository {
-
-    private val threadDao = diContainer.appDb.threadDao()
-    private val postDao = diContainer.appDb.postDao()
-    private val apiService = diContainer.apiService
-    private val appAuth = diContainer.appAuth
-    private val postRepository = diContainer.postRepository
-    private val networkStatus = diContainer.networkStatus
+    @Inject
+    lateinit var apiService: ApiService
+    @Inject
+    lateinit var threadDao: ThreadDao
+    @Inject
+    lateinit var postDao: PostDao
+    @Inject
+    lateinit var appAuth: AppAuth
+    @Inject
+    lateinit var postRepository: PostRepository
+    @Inject
+    lateinit var networkStatus: NetworkStatus
 
     override val lastUpdateTime: MutableLiveData<Long> = MutableLiveData(0L)
 

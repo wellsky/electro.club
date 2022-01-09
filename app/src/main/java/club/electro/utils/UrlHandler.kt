@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import club.electro.R
+import club.electro.api.ApiService
 import club.electro.di.DependencyContainer
 import club.electro.dto.THREAD_TYPE_POST_WITH_COMMENTS
 import club.electro.error.ApiError
@@ -22,8 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.net.URI
-
-
+import javax.inject.Inject
 
 
 class UrlHandler(val context: Context, val navController: NavController) {
@@ -36,8 +36,8 @@ class UrlHandler(val context: Context, val navController: NavController) {
         private val URL_TYPE_USER_ACCOUNT: Byte = 3
     }
 
-    private val diContainer = DependencyContainer.getInstance()
-    private val apiService = diContainer.apiService
+    @Inject
+    lateinit var apiService: ApiService
 
     private var url: String? = ""
 

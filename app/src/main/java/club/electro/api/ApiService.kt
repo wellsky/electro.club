@@ -16,56 +16,26 @@ import retrofit2.http.*
 const val BASE_SERVER_URL = "https://electro.club/api/v1/"
 const val UPDATES_SERVER_URL = "https://srv1.electro.club/api/"
 
-val logging = HttpLoggingInterceptor().apply {
-    if (BuildConfig.DEBUG) {
-        level = HttpLoggingInterceptor.Level.BODY
+
+fun okhttp(vararg interceptors: Interceptor): OkHttpClient = OkHttpClient.Builder()
+    .apply {
+        interceptors.forEach {
+            this.addInterceptor(it)
+        }
     }
-}
+    .build()
 
-// https://stackoverflow.com/questions/34791244/retrofit2-modifying-request-body-in-okhttp-interceptor
-val addTokensInterceptor = Interceptor {
-    val request = it.request()
-    val body = request.body
-
-    val diContainer = DependencyContainer.getInstance()
-
-    val accessTokenString = "&access_token=" + diContainer.accessToken
-    val userTokenString = if (diContainer.appAuth.myToken() != null) "&user_token=" + diContainer.appAuth.myToken() else ""
-
-    val newRequest = request.newBuilder()
-        .post(
-            RequestBody.create(
-                body?.contentType(),
-                body.bodyToString() + accessTokenString + userTokenString
-            )
-        )
-        .build()
-    it.proceed(newRequest)
-}
-
-fun RequestBody?.bodyToString(): String {
-    if (this == null) return ""
-    val buffer = okio.Buffer()
-    writeTo(buffer)
-    return buffer.readUtf8()
-}
-
-
-val okhttp = OkHttpClient.Builder()
-        .addInterceptor(addTokensInterceptor)
-        .addInterceptor(logging)
-        .build()
-
-val retrofit = Retrofit.Builder()
+fun retrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
     .addConverterFactory(GsonConverterFactory.create())
     .baseUrl(BASE_SERVER_URL)
-    .client(okhttp)
+    .client(client)
     .build()
+
 
 interface ApiService {
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
-    suspend fun getFeedPosts(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiFeedPostsData>>
+    suspend fun getFeedPosts(@Field("method") method: String = "getFeedPosts"): Response<ApiResponse<ApiFeedPostsData>>
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
@@ -174,11 +144,11 @@ interface ApiService {
 
 }
 
-object Api {
-    val service: ApiService by lazy {
-        retrofit.create(ApiService::class.java)
-    }
-}
+//object Api {
+//    val service: ApiService by lazy {
+//        retrofit.create(ApiService::class.java)
+//    }
+//}
 
 data class ApiResponse<D> (
     val status: String,

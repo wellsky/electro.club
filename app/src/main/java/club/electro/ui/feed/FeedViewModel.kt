@@ -10,7 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class FeedViewModel : ViewModel() {
-    private val repository: FeedRepository = FeedRepositoryServerImpl(DependencyContainer.getInstance())
+    private val repository: FeedRepository = FeedRepositoryServerImpl()
     val data = repository.data.asLiveData(Dispatchers.Default)
 
     fun getFeedPosts() = viewModelScope.launch {
