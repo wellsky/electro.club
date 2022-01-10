@@ -2,6 +2,7 @@ package club.electro.ui.thread
 
 import android.app.Application
 import androidx.lifecycle.*
+import androidx.paging.cachedIn
 import club.electro.application.ElectroClubApp
 import club.electro.dto.Post
 import club.electro.repository.*
@@ -18,7 +19,7 @@ class ThreadViewModel(
     private val repository: ThreadRepository = ThreadRepositoryServerImpl((application as ElectroClubApp).diContainer, threadType, threadId, targetPost)
 
     val thread = repository.thread.asLiveData()
-    val posts = repository.posts
+    val posts = repository.posts.cachedIn(viewModelScope)
 
     val lastUpdateTime = repository.lastUpdateTime
 

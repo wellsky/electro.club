@@ -51,8 +51,7 @@ class ThreadFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var currentTargetPost: ThreadLoadTarget? = null // Задается при вызове загрузки постов и сбрасывается в null при первом поступлении новых данных
-
-    private var firstUpdateTimeReceived = false
+    private var currentIncomingRefresh: Boolean = false // Становится true, если тема обновляется из-за изменений на сервере
 
     private var scrolledToTop: Boolean = true
     private var scrolledToBottom: Boolean = true
@@ -162,6 +161,8 @@ class ThreadFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        var firstUpdateTimeReceived = false
+
         _binding = FragmentThreadBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
@@ -205,17 +206,14 @@ class ThreadFragment : Fragment() {
 
         binding.postsList.adapter = adapter
 
-        // TODO непонятный баг. Функция, переданная в LaunchWhenCreated вызывается, даже когда фрагмент восстанавливается, а не только создается
-        // При этом есди использовать lifecycleScope а не viewLifecycleOwner.lifecycleScope, то каждый раз создаются дубликаты Load
-        // В итоге когда пользователь возвращается в чат из "следующего" фрагмента, то все посты перезагружаются с сервера и сбивается текущая позиция скроллинга
-        //viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-        lifecycleScope.launchWhenCreated {
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             println("LaunchWhenCreated")
             viewModel.posts.collectLatest {
                 currentTargetPost?.let {
                     setGravityForTarget(it)
                     currentTargetPost = null
                 }
+
                 adapter.submitData(it)
             }
 
@@ -228,10 +226,7 @@ class ThreadFragment : Fragment() {
         adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
             // https://stackoverflow.com/questions/51889154/recycler-view-not-scrolling-to-the-top-after-adding-new-item-at-the-top-as-chan
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                // TODO нужен нормальный метод для определения публикации новых постов
-                val newPostsPublished = false //((positionStart == 0) and (itemCount == 1))
-
-                if (newPostsPublished) {
+                if (currentIncomingRefresh) {
                     if (binding.postsList.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
                         if (scrolledToBottom) {
                             binding.postsList.smoothScrollToPosition(0);
@@ -240,16 +235,17 @@ class ThreadFragment : Fragment() {
                             println("new messages in bottom of the list")
                         }
                     }
+                    currentIncomingRefresh = false
                 }
             }
         })
 
-        // TODO реализовано криво. Вообще логику обновления лучше не выносить за репозиторий.
-        // Но только adapter.refresh() может указать медиатору на текущий видимый пост
+        // Обновляет видимые посты, если увеличилось время последнего изменения на сервере подписок
         viewModel.lastUpdateTime.observe(viewLifecycleOwner) {
             if (it > 0L) {
                 if (firstUpdateTimeReceived) {
                     adapter.refresh()
+                    currentIncomingRefresh = true
                 } else {
                     firstUpdateTimeReceived = true
                 }
