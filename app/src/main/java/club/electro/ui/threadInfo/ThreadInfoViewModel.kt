@@ -12,7 +12,7 @@ class ThreadInfoViewModel(application: Application, threadType: Byte, threadId: 
     private val repository: ThreadRepository = ThreadRepositoryServerImpl((application as ElectroClubApp).diContainer, threadType, threadId)
 
     var thread: LiveData<PostsThread> = repository.thread.asLiveData()
-    val lastUpdateTime = repository.lastUpdateTime
+    val threadStatus = repository.threadStatus
 
     fun getThread() = viewModelScope.launch {
         repository.getThread()

@@ -6,18 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import club.electro.MainViewModel
-import club.electro.R
 import club.electro.ToolBarConfig
 import club.electro.databinding.FragmentThreadInfoBinding
-import club.electro.ui.thread.ThreadViewModel
-import club.electro.ui.thread.ThreadViewModelFactory
 import club.electro.ui.threadInfo.ThreadInfoViewModelFactory
 import club.electro.utils.ByteArg
 import club.electro.utils.LongArg
 import club.electro.utils.loadCircleCrop
-import com.bumptech.glide.Glide
 
 class ThreadInfoFragment : Fragment() {
     companion object {
@@ -29,8 +24,6 @@ class ThreadInfoFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var viewModel: ThreadInfoViewModel
-
-    private var firstUpdateTimeReceived = false
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -67,6 +60,8 @@ class ThreadInfoFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        var firstUpdateTimeReceived = false
+
         _binding = FragmentThreadInfoBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
@@ -83,13 +78,10 @@ class ThreadInfoFragment : Fragment() {
             }
         }
 
-        // TODO реализовано криво. Вообще логику обновления лучше не выносить за репозиторий.
-        // Но почему-то вызванная из checkForUpdates() функция reloadPosts() не релодит посты
-        viewModel.lastUpdateTime.observe(viewLifecycleOwner) {
-            if (it > 0L) {
+        viewModel.threadStatus.observe(viewLifecycleOwner) {
+            if (it.lastUpdateTime > 0L) {
                 if (firstUpdateTimeReceived) {
                     viewModel.getThread()
-                    //viewModel.reloadPosts()
                 } else {
                     firstUpdateTimeReceived = true
                 }

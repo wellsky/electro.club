@@ -6,7 +6,6 @@ import androidx.paging.cachedIn
 import club.electro.application.ElectroClubApp
 import club.electro.dto.Post
 import club.electro.repository.*
-import club.electro.utils.UrlHandler
 import kotlinx.coroutines.launch
 
 class ThreadViewModel(
@@ -21,7 +20,7 @@ class ThreadViewModel(
     val thread = repository.thread.asLiveData()
     val posts = repository.posts.cachedIn(viewModelScope)
 
-    val lastUpdateTime = repository.lastUpdateTime
+    val threadStatus = repository.threadStatus
 
     val editorPost = MutableLiveData(emptyPost) // Пост, который в данный момент в текстовом редакторе
     val editedPost = MutableLiveData(emptyPost) // Опубликованный пост, который в данный момент редактируется в текстовом редакторе

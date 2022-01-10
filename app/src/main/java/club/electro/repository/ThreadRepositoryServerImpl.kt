@@ -2,7 +2,6 @@ package club.electro.repository
 
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.*
-import club.electro.R
 import club.electro.di.DependencyContainer
 import club.electro.dto.Post
 import club.electro.dto.PostsThread
@@ -28,7 +27,7 @@ class ThreadRepositoryServerImpl(
     private val postRepository = diContainer.postRepository
     private val networkStatus = diContainer.networkStatus
 
-    override val lastUpdateTime: MutableLiveData<Long> = MutableLiveData(0L)
+    override val threadStatus: MutableLiveData<ThreadStatus> = MutableLiveData(ThreadStatus())
 
     private lateinit var updaterJob: Job
 
@@ -134,12 +133,13 @@ class ThreadRepositoryServerImpl(
                 val body = response.body() //?: throw ApiError(response.code(), response.message())
 
                 body?.let {
-                    val newTime = body.data.time
-
-                    if (newTime > lastUpdateTime.value!!) {
-                        lastUpdateTime.postValue(newTime)
+                    if (body.data.time > threadStatus.value!!.lastUpdateTime) {
+                        val newStatus = ThreadStatus(
+                            lastUpdateTime = body.data.time,
+                            lastMessageTime = body.data.time // TODO надо получать время последнего сообщения
+                        )
+                        threadStatus.postValue(newStatus)
                     }
-
                     networkStatus.setStatus(NetworkStatus.Status.ONLINE)
                 }
             }  catch (e: IOException) {

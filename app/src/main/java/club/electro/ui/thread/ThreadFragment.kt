@@ -241,11 +241,12 @@ class ThreadFragment : Fragment() {
         })
 
         // Обновляет видимые посты, если увеличилось время последнего изменения на сервере подписок
-        viewModel.lastUpdateTime.observe(viewLifecycleOwner) {
-            if (it > 0L) {
+        viewModel.threadStatus.observe(viewLifecycleOwner) {
+            if (it.lastUpdateTime > 0L) {
                 if (firstUpdateTimeReceived) {
                     adapter.refresh()
                     currentIncomingRefresh = true
+                    // TODO надо убрать currentIncomingRefresh и ввести newPostReceived
                 } else {
                     firstUpdateTimeReceived = true
                 }

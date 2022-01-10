@@ -9,8 +9,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface ThreadRepository {
     val thread: Flow<PostsThread>
+    val threadStatus: MutableLiveData<ThreadStatus>
     val posts: Flow<PagingData<Post>>
-    val lastUpdateTime: MutableLiveData<Long>
+
 
     suspend fun getThread()
     suspend fun changeSubscription(newStatus: Byte)
@@ -26,3 +27,8 @@ interface ThreadRepository {
     fun startCheckUpdates()
     fun stopCheckUpdates()
 }
+
+data class ThreadStatus (
+    val lastUpdateTime: Long = 0,
+    val lastMessageTime: Long = 0,
+)
