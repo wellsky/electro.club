@@ -1,26 +1,12 @@
 package club.electro.di
 
-import android.content.Context
-import androidx.work.WorkManager
-import club.electro.R
-import club.electro.auth.AppAuth
-import club.electro.db.AppDb
-import club.electro.model.NetworkStatus
-import club.electro.repository.PostRepository
-import club.electro.repository.PostRepositoryServerImpl
-import club.electro.repository.UserRepository
-import club.electro.repository.UserRepositoryServerImpl
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
-import javax.inject.Singleton
+class DependencyContainer constructor() {
 
-@Singleton
-class DependencyContainer @Inject constructor() {
-    @ApplicationContext lateinit var context: Context
-    @Inject lateinit var appAuth: AppAuth
+    //@Inject lateinit var appAuth: AppAuth
 
-    val resources = context.resources
-    val accessToken = resources.getString(R.string.electro_club_access_token)
+    //@ApplicationContext lateinit var context: Context
+    //val resources = context.resources
+    //val accessToken = resources.getString(R.string.electro_club_access_token)
 
     //val appDb = AppDb.getInstance(context = context)
 

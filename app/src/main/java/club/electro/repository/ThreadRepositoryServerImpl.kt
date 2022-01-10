@@ -2,7 +2,6 @@ package club.electro.repository
 
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.*
-import club.electro.R
 import club.electro.api.ApiService
 import club.electro.auth.AppAuth
 import club.electro.dao.PostDao

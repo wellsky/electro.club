@@ -1,35 +1,27 @@
 package club.electro.repository
 
-import club.electro.R
 import club.electro.api.ApiService
 import club.electro.auth.AppAuth
 import club.electro.dao.FeedPostDao
-import club.electro.di.DependencyContainer
 import club.electro.dto.FeedPost
 import club.electro.entity.toEntity
 import club.electro.error.ApiError
-import club.electro.error.NetworkError
 import club.electro.error.UnknownError
 import club.electro.model.NetworkStatus
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import java.io.IOException
-import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FeedRepositoryServerImpl(): FeedRepository {
-    @Inject
-    lateinit var dao : FeedPostDao
-    @Inject
-    lateinit var apiService: ApiService
-    @Inject
-    lateinit var appAuth : AppAuth
-    @Inject
-    lateinit var networkStatus : NetworkStatus
+class FeedRepositoryServerImpl(
+    private val dao : FeedPostDao,
+    private val apiService: ApiService,
+    private val networkStatus : NetworkStatus
+): FeedRepository {
+
 
     override var data: Flow<List<FeedPost>> = dao.flowFeedByPublshedDESC().map {
         it.map {

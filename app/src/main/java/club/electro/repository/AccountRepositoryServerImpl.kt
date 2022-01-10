@@ -4,23 +4,17 @@ import club.electro.api.ApiService
 import club.electro.auth.AppAuth
 import club.electro.dao.AreaDao
 import club.electro.dao.PostDao
-import club.electro.di.DependencyContainer
 import club.electro.error.ApiError
-import club.electro.repository.AccountRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AccountRepositoryServerImpl @Inject constructor(
     private val apiService: ApiService,
+    private val appAuth : AppAuth,
+    private val postDao : PostDao,
+    private val areaDao : AreaDao
 ): AccountRepository {
-    @Inject
-    lateinit var postDao : PostDao
-    @Inject
-    lateinit var areaDao : AreaDao
-    @Inject
-    lateinit var appAuth : AppAuth
-
     override suspend fun signIn(login: String, password: String): Boolean {
         val response = apiService.signIn(
             email = login,

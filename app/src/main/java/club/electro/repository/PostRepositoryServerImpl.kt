@@ -22,15 +22,12 @@ import javax.inject.Inject
 
 class PostRepositoryServerImpl @Inject constructor(
     @ApplicationContext private val context : Context,
+    private val dao : PostDao,
+    private val apiService: ApiService,
+    private val appAuth: AppAuth,
+    private val networkStatus: NetworkStatus
 ): PostRepository {
-    @Inject
-    lateinit var dao : PostDao
-    @Inject
-    lateinit var apiService: ApiService
-    @Inject
-    lateinit var appAuth: AppAuth
-    @Inject
-    lateinit var networkStatus: NetworkStatus
+
 
     private val workManager: WorkManager = WorkManager.getInstance(context)
 

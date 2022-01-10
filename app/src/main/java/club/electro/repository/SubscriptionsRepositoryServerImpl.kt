@@ -1,11 +1,8 @@
 package club.electro.repository
 
-import club.electro.R
 import club.electro.api.ApiService
 import club.electro.auth.AppAuth
 import club.electro.dao.AreaDao
-import club.electro.db.AppDb
-import club.electro.di.DependencyContainer
 import club.electro.dto.SubscriptionArea
 import club.electro.entity.AreaEntity
 import club.electro.entity.toDto
@@ -17,19 +14,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import java.io.IOException
-import javax.inject.Inject
 
-class SubscriptionsRepositoryServerImpl() : SubscriptionsRepository {
-    @Inject
-    lateinit var apiService: ApiService
-    @Inject
-    lateinit var appDb : AppDb
-    @Inject
-    lateinit var appAuth : AppAuth
-    @Inject
-    lateinit var dao: AreaDao
-    @Inject
-    lateinit var networkStatus: NetworkStatus
+class SubscriptionsRepositoryServerImpl(
+    private val apiService: ApiService,
+    private val appAuth : AppAuth,
+    private val dao: AreaDao,
+    private val networkStatus: NetworkStatus
+
+) : SubscriptionsRepository {
 
     override val data: Flow<List<SubscriptionArea>> = dao.getAll().map(List<AreaEntity>::toDto).flowOn(Dispatchers.Default)
 
