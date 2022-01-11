@@ -3,7 +3,6 @@ package club.electro.adapter
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import club.electro.dao.PostDao
-import club.electro.di.DependencyContainer
 import club.electro.dto.Post
 import club.electro.dto.User
 import club.electro.entity.PostEntity

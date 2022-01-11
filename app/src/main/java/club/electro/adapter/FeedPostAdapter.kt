@@ -36,9 +36,12 @@ class FeedPostViewHolder(
     private val onInteractionListener: OnFeedPostInteractionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
+    companion object {
+        private val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
+    }
+
     fun bind(feedPost: FeedPost) {
         binding.apply {
-            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
             val date = java.util.Date(feedPost.published * 1000)
 
             channelName.text = feedPost.channelName

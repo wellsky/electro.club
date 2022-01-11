@@ -17,8 +17,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import java.io.IOException
+import javax.inject.Inject
 
-class MapRepositoryServerImpl(
+class MapRepositoryServerImpl @Inject constructor(
     @ApplicationContext context: Context,
     private val apiService: ApiService,
     private val markerDao: MapMarkerDao,

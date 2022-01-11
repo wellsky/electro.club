@@ -1,13 +1,10 @@
 package club.electro.api
 
-import club.electro.BuildConfig
-import club.electro.di.DependencyContainer
 import club.electro.dto.*
 import club.electro.utils.UrlDataResult
+import club.electro.utils.UrlDataResultDto
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.RequestBody
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -41,8 +38,8 @@ interface ApiService {
     @POST(BASE_SERVER_URL)
     suspend fun getUrlData(
         @Field("method") method: String = "getUrlData",
-        @Field("url") url: String ,
-    ): Response<ApiResponse<UrlDataResult>>
+        @Field("url") url: String,
+    ): Response<ApiResponse<UrlDataResultDto>>
 
     @FormUrlEncoded
     @POST(UPDATES_SERVER_URL)

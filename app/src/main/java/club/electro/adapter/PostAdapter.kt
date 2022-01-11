@@ -63,9 +63,12 @@ class PostViewHolder(
     private val lifecycleScope: LifecycleCoroutineScope
 ) : RecyclerView.ViewHolder(binding.root) {
 
+    companion object {
+        private val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
+    }
+
     fun bind(post: Post) {
         binding.apply {
-            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
             val date = java.util.Date(post.published * 1000)
 
             authorName.text = post.authorName

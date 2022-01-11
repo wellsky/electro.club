@@ -14,8 +14,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import java.io.IOException
+import javax.inject.Inject
 
-class SubscriptionsRepositoryServerImpl(
+class SubscriptionsRepositoryServerImpl @Inject constructor(
     private val apiService: ApiService,
     private val appAuth : AppAuth,
     private val dao: AreaDao,

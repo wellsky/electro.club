@@ -20,16 +20,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class LoginFragment : Fragment() {
+class LoginFragment: Fragment() {
     private val viewModel: LoginViewModel by viewModels (
         ownerProducer = ::requireParentFragment
     )
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
-
-    @Inject
-    lateinit var appAuth: AppAuth
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,10 +52,10 @@ class LoginFragment : Fragment() {
 
             when (it) {
                 LoginFormState.LOGGED -> {
-                    setUserLogged()
+                    setUserLogged(viewModel.appAuth)
                 }
                 LoginFormState.SUCCESS -> {
-                    setUserLogged()
+                    setUserLogged(viewModel.appAuth)
                     AndroidUtils.hideKeyboard(requireView())
                     Snackbar.make(binding.root, R.string.success_auth, Snackbar.LENGTH_LONG)
                         .show()
@@ -82,7 +79,7 @@ class LoginFragment : Fragment() {
         return binding.root
     }
 
-    fun setUserLogged() {
+    fun setUserLogged(appAuth: AppAuth) {
         binding.loggedUserGroup.isVisible = true
         binding.loginFormGroup.isVisible = false
 

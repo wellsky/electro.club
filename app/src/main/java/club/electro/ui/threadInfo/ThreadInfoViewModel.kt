@@ -9,7 +9,7 @@ import club.electro.repository.ThreadRepositoryServerImpl
 import kotlinx.coroutines.launch
 
 class ThreadInfoViewModel(application: Application, threadType: Byte, threadId: Long) : AndroidViewModel(application) {
-    private val repository: ThreadRepository = ThreadRepositoryServerImpl((application as ElectroClubApp).diContainer, threadType, threadId)
+    private val repository: ThreadRepository = ThreadRepositoryServerImpl(threadType, threadId)
 
     var thread: LiveData<PostsThread> = repository.thread.asLiveData()
     val lastUpdateTime = repository.lastUpdateTime

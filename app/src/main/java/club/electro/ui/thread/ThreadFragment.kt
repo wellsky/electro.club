@@ -23,7 +23,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import androidx.core.view.isVisible
 import club.electro.ToolBarConfig
-import club.electro.di.DependencyContainer
+import club.electro.auth.AppAuth
 import club.electro.dto.*
 import club.electro.repository.ThreadLoadTarget
 import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST
@@ -33,9 +33,14 @@ import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
 import club.electro.utils.htmlToText
 import club.electro.utils.UrlHandler
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
-class ThreadFragment : Fragment() {
+@AndroidEntryPoint
+class ThreadFragment @Inject constructor(
+    val appAuth: AppAuth
+): Fragment() {
     companion object {
         var Bundle.threadType: Byte by ByteArg
         var Bundle.threadId: Long by LongArg
@@ -57,8 +62,6 @@ class ThreadFragment : Fragment() {
     private var scrolledToTop: Boolean = true
     private var scrolledToBottom: Boolean = true
 
-    private val appAuth = DependencyContainer.getInstance().appAuth
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
@@ -73,7 +76,7 @@ class ThreadFragment : Fragment() {
                             findNavController().navigate(
                                 R.id.action_threadFragment_to_threadInfoFragment,
                                 Bundle().apply {
-                                    threadInfoType = it.type
+                                    threadInfoType = it.type.value
                                     threadInfoId = it.id
                                 }
                             )
@@ -90,7 +93,7 @@ class ThreadFragment : Fragment() {
         if (appAuth.authorized()) {
             viewModel.thread.value?.let { thread ->
                 requireActivity().run {
-                    if (thread.type == THREAD_TYPE_PUBLIC_CHAT) {
+                    if (thread.type == ThreadType.THREAD_TYPE_PUBLIC_CHAT) {
                         menuInflater.inflate(R.menu.menu_thread, menu)
                         if (thread.subscriptionStatus.equals(SUBSCRIPTION_STATUS_NONE)) {
                             menu.findItem(R.id.thread_unsubscribe).isVisible = false

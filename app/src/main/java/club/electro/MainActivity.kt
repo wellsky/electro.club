@@ -15,16 +15,19 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import club.electro.auth.AppAuth
 import club.electro.databinding.ActivityMainBinding
-import club.electro.di.DependencyContainer
 import club.electro.model.NetworkStatus
 import club.electro.utils.loadCircleCrop
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class MainActivity: AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels ()
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -61,9 +64,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        val appAuth = DependencyContainer.getInstance().appAuth
-
-        appAuth.authState.observe(this, { authState ->
+        viewModel.appAuth.authState.observe(this, { authState ->
             if (authState.authorized) {
                 headerImage.loadCircleCrop(authState.avatar)
 

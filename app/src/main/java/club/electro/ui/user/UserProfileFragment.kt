@@ -12,7 +12,6 @@ import club.electro.MainViewModel
 import club.electro.R
 import club.electro.ToolBarConfig
 import club.electro.databinding.FragmentUserProfileBinding
-import club.electro.di.DependencyContainer
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.utils.LongArg
@@ -23,8 +22,6 @@ class UserProfileFragment : Fragment() {
     companion object {
         var Bundle.userId: Long by LongArg
     }
-
-    val diContainer: DependencyContainer = DependencyContainer.getInstance()
 
     private var _binding: FragmentUserProfileBinding? = null
     private val binding get() = _binding!!

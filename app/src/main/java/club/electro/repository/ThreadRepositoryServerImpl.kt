@@ -6,7 +6,6 @@ import club.electro.api.ApiService
 import club.electro.auth.AppAuth
 import club.electro.dao.PostDao
 import club.electro.dao.ThreadDao
-import club.electro.di.DependencyContainer
 import club.electro.dto.Post
 import club.electro.dto.PostsThread
 import club.electro.entity.toEntity
@@ -18,25 +17,18 @@ import kotlinx.coroutines.flow.*
 import java.io.IOException
 import javax.inject.Inject
 
-class ThreadRepositoryServerImpl(
-            val diContainer: DependencyContainer,
-            val threadType: Byte,
-            val threadId: Long,
-            val targetPost: ThreadLoadTarget = ThreadLoadTarget(TARGET_POSITION_LAST)
-        ) : ThreadRepository {
-    @Inject
-    lateinit var apiService: ApiService
-    @Inject
-    lateinit var threadDao: ThreadDao
-    @Inject
-    lateinit var postDao: PostDao
-    @Inject
-    lateinit var appAuth: AppAuth
-    @Inject
-    lateinit var postRepository: PostRepository
-    @Inject
-    lateinit var networkStatus: NetworkStatus
+class ThreadRepositoryServerImpl @Inject constructor(
+            private val threadType: Byte,
+            private val threadId: Long,
+            targetPost: ThreadLoadTarget = ThreadLoadTarget(TARGET_POSITION_LAST),
 
+            private val apiService: ApiService,
+            private val threadDao: ThreadDao,
+            private val postDao: PostDao,
+            private val appAuth: AppAuth,
+            private val postRepository: PostRepository,
+            private val networkStatus: NetworkStatus
+        ) : ThreadRepository {
     override val lastUpdateTime: MutableLiveData<Long> = MutableLiveData(0L)
 
     private lateinit var updaterJob: Job
@@ -45,12 +37,10 @@ class ThreadRepositoryServerImpl(
     val targetFlow = MutableStateFlow(value = targetPost)
 
     override val posts = targetFlow.flatMapLatest { refreshTarget ->
-        println("Creating pager")
-
         @OptIn(ExperimentalPagingApi::class)
         Pager(
             config = PagingConfig(pageSize = 20),
-            remoteMediator = PostRemoteMediator(diContainer, threadType, threadId, target = refreshTarget),
+            remoteMediator = PostRemoteMediator(threadType, threadId, target = refreshTarget),
             pagingSourceFactory = {
                 postDao.freshPosts(threadType, threadId)
             },

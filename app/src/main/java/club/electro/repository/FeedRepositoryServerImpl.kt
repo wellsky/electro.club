@@ -13,10 +13,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import java.io.IOException
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FeedRepositoryServerImpl(
+class FeedRepositoryServerImpl @Inject constructor(
     private val dao : FeedPostDao,
     private val apiService: ApiService,
     private val networkStatus : NetworkStatus

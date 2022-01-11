@@ -2,12 +2,10 @@ package club.electro.repository
 
 import android.content.Context
 import androidx.work.*
-import club.electro.R
 import club.electro.adapter.PostsEntitiesPreparator
 import club.electro.api.ApiService
 import club.electro.auth.AppAuth
 import club.electro.dao.PostDao
-import club.electro.di.DependencyContainer
 import club.electro.dto.Post
 import club.electro.entity.PostEntity
 import club.electro.entity.toEntity

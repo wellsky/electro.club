@@ -6,16 +6,18 @@ import club.electro.application.ElectroClubApp
 import club.electro.dto.Post
 import club.electro.repository.*
 import club.electro.utils.UrlHandler
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ThreadViewModel(
-        application: Application,
-        val threadType: Byte,
-        val threadId: Long,
-        val targetPost: ThreadLoadTarget
+class ThreadViewModel @Inject constructor(
+    @ApplicationContext application: Application,
+    val threadType: Byte,
+    val threadId: Long,
+    val targetPost: ThreadLoadTarget
 ) : AndroidViewModel(application) {
 
-    private val repository: ThreadRepository = ThreadRepositoryServerImpl((application as ElectroClubApp).diContainer, threadType, threadId, targetPost)
+    private val repository: ThreadRepository = ThreadRepositoryServerImpl(threadType, threadId, targetPost)
 
     val thread = repository.thread.asLiveData()
     val posts = repository.posts

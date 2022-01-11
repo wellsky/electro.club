@@ -11,10 +11,19 @@ import javax.inject.Singleton
 abstract class RepositoryModule {
     @Binds
     @Singleton
+    abstract fun bindSubscriptionsRepository(impl: SubscriptionsRepositoryServerImpl): SubscriptionsRepository
+    @Binds
+    @Singleton
     abstract fun bindAccountRepository(impl: AccountRepositoryServerImpl): AccountRepository
     @Binds
     @Singleton
     abstract fun bindPostRepository(impl: PostRepositoryServerImpl): PostRepository
+    @Binds
+    @Singleton
+    abstract fun bindMapRepository(impl: MapRepositoryServerImpl): MapRepository
+    @Binds
+    @Singleton
+    abstract fun bindFeedRepository(impl: FeedRepositoryServerImpl): FeedRepository
     @Binds
     @Singleton
     abstract fun bindUserRepository(impl: UserRepositoryServerImpl): UserRepository

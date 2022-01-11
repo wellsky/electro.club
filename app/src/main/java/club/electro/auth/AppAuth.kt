@@ -3,14 +3,13 @@ package club.electro.auth
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
-import club.electro.R
 import club.electro.api.ApiService
-import club.electro.di.DependencyContainer
 import club.electro.dto.PushToken
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.ktx.messaging
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
@@ -25,8 +24,7 @@ import javax.inject.Singleton
 
 @Singleton
 class AppAuth @Inject constructor(
-    @ApplicationContext context: Context,
-    private val apiService: ApiService,
+    @ApplicationContext val context: Context,
 ) {
     private val prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
     private val idKey = "id"
@@ -111,6 +109,7 @@ class AppAuth @Inject constructor(
     fun sendPushToken(token: String? = null) {
         CoroutineScope(Dispatchers.Default).launch {
             try {
+                val apiService =  getApiService()
                 val pushToken = PushToken(token ?: Firebase.messaging.token.await())
                 val params = HashMap<String?, String?>()
 
@@ -128,6 +127,20 @@ class AppAuth @Inject constructor(
                 e.printStackTrace()
             }
         }
+    }
+
+    @InstallIn(SingletonComponent::class)
+    @EntryPoint
+    interface AppAuthEntryPoint {
+        fun apiService(): ApiService
+    }
+
+    private fun getApiService(): ApiService {
+        val hiltEntryPoint = EntryPointAccessors.fromApplication(
+            context,
+            AppAuthEntryPoint::class.java
+        )
+        return hiltEntryPoint.apiService()
     }
 }
 

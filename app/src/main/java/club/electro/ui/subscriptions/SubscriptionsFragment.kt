@@ -13,7 +13,6 @@ import club.electro.ToolBarConfig
 import club.electro.adapter.SubscriptionAreaAdapter
 import club.electro.adapter.SubscriptionAreaInteractionListener
 import club.electro.databinding.FragmentSubscriptionsBinding
-import club.electro.di.DependencyContainer
 import club.electro.dto.SubscriptionArea
 import club.electro.repository.ThreadLoadTarget
 import club.electro.ui.thread.ThreadFragment.Companion.postId
@@ -27,8 +26,6 @@ class SubscriptionsFragment : Fragment() {
 
     private var _binding: FragmentSubscriptionsBinding? = null
     private val binding get() = _binding!!
-
-    private val appAuth = DependencyContainer.getInstance().appAuth
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -67,7 +64,7 @@ class SubscriptionsFragment : Fragment() {
             binding.swiperefresh.setRefreshing(false)
         })
 
-        appAuth.authState.observe(viewLifecycleOwner, {
+        viewModel.appAuth.authState.observe(viewLifecycleOwner, {
             binding.subscriptionsList.isVisible = it.authorized
             binding.swiperefresh.isActivated = it.authorized
             binding.notLoggedHint.isVisible = !it.authorized

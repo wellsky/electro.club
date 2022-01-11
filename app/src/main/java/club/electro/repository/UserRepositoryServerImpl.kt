@@ -10,8 +10,9 @@ import club.electro.error.UnknownError
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.IOException
+import javax.inject.Inject
 
-class UserRepositoryServerImpl(
+class UserRepositoryServerImpl @Inject constructor(
     private val apiService: ApiService,
     private val dao: UserDao
 ) : UserRepository {

@@ -4,10 +4,15 @@ import android.content.Context
 import club.electro.BuildConfig
 import club.electro.R
 import club.electro.auth.AppAuth
-import club.electro.di.DependencyContainer
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.RequestBody
 import okhttp3.logging.HttpLoggingInterceptor
+import javax.inject.Singleton
 
 fun loggingInterceptor() = HttpLoggingInterceptor()
     .apply {
@@ -17,25 +22,36 @@ fun loggingInterceptor() = HttpLoggingInterceptor()
     }
 
 
-// https://stackoverflow.com/questions/34791244/retrofit2-modifying-request-body-in-okhttp-interceptor
-fun addTokensInterceptor(context: Context, appAuth: AppAuth) = Interceptor {
-    val request = it.request()
-    val body = request.body
+abstract class TokenInterceptor: Interceptor
 
-    val accessToken = context.resources.getString(R.string.electro_club_access_token)
+@InstallIn(SingletonComponent::class)
+@Module
+class NetworkModule {
+    @Singleton
+    @Provides
+    fun provideTokensInterceptor(@ApplicationContext context: Context, appAuth: AppAuth): TokenInterceptor =
+        Interceptor {
+            // https://stackoverflow.com/questions/34791244/retrofit2-modifying-request-body-in-okhttp-interceptor
+            val request = it.request()
+            val body = request.body
 
-    val accessTokenString = "&access_token=" + accessToken
-    val userTokenString = if (appAuth.myToken() != null) "&user_token=" + appAuth.myToken() else ""
+            val accessToken =
+                context.resources.getString(R.string.electro_club_access_token)
 
-    val newRequest = request.newBuilder()
-        .post(
-            RequestBody.create(
-                body?.contentType(),
-                body.bodyToString() + accessTokenString + userTokenString
-            )
-        )
-        .build()
-    it.proceed(newRequest)
+            val accessTokenString = "&access_token=" + accessToken
+            val userTokenString =
+                if (appAuth.myToken() != null) "&user_token=" + appAuth.myToken() else ""
+
+            val newRequest = request.newBuilder()
+                .post(
+                    RequestBody.create(
+                        body?.contentType(),
+                        body.bodyToString() + accessTokenString + userTokenString
+                    )
+                )
+                .build()
+            it.proceed(newRequest)
+        } as TokenInterceptor
 }
 
 fun RequestBody?.bodyToString(): String {
