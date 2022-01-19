@@ -7,8 +7,6 @@ import androidx.appcompat.app.AlertDialog
 import club.electro.adapter.PostAdapter
 import club.electro.adapter.PostInteractionListener
 import club.electro.databinding.FragmentThreadBinding
-import club.electro.utils.LongArg
-import club.electro.utils.ByteArg
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -22,6 +20,7 @@ import club.electro.util.AndroidUtils
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import club.electro.ToolBarConfig
 import club.electro.auth.AppAuth
 import club.electro.dto.*
@@ -31,8 +30,9 @@ import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST_
 import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_LAST
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
-import club.electro.utils.htmlToText
-import club.electro.utils.UrlHandler
+import club.electro.ui.user.UserProfileViewModel
+import club.electro.ui.user.UserProfileViewModelFactory
+import club.electro.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -47,10 +47,13 @@ class ThreadFragment @Inject constructor(
         var Bundle.postId: Long by LongArg // Может быть -1 (загрузить с последнего сообщения) и -2 (с первого непрочитанного)
     }
 
+    private val viewModel: ThreadViewModel by viewModels()
+
     private var threadType: Byte = 0
     private var threadId: Long = 0
 
-    private lateinit var viewModel: ThreadViewModel
+    //private lateinit var viewModel: ThreadViewModel
+    private lateinit var urlHandlerFactory: UrlHandlerFactory
 
     private var _binding: FragmentThreadBinding? = null
     private val binding get() = _binding!!
@@ -76,7 +79,7 @@ class ThreadFragment @Inject constructor(
                             findNavController().navigate(
                                 R.id.action_threadFragment_to_threadInfoFragment,
                                 Bundle().apply {
-                                    threadInfoType = it.type.value
+                                    threadInfoType = it.type
                                     threadInfoId = it.id
                                 }
                             )
@@ -93,7 +96,7 @@ class ThreadFragment @Inject constructor(
         if (appAuth.authorized()) {
             viewModel.thread.value?.let { thread ->
                 requireActivity().run {
-                    if (thread.type == ThreadType.THREAD_TYPE_PUBLIC_CHAT) {
+                    if (thread.type == ThreadType.THREAD_TYPE_PUBLIC_CHAT.value) {
                         menuInflater.inflate(R.menu.menu_thread, menu)
                         if (thread.subscriptionStatus.equals(SUBSCRIPTION_STATUS_NONE)) {
                             menu.findItem(R.id.thread_unsubscribe).isVisible = false
@@ -146,12 +149,12 @@ class ThreadFragment @Inject constructor(
 
         currentTargetPost = ThreadLoadTarget(postId)
 
-        viewModel = ViewModelProvider(this, ThreadViewModelFactory(
-            requireActivity().getApplication(),
-            threadType,
-            threadId,
-            currentTargetPost!!
-        )).get(ThreadViewModel::class.java)
+//        viewModel = ViewModelProvider(this, ThreadViewModelFactory(
+//            requireActivity().getApplication(),
+//            threadType,
+//            threadId,
+//            currentTargetPost!!
+//        )).get(ThreadViewModel::class.java)
 
         viewModel.getThread()
     }
@@ -196,7 +199,7 @@ class ThreadFragment @Inject constructor(
             }
 
             override fun onUrlClicked(url: String?) {
-                UrlHandler(requireContext(), findNavController()).setUrl(url).open()
+                urlHandlerFactory.create(findNavController()).setUrl(url).open()
             }
         }, lifecycleScope)
         adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY

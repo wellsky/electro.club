@@ -14,13 +14,23 @@ import club.electro.entity.PostRemoteKeyEntity
 import club.electro.entity.toEntity
 import club.electro.error.ApiError
 import club.electro.model.NetworkStatus
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import java.io.IOException
-import javax.inject.Inject
+
+@AssistedFactory
+interface PostRemoteMediatorFactory {
+    fun create(threadType: Byte, threadId: Long, target: ThreadLoadTarget): PostRemoteMediator
+}
 
 @OptIn(ExperimentalPagingApi::class)
-class PostRemoteMediator @Inject constructor (
+class PostRemoteMediator @AssistedInject constructor(
+    @Assisted
     val threadType: Byte,
+    @Assisted
     val threadId: Long,
+    @Assisted
     val target: ThreadLoadTarget,
 
     private val apiService: ApiService,
@@ -28,9 +38,8 @@ class PostRemoteMediator @Inject constructor (
     private val postDao: PostDao,
     private val postRemoteKeyDao: PostRemoteKeyDao,
     private val repository: PostRepository,
-    private val networkStatus: NetworkStatus
+    private val networkStatus: NetworkStatus,
 ) : RemoteMediator<Int, PostEntity>() {
-
 
     override suspend fun load(
         loadType: LoadType,

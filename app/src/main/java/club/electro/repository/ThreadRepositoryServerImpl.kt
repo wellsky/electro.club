@@ -1,6 +1,7 @@
 package club.electro.repository
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.paging.*
 import club.electro.api.ApiService
 import club.electro.auth.AppAuth
@@ -11,16 +12,40 @@ import club.electro.dto.PostsThread
 import club.electro.entity.toEntity
 import club.electro.error.*
 import club.electro.model.NetworkStatus
-import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_LAST
+import dagger.Binds
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.IOException
 import javax.inject.Inject
 
+@InstallIn(ViewModelComponent::class)
+@Module
+interface ThreadRepositoryModule {
+    companion object {
+        @Provides
+        @ViewModelScoped
+        // SavedStateHandle
+        // 1. хранит arguments из фрагмента
+        // 2. переживает смерть процесса
+        // 3. автоматически предоставляется dagger hilt
+        fun provideArg(savedStateHandle: SavedStateHandle): String =
+            requireNotNull(savedStateHandle["threadType"])
+    }
+
+    @Binds
+    @ViewModelScoped
+    fun bindThreadRepository(impl: ThreadRepositoryServerImpl): ThreadRepository
+}
+
 class ThreadRepositoryServerImpl @Inject constructor(
             private val threadType: Byte,
             private val threadId: Long,
-            targetPost: ThreadLoadTarget = ThreadLoadTarget(TARGET_POSITION_LAST),
+            private val targetPostId: Long,
 
             private val apiService: ApiService,
             private val threadDao: ThreadDao,
@@ -33,6 +58,11 @@ class ThreadRepositoryServerImpl @Inject constructor(
 
     private lateinit var updaterJob: Job
 
+    private val targetPost = ThreadLoadTarget(targetPostId)
+
+    @Inject
+    lateinit var mediatorFactory: PostRemoteMediatorFactory
+
     // https://stackoverflow.com/questions/64692260/paging-3-0-list-with-new-params-in-kotlin?noredirect=1&lq=1
     val targetFlow = MutableStateFlow(value = targetPost)
 
@@ -40,7 +70,7 @@ class ThreadRepositoryServerImpl @Inject constructor(
         @OptIn(ExperimentalPagingApi::class)
         Pager(
             config = PagingConfig(pageSize = 20),
-            remoteMediator = PostRemoteMediator(threadType, threadId, target = refreshTarget),
+            remoteMediator = mediatorFactory.create(threadType, threadId, refreshTarget),
             pagingSourceFactory = {
                 postDao.freshPosts(threadType, threadId)
             },

@@ -9,12 +9,17 @@ import club.electro.R
 import club.electro.api.ApiService
 import club.electro.dto.ThreadType
 import club.electro.error.ApiError
+import club.electro.repository.PostRemoteMediator
+import club.electro.repository.ThreadLoadTarget
 import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST
 import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.ui.user.UserProfileFragment.Companion.userId
 import com.google.gson.annotations.SerializedName
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,9 +27,13 @@ import kotlinx.coroutines.launch
 import java.net.URI
 import javax.inject.Inject
 
+@AssistedFactory
+interface UrlHandlerFactory {
+    fun create(navController: NavController): UrlHandler
+}
 
-class UrlHandler @Inject constructor(
-    val navController: NavController,
+class UrlHandler @AssistedInject constructor(
+    @Assisted val navController: NavController,
     @ApplicationContext val context: Context,
     val apiService: ApiService
 ) {

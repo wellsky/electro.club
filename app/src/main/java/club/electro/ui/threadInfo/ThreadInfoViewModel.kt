@@ -1,16 +1,14 @@
 package club.electro.ui.user
 
-import android.app.Application
 import androidx.lifecycle.*
-import club.electro.application.ElectroClubApp
 import club.electro.dto.PostsThread
 import club.electro.repository.ThreadRepository
-import club.electro.repository.ThreadRepositoryServerImpl
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ThreadInfoViewModel(application: Application, threadType: Byte, threadId: Long) : AndroidViewModel(application) {
-    private val repository: ThreadRepository = ThreadRepositoryServerImpl(threadType, threadId)
-
+class ThreadInfoViewModel @Inject constructor(
+    val repository: ThreadRepository
+) : ViewModel() {
     var thread: LiveData<PostsThread> = repository.thread.asLiveData()
     val lastUpdateTime = repository.lastUpdateTime
 

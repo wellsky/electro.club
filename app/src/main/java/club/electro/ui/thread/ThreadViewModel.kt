@@ -1,24 +1,14 @@
 package club.electro.ui.thread
 
-import android.app.Application
 import androidx.lifecycle.*
-import club.electro.application.ElectroClubApp
 import club.electro.dto.Post
 import club.electro.repository.*
-import club.electro.utils.UrlHandler
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ThreadViewModel @Inject constructor(
-    @ApplicationContext application: Application,
-    val threadType: Byte,
-    val threadId: Long,
-    val targetPost: ThreadLoadTarget
-) : AndroidViewModel(application) {
-
-    private val repository: ThreadRepository = ThreadRepositoryServerImpl(threadType, threadId, targetPost)
-
+    val repository: ThreadRepository
+) : ViewModel() {
     val thread = repository.thread.asLiveData()
     val posts = repository.posts
 

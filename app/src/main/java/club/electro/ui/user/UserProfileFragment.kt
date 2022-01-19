@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import club.electro.MainViewModel
@@ -14,6 +15,7 @@ import club.electro.ToolBarConfig
 import club.electro.databinding.FragmentUserProfileBinding
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
+import club.electro.ui.thread.ThreadViewModelFactory
 import club.electro.utils.LongArg
 import club.electro.utils.loadCircleCrop
 import com.bumptech.glide.Glide
@@ -26,7 +28,13 @@ class UserProfileFragment : Fragment() {
     private var _binding: FragmentUserProfileBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: UserProfileViewModel
+    //private lateinit var viewModel: UserProfileViewModel
+
+    private val viewModel: UserProfileViewModel by viewModels {
+        UserProfileViewModelFactory(
+            requireArguments().userId,
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,10 +46,10 @@ class UserProfileFragment : Fragment() {
 
         val userId = requireArguments().userId
 
-        viewModel = ViewModelProvider(this, UserProfileViewModelFactory(
-            requireActivity().getApplication(),
-            userId
-        )).get(UserProfileViewModel::class.java)
+//        viewModel = ViewModelProvider(this, UserProfileViewModelFactory(
+//            requireActivity().getApplication(),
+//            userId
+//        )).get(UserProfileViewModel::class.java)
 
         viewModel.currentProfile.observe(viewLifecycleOwner) { user->
             with (binding) {

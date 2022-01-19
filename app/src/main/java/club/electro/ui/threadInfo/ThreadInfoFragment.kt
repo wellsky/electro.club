@@ -54,7 +54,6 @@ class ThreadInfoFragment : Fragment() {
         val threadId = requireArguments().threadInfoId
 
         viewModel = ViewModelProvider(this, ThreadInfoViewModelFactory(
-            requireActivity().getApplication(),
             threadType,
             threadId,
         )).get(ThreadInfoViewModel::class.java)
