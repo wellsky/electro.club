@@ -24,7 +24,7 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindFeedRepository(impl: FeedRepositoryServerImpl): FeedRepository
-    @Binds
-    @Singleton
-    abstract fun bindUserRepository(impl: UserRepositoryServerImpl): UserRepository
+//    @Binds
+//    @Singleton
+//    abstract fun bindUserRepository(impl: UserRepositoryServerImpl): UserRepository
 }

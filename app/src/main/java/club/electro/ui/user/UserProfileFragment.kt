@@ -15,7 +15,6 @@ import club.electro.ToolBarConfig
 import club.electro.databinding.FragmentUserProfileBinding
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
-import club.electro.ui.thread.ThreadViewModelFactory
 import club.electro.utils.LongArg
 import club.electro.utils.loadCircleCrop
 import com.bumptech.glide.Glide
@@ -30,11 +29,7 @@ class UserProfileFragment : Fragment() {
 
     //private lateinit var viewModel: UserProfileViewModel
 
-    private val viewModel: UserProfileViewModel by viewModels {
-        UserProfileViewModelFactory(
-            requireArguments().userId,
-        )
-    }
+    private val viewModel: UserProfileViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,

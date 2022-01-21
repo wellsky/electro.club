@@ -22,19 +22,31 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.IOException
 import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Singleton
 
 @InstallIn(ViewModelComponent::class)
 @Module
 interface ThreadRepositoryModule {
     companion object {
-        @Provides
-        @ViewModelScoped
         // SavedStateHandle
         // 1. хранит arguments из фрагмента
         // 2. переживает смерть процесса
         // 3. автоматически предоставляется dagger hilt
-        fun provideArg(savedStateHandle: SavedStateHandle): String =
-            requireNotNull(savedStateHandle["threadType"])
+        @Provides
+        @ViewModelScoped
+        @Named("threadType")
+        fun provideThreadType(savedStateHandle: SavedStateHandle): Byte = requireNotNull(savedStateHandle["threadType"])
+
+        @Provides
+        @ViewModelScoped
+        @Named("threadId")
+        fun provideThreadId(savedStateHandle: SavedStateHandle): Long = requireNotNull(savedStateHandle["threadId"])
+
+        @Provides
+        @ViewModelScoped
+        @Named("targetPostId")
+        fun provideTargetPostId(savedStateHandle: SavedStateHandle): Long = requireNotNull(savedStateHandle["targetPostId"])
     }
 
     @Binds
@@ -43,8 +55,13 @@ interface ThreadRepositoryModule {
 }
 
 class ThreadRepositoryServerImpl @Inject constructor(
+            @field:Named("threadType")
             private val threadType: Byte,
+
+            @field:Named("threadId")
             private val threadId: Long,
+
+            @field:Named("targetPostId")
             private val targetPostId: Long,
 
             private val apiService: ApiService,

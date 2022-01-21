@@ -6,7 +6,5 @@ import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class ElectroClubApp: Application() {
-    override fun onCreate() {
-        super.onCreate()
-    }
+
 }

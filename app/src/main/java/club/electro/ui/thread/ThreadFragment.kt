@@ -30,8 +30,6 @@ import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST_
 import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_LAST
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
-import club.electro.ui.user.UserProfileViewModel
-import club.electro.ui.user.UserProfileViewModelFactory
 import club.electro.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

@@ -3,9 +3,11 @@ package club.electro.ui.thread
 import androidx.lifecycle.*
 import club.electro.dto.Post
 import club.electro.repository.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class ThreadViewModel @Inject constructor(
     val repository: ThreadRepository
 ) : ViewModel() {

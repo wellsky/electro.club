@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity: AppCompatActivity() {
+class MainActivity: AppCompatActivity(R.layout.activity_main) {
     private val viewModel: MainViewModel by viewModels ()
 
     private lateinit var appBarConfiguration: AppBarConfiguration

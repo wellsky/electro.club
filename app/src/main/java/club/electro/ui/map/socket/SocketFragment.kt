@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import club.electro.databinding.FragmentSocketBinding
 import club.electro.utils.LongArg
@@ -16,19 +17,19 @@ class SocketFragment : Fragment() {
         var Bundle.socketId: Long by LongArg
     }
 
-    private lateinit var viewModel: SocketViewModel
+    private val viewModel: SocketViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val socketId = requireArguments().socketId
-
-        viewModel = ViewModelProvider(this, SocketViewModelFactory(
-            requireActivity().getApplication(),
-            socketId
-        )
-        ).get(SocketViewModel::class.java)
-    }
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//
+//        val socketId = requireArguments().socketId
+//
+////        viewModel = ViewModelProvider(this, SocketViewModelFactory(
+////            requireActivity().getApplication(),
+////            socketId
+////        )
+////        ).get(SocketViewModel::class.java)
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
