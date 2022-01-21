@@ -36,9 +36,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class ThreadFragment @Inject constructor(
-    val appAuth: AppAuth
-): Fragment() {
+class ThreadFragment @Inject constructor(): Fragment() {
     companion object {
         var Bundle.threadType: Byte by ByteArg
         var Bundle.threadId: Long by LongArg
@@ -91,7 +89,7 @@ class ThreadFragment @Inject constructor(
     // https://www.vogella.com/tutorials/AndroidActionBar/article.html
     override fun onPrepareOptionsMenu(menu: Menu) {
         menu.clear()
-        if (appAuth.authorized()) {
+        if (viewModel.appAuth.authorized()) {
             viewModel.thread.value?.let { thread ->
                 requireActivity().run {
                     if (thread.type == ThreadType.THREAD_TYPE_PUBLIC_CHAT.value) {
@@ -279,7 +277,7 @@ class ThreadFragment @Inject constructor(
             }
         }
 
-        appAuth.authState.observe(viewLifecycleOwner) {
+        viewModel.appAuth.authState.observe(viewLifecycleOwner) {
             requireActivity().invalidateOptionsMenu()
             invalidateBottomPanel()
         }
@@ -387,7 +385,7 @@ class ThreadFragment @Inject constructor(
         var showBottomPanel = false
         viewModel.thread.value?.let {
             if (it.subscriptionStatus.equals(SUBSCRIPTION_STATUS_SUBSCRIBED)) {
-                if (appAuth.authorized()) {
+                if (viewModel.appAuth.authorized()) {
                     showBottomPanel = true
                 }
             }

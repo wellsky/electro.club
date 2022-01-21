@@ -45,8 +45,8 @@ interface ThreadRepositoryModule {
 
         @Provides
         @ViewModelScoped
-        @Named("targetPostId")
-        fun provideTargetPostId(savedStateHandle: SavedStateHandle): Long = requireNotNull(savedStateHandle["targetPostId"])
+        @Named("postId")
+        fun provideTargetPostId(savedStateHandle: SavedStateHandle): Long = requireNotNull(savedStateHandle["postId"])
     }
 
     @Binds
@@ -61,7 +61,7 @@ class ThreadRepositoryServerImpl @Inject constructor(
             @Named("threadId")
             private val threadId: Long,
 
-            @Named("targetPostId")
+            @Named("postId")
             private val targetPostId: Long,
 
             private val apiService: ApiService,

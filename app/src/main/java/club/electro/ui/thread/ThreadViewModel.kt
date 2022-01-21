@@ -1,6 +1,7 @@
 package club.electro.ui.thread
 
 import androidx.lifecycle.*
+import club.electro.auth.AppAuth
 import club.electro.dto.Post
 import club.electro.repository.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -9,7 +10,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
-    val repository: ThreadRepository
+    val repository: ThreadRepository,
+    val appAuth: AppAuth
 ) : ViewModel() {
     val thread = repository.thread.asLiveData()
     val posts = repository.posts
