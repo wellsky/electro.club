@@ -11,7 +11,10 @@ import club.electro.databinding.FragmentSocketBinding
 import club.electro.utils.LongArg
 import club.electro.utils.htmlToText
 import club.electro.utils.loadCircleCrop
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class SocketFragment : Fragment() {
     companion object {
         var Bundle.socketId: Long by LongArg

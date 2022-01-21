@@ -26,8 +26,9 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.google.android.gms.maps.model.Marker
 import com.bumptech.glide.request.target.Target
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MapFragment : Fragment() {
     private val viewModel: MapViewModel by viewModels (
         ownerProducer = ::requireParentFragment

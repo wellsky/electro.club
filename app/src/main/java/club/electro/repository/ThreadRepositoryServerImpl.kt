@@ -55,13 +55,13 @@ interface ThreadRepositoryModule {
 }
 
 class ThreadRepositoryServerImpl @Inject constructor(
-            @field:Named("threadType")
+            @Named("threadType")
             private val threadType: Byte,
 
-            @field:Named("threadId")
+            @Named("threadId")
             private val threadId: Long,
 
-            @field:Named("targetPostId")
+            @Named("targetPostId")
             private val targetPostId: Long,
 
             private val apiService: ApiService,

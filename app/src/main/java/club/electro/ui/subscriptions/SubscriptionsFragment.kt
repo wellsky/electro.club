@@ -18,7 +18,9 @@ import club.electro.repository.ThreadLoadTarget
 import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SubscriptionsFragment : Fragment() {
     private val viewModel: SubscriptionsViewModel by viewModels (
         ownerProducer = ::requireParentFragment

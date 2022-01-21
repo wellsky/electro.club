@@ -18,7 +18,9 @@ import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.utils.LongArg
 import club.electro.utils.loadCircleCrop
 import com.bumptech.glide.Glide
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class UserProfileFragment : Fragment() {
     companion object {
         var Bundle.userId: Long by LongArg

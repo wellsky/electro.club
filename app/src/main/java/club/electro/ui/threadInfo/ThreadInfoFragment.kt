@@ -14,7 +14,9 @@ import club.electro.ui.thread.ThreadViewModel
 import club.electro.utils.ByteArg
 import club.electro.utils.LongArg
 import club.electro.utils.loadCircleCrop
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ThreadInfoFragment : Fragment() {
     companion object {
         var Bundle.threadInfoType: Byte by ByteArg

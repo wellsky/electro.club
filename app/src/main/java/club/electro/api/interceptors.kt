@@ -29,8 +29,10 @@ abstract class TokenInterceptor: Interceptor
 class NetworkModule {
     @Singleton
     @Provides
-    fun provideTokensInterceptor(@ApplicationContext context: Context, appAuth: AppAuth): TokenInterceptor =
-        Interceptor {
+    fun provideTokensInterceptor(
+        @ApplicationContext context: Context,
+        appAuth: AppAuth
+    ) = Interceptor {
             // https://stackoverflow.com/questions/34791244/retrofit2-modifying-request-body-in-okhttp-interceptor
             val request = it.request()
             val body = request.body
@@ -51,7 +53,7 @@ class NetworkModule {
                 )
                 .build()
             it.proceed(newRequest)
-        } as TokenInterceptor
+        }
 }
 
 fun RequestBody?.bodyToString(): String {

@@ -15,12 +15,11 @@ import club.electro.dto.*
 import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
-import ru.netology.nmedia.viewmodel.LoginViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FeedFragment : Fragment() {
-    private val feedViewModel: FeedViewModel by viewModels (
-        ownerProducer = ::requireParentFragment
-    )
+    private val feedViewModel: FeedViewModel by viewModels ()
 
     private var _binding: FragmentFeedBinding? = null
     private val binding get() = _binding!!
