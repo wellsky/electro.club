@@ -1,4 +1,4 @@
-package club.electro.repository
+package club.electro.repository.post
 
 import androidx.work.WorkManager
 import club.electro.dto.Post

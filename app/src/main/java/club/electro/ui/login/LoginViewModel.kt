@@ -1,10 +1,8 @@
 package ru.netology.nmedia.viewmodel
 
-import android.app.Application
 import androidx.lifecycle.*
-import club.electro.application.ElectroClubApp
 import club.electro.auth.AppAuth
-import club.electro.repository.AccountRepository
+import club.electro.repository.account.AccountRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

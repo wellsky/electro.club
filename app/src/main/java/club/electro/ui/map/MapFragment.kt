@@ -16,7 +16,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import android.graphics.Bitmap
 import android.view.*
 import club.electro.dto.*
-import club.electro.repository.ThreadLoadTarget
+import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType

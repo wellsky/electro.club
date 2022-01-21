@@ -1,7 +1,6 @@
-package club.electro.repository
+package club.electro.repository.feed
 
 import club.electro.api.ApiService
-import club.electro.auth.AppAuth
 import club.electro.dao.FeedPostDao
 import club.electro.dto.FeedPost
 import club.electro.entity.toEntity

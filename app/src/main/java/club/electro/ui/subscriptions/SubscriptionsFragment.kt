@@ -14,7 +14,7 @@ import club.electro.adapter.SubscriptionAreaAdapter
 import club.electro.adapter.SubscriptionAreaInteractionListener
 import club.electro.databinding.FragmentSubscriptionsBinding
 import club.electro.dto.SubscriptionArea
-import club.electro.repository.ThreadLoadTarget
+import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType

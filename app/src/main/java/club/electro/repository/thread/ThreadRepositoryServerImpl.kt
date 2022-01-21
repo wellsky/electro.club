@@ -1,7 +1,6 @@
-package club.electro.repository
+package club.electro.repository.thread
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.paging.*
 import club.electro.api.ApiService
 import club.electro.auth.AppAuth
@@ -12,78 +11,62 @@ import club.electro.dto.PostsThread
 import club.electro.entity.toEntity
 import club.electro.error.*
 import club.electro.model.NetworkStatus
-import dagger.Binds
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.android.scopes.ViewModelScoped
+import club.electro.repository.PostRemoteMediatorFactory
+import club.electro.repository.post.PostRepository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Named
-import javax.inject.Singleton
-
-@InstallIn(ViewModelComponent::class)
-@Module
-interface ThreadRepositoryModule {
-    companion object {
-        // SavedStateHandle
-        // 1. хранит arguments из фрагмента
-        // 2. переживает смерть процесса
-        // 3. автоматически предоставляется dagger hilt
-        @Provides
-        @ViewModelScoped
-        @Named("threadType")
-        fun provideThreadType(savedStateHandle: SavedStateHandle): Byte = requireNotNull(savedStateHandle["threadType"])
-
-        @Provides
-        @ViewModelScoped
-        @Named("threadId")
-        fun provideThreadId(savedStateHandle: SavedStateHandle): Long = requireNotNull(savedStateHandle["threadId"])
-
-        @Provides
-        @ViewModelScoped
-        @Named("postId")
-        fun provideTargetPostId(savedStateHandle: SavedStateHandle): Long = requireNotNull(savedStateHandle["postId"])
-    }
-
-    @Binds
-    @ViewModelScoped
-    fun bindThreadRepository(impl: ThreadRepositoryServerImpl): ThreadRepository
-}
 
 class ThreadRepositoryServerImpl @Inject constructor(
-            @Named("threadType")
+    @Named("threadType")
             private val threadType: Byte,
 
-            @Named("threadId")
+    @Named("threadId")
             private val threadId: Long,
 
-            @Named("postId")
-            private val targetPostId: Long,
-
-            private val apiService: ApiService,
-            private val threadDao: ThreadDao,
-            private val postDao: PostDao,
-            private val appAuth: AppAuth,
-            private val postRepository: PostRepository,
-            private val networkStatus: NetworkStatus
+    private val apiService: ApiService,
+    private val threadDao: ThreadDao,
+    private val postDao: PostDao,
+    private val appAuth: AppAuth,
+    private val postRepository: PostRepository,
+    private val networkStatus: NetworkStatus
         ) : ThreadRepository {
     override val lastUpdateTime: MutableLiveData<Long> = MutableLiveData(0L)
 
     private lateinit var updaterJob: Job
 
-    private val targetPost = ThreadLoadTarget(targetPostId)
+//    private val targetPost = ThreadLoadTarget(targetPostId)
 
     @Inject
     lateinit var mediatorFactory: PostRemoteMediatorFactory
 
     // https://stackoverflow.com/questions/64692260/paging-3-0-list-with-new-params-in-kotlin?noredirect=1&lq=1
-    val targetFlow = MutableStateFlow(value = targetPost)
+//    val targetFlow = MutableStateFlow(value = targetPost)
 
-    override val posts = targetFlow.flatMapLatest { refreshTarget ->
+
+//    override val posts = targetFlow.flatMapLatest { refreshTarget ->
+//        @OptIn(ExperimentalPagingApi::class)
+//        Pager(
+//            config = PagingConfig(pageSize = 20),
+//            remoteMediator = mediatorFactory.create(threadType, threadId, refreshTarget),
+//            pagingSourceFactory = {
+//                postDao.freshPosts(threadType, threadId)
+//            },
+//        ).flow.map { pagingData ->
+//            pagingData.map {
+//                it.toDto()
+//            }
+//        }
+//    }
+
+
+    override val thread: Flow<PostsThread> = threadDao.get(threadType, threadId)
+
+    //fun targetFlow(targetPost: ThreadLoadTarget) = MutableStateFlow(value = targetPost)
+
+   override fun posts(refreshTarget: ThreadLoadTarget): Flow<PagingData<Post>> =
         @OptIn(ExperimentalPagingApi::class)
         Pager(
             config = PagingConfig(pageSize = 20),
@@ -96,9 +79,7 @@ class ThreadRepositoryServerImpl @Inject constructor(
                 it.toDto()
             }
         }
-    }
 
-    override val thread: Flow<PostsThread> = threadDao.get(threadType, threadId)
 
     override suspend fun getThread() {
         appAuth.myToken()?.let { myToken ->
@@ -145,13 +126,13 @@ class ThreadRepositoryServerImpl @Inject constructor(
         }
     }
 
-    override fun reloadPosts(target: ThreadLoadTarget) {
-        changeTargetPost(target)
-    }
+//    override fun reloadPosts(target: ThreadLoadTarget) {
+//        changeTargetPost(target)
+//    }
 
-    override fun changeTargetPost(target: ThreadLoadTarget) {
-        targetFlow.value = target
-    }
+//    override fun changeTargetPost(target: ThreadLoadTarget) {
+//        targetFlow.value = target
+//    }
 
     override suspend fun savePostToServer(post: Post) {
         val newPost = post.copy(
@@ -166,7 +147,7 @@ class ThreadRepositoryServerImpl @Inject constructor(
     }
 
     override suspend fun checkForUpdates()  {
-        while (true) {
+        while (false) {
             delay(2_000L)
             try {
                 val response = apiService.getAreaModifiedTime(

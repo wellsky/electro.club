@@ -1,4 +1,4 @@
-package club.electro.repository
+package club.electro.repository.map
 
 import android.content.Context
 import club.electro.api.ApiService

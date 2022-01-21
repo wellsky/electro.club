@@ -6,11 +6,10 @@ import club.electro.dao.PostDao
 import club.electro.dto.Post
 import club.electro.dto.User
 import club.electro.entity.PostEntity
-import club.electro.repository.PostRepository
-import club.electro.repository.UserRepository
+import club.electro.repository.post.PostRepository
+import club.electro.repository.user.UserRepository
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class PostsEntitiesPreparator(
     val postsEntities: List<PostEntity>,
@@ -32,8 +31,8 @@ class PostsEntitiesPreparator(
     }
 }
 
-@Singleton
-class PostEntityContentPreparator @Inject constructor(
+
+class PostEntityContentPreparator (
     val postEntity: PostEntity,
     val onEveryDataUpdate: (suspend () -> Unit)? = null
 ) {
@@ -91,15 +90,19 @@ class PostEntityContentPreparator @Inject constructor(
         }
 
         postEntity?.answerTo?.let {
+            println("1")
+            println(postRepository.hashCode())
             val sourceMessage: Post? = postRepository.getLocalById(
                 postEntity.threadType,
                 postEntity.threadId,
                 it,
                 onEveryDataUpdate
             )
+            println("2")
             val answerText = sourceMessage?.let {
                 "<blockquote><strong>Ответ ${sourceMessage.authorName} </strong>: ${shortTextPreview(sourceMessage.content)}</blockquote>"
             } ?: "<blockquote><strong>Ответ на сообщение $it</strong></blockquote>"
+            println("3")
             text = answerText + text
         }
         return this
@@ -114,6 +117,9 @@ class PostEntityContentPreparator @Inject constructor(
         return this
     }
 
+    /**
+     * Если в тексте изображение имеет относительный URL, добавляет полностю домен
+     */
     fun prepareRelativeUrls(): PostEntityContentPreparator {
         var newText = text
         newText = newText.replace("src=\"/data/", "src=\"https://electro.club/data/")
@@ -149,7 +155,7 @@ class PostEntityContentPreparator @Inject constructor(
 
 
     /**
-     * Заменяет тэги [quote messge=<id>]<text>[/quote] на цитату
+     * Заменяет тэги [user=<id>] на никнейм, ссылающийся на профиль пользователя
      */
     suspend fun prepareUsers(): PostEntityContentPreparator {
         val pattern = """\[user=(\d+?)\]"""

@@ -2,7 +2,7 @@ package club.electro.ui.map.socket
 
 import androidx.lifecycle.*
 import club.electro.dto.Socket
-import club.electro.repository.MapRepository
+import club.electro.repository.map.MapRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

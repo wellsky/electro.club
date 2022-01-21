@@ -14,6 +14,8 @@ import club.electro.entity.PostRemoteKeyEntity
 import club.electro.entity.toEntity
 import club.electro.error.ApiError
 import club.electro.model.NetworkStatus
+import club.electro.repository.post.PostRepository
+import club.electro.repository.thread.ThreadLoadTarget
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -116,6 +118,7 @@ class PostRemoteMediator @AssistedInject constructor(
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
+
             val body = response.body() ?: throw ApiError(
                 response.code(),
                 response.message(),

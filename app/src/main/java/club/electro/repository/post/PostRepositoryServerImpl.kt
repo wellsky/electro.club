@@ -1,4 +1,4 @@
-package club.electro.repository
+package club.electro.repository.post
 
 import android.content.Context
 import androidx.work.*
@@ -30,6 +30,7 @@ class PostRepositoryServerImpl @Inject constructor(
     private val workManager: WorkManager = WorkManager.getInstance(context)
 
     override suspend fun getLocalById(threadType: Byte, threadId:Long, id: Long, onLoadedCallback:  (suspend () -> Unit)?): Post? {
+        println("GetLocalById " + id)
         return dao.getById(threadType, threadId, id)?.let {
             if (it.status != Post.STATUS_WAITING_FOR_LOAD) {
                 it.toDto()

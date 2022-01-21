@@ -3,9 +3,7 @@ package club.electro.ui.map
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.*
-import club.electro.application.ElectroClubApp
-import club.electro.repository.MapRepository
-import club.electro.repository.MapRepositoryServerImpl
+import club.electro.repository.map.MapRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers

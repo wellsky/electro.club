@@ -22,12 +22,11 @@ import kotlinx.coroutines.flow.collectLatest
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import club.electro.ToolBarConfig
-import club.electro.auth.AppAuth
 import club.electro.dto.*
-import club.electro.repository.ThreadLoadTarget
-import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST
-import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST_UNREAD
-import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_LAST
+import club.electro.repository.thread.ThreadLoadTarget
+import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST
+import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST_UNREAD
+import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_LAST
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
 import club.electro.utils.*
@@ -75,8 +74,8 @@ class ThreadFragment @Inject constructor(): Fragment() {
                             findNavController().navigate(
                                 R.id.action_threadFragment_to_threadInfoFragment,
                                 Bundle().apply {
-                                    threadInfoType = it.type
-                                    threadInfoId = it.id
+                                    threadType = it.type
+                                    threadId = it.id
                                 }
                             )
                         }

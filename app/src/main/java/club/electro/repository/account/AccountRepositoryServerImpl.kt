@@ -1,4 +1,4 @@
-package club.electro.repository
+package club.electro.repository.account
 
 import club.electro.api.ApiService
 import club.electro.auth.AppAuth

@@ -141,12 +141,6 @@ interface ApiService {
 
 }
 
-//object Api {
-//    val service: ApiService by lazy {
-//        retrofit.create(ApiService::class.java)
-//    }
-//}
-
 data class ApiResponse<D> (
     val status: String,
     val data: D

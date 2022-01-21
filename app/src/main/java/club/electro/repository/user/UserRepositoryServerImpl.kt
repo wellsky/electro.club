@@ -1,6 +1,5 @@
-package club.electro.repository
+package club.electro.repository.user
 
-import androidx.lifecycle.SavedStateHandle
 import club.electro.api.ApiService
 import club.electro.dao.UserDao
 import club.electro.dto.*
@@ -8,35 +7,10 @@ import club.electro.entity.toEntity
 import club.electro.error.ApiError
 import club.electro.error.NetworkError
 import club.electro.error.UnknownError
-import dagger.Binds
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.IOException
 import javax.inject.Inject
-
-@InstallIn(ViewModelComponent::class)
-@Module
-interface UserRepositoryModule {
-    companion object {
-        @Provides
-        @ViewModelScoped
-        // SavedStateHandle
-        // 1. хранит arguments из фрагмента
-        // 2. переживает смерть процесса
-        // 3. автоматически предоставляется dagger hilt
-        fun provideArg(savedStateHandle: SavedStateHandle): String =
-            requireNotNull(savedStateHandle["userId"])
-    }
-
-    @Binds
-    @ViewModelScoped
-    fun bindUserRepository(impl: UserRepositoryServerImpl): UserRepository
-}
 
 class UserRepositoryServerImpl @Inject constructor(
     private val apiService: ApiService,

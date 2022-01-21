@@ -3,18 +3,27 @@ package club.electro.ui.thread
 import androidx.lifecycle.*
 import club.electro.auth.AppAuth
 import club.electro.dto.Post
-import club.electro.repository.*
+import club.electro.repository.thread.ThreadLoadTarget
+import club.electro.repository.thread.ThreadRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
+    state : SavedStateHandle,
     val repository: ThreadRepository,
     val appAuth: AppAuth
 ) : ViewModel() {
     val thread = repository.thread.asLiveData()
-    val posts = repository.posts
+
+    val mutablePosts = MutableStateFlow(value = ThreadLoadTarget((state.get("postId") ?: 0L)))
+
+    val posts = mutablePosts.flatMapLatest { refreshTarget ->
+        repository.posts(refreshTarget)
+    }
 
     val lastUpdateTime = repository.lastUpdateTime
 
@@ -31,7 +40,8 @@ class ThreadViewModel @Inject constructor(
     }
 
     fun reloadPosts(target: ThreadLoadTarget) {
-        repository.reloadPosts(target)
+        //repository.reloadPosts(target)
+        mutablePosts.value = target
     }
 
     fun changeEditorPostContent(content: String) {

@@ -2,7 +2,7 @@ package club.electro.ui.user
 
 import androidx.lifecycle.*
 import club.electro.dto.PostsThread
-import club.electro.repository.ThreadRepository
+import club.electro.repository.thread.ThreadRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

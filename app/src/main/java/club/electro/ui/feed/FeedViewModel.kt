@@ -3,8 +3,7 @@ package club.electro.ui.feed
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import club.electro.repository.FeedRepository
-import club.electro.repository.FeedRepositoryServerImpl
+import club.electro.repository.feed.FeedRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

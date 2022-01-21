@@ -2,8 +2,7 @@ package club.electro.ui.user
 
 import androidx.lifecycle.*
 import club.electro.dto.User
-import club.electro.repository.UserRepository
-import dagger.assisted.Assisted
+import club.electro.repository.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
