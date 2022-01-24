@@ -35,7 +35,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class ThreadFragment @Inject constructor(): Fragment() {
+class ThreadFragment constructor(): Fragment() {
     companion object {
         var Bundle.threadType: Byte by ByteArg
         var Bundle.threadId: Long by LongArg
@@ -47,8 +47,8 @@ class ThreadFragment @Inject constructor(): Fragment() {
     private var threadType: Byte = 0
     private var threadId: Long = 0
 
-    //private lateinit var viewModel: ThreadViewModel
-    private lateinit var urlHandlerFactory: UrlHandlerFactory
+    @Inject
+    lateinit var urlHandlerFactory: UrlHandler.Factory
 
     private var _binding: FragmentThreadBinding? = null
     private val binding get() = _binding!!

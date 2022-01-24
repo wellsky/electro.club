@@ -23,14 +23,14 @@ class PostRepositoryServerImpl @Inject constructor(
     private val dao : PostDao,
     private val apiService: ApiService,
     private val appAuth: AppAuth,
-    private val networkStatus: NetworkStatus
+    private val networkStatus: NetworkStatus,
+    private val postsEntitiesPreparatorFactory: PostsEntitiesPreparator.Factory
 ): PostRepository {
 
 
     private val workManager: WorkManager = WorkManager.getInstance(context)
 
     override suspend fun getLocalById(threadType: Byte, threadId:Long, id: Long, onLoadedCallback:  (suspend () -> Unit)?): Post? {
-        println("GetLocalById " + id)
         return dao.getById(threadType, threadId, id)?.let {
             if (it.status != Post.STATUS_WAITING_FOR_LOAD) {
                 it.toDto()
@@ -98,7 +98,7 @@ class PostRepositoryServerImpl @Inject constructor(
     }
 
     override suspend fun prepareAndSaveLocal(postsEntities: List<PostEntity>) {
-        PostsEntitiesPreparator(
+        postsEntitiesPreparatorFactory.create(
             postsEntities = postsEntities,
             onFirstResult = {
                 dao.insert(it)

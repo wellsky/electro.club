@@ -2,28 +2,53 @@ package club.electro.adapter
 
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
-import club.electro.dao.PostDao
 import club.electro.dto.Post
 import club.electro.dto.User
 import club.electro.entity.PostEntity
 import club.electro.repository.post.PostRepository
 import club.electro.repository.user.UserRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.runBlocking
-import javax.inject.Inject
 
-class PostsEntitiesPreparator(
-    val postsEntities: List<PostEntity>,
-    val onStart: (suspend (postsEntities: List<PostEntity>) -> Unit) = { },
-    val onFirstResult: (suspend (postsEntities: List<PostEntity>) -> Unit) = { },
-    val onEveryDataUpdate: (suspend (postEntity: PostEntity) -> Unit) = { }
+class PostsEntitiesPreparator @AssistedInject constructor(
+    @Assisted
+    private val postsEntities: List<PostEntity>,
+    @Assisted("onStart")
+    private val onStart: (suspend (postsEntities: List<PostEntity>) -> Unit) = { },
+    @Assisted("onFirstResult")
+    private val onFirstResult: (suspend (postsEntities: List<PostEntity>) -> Unit) = { },
+    @Assisted
+    private val onEveryDataUpdate: (suspend (postEntity: PostEntity) -> Unit) = { },
+    private val postEntityContentPreparatorFactory: PostEntityContentPreparator.Factory,
 ) {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            postsEntities: List<PostEntity>,
+            @Assisted("onStart")
+            onStart: (suspend (postsEntities: List<PostEntity>) -> Unit) = { },
+            @Assisted("onFirstResult")
+            onFirstResult: (suspend (postsEntities: List<PostEntity>) -> Unit) = { },
+            onEveryDataUpdate: (suspend (postEntity: PostEntity) -> Unit) = { },
+        ): PostsEntitiesPreparator
+    }
+
     suspend fun prepareAll() {
         onStart(postsEntities)
         val preparedEntities = postsEntities.map {
-            PostEntityContentPreparator(
+            postEntityContentPreparatorFactory.create(
                 postEntity = it,
                 onEveryDataUpdate = {
-                    onEveryDataUpdate(PostEntityContentPreparator(it).prepareAll().getPrepared())
+                    onEveryDataUpdate(
+                        postEntityContentPreparatorFactory.create(
+                            postEntity = it,
+                        )
+                            .prepareAll()
+                            .getPrepared()
+                    )
                 }
             ).prepareAll().getPrepared()
         }
@@ -32,20 +57,26 @@ class PostsEntitiesPreparator(
 }
 
 
-class PostEntityContentPreparator (
-    val postEntity: PostEntity,
-    val onEveryDataUpdate: (suspend () -> Unit)? = null
+class PostEntityContentPreparator @AssistedInject constructor(
+    @Assisted
+    private val postEntity: PostEntity,
+    @Assisted
+    private val onEveryDataUpdate: (suspend () -> Unit)? = null,
+
+    private val postRepository: PostRepository,
+    private val userRepository: UserRepository,
 ) {
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            postEntity: PostEntity,
+            onEveryDataUpdate: (suspend () -> Unit)? = null,
+        ): PostEntityContentPreparator
+    }
+
     val ANSWERTO_MAX_TEXT_LENGTH = 128
 
     var text = postEntity.content
-
-    @Inject
-    lateinit var postDao : PostDao
-    @Inject
-    lateinit var postRepository: PostRepository
-    @Inject
-    lateinit var userRepository: UserRepository
 
     fun getPrepared(): PostEntity {
         return postEntity.copy(preparedContent = text)
@@ -90,19 +121,15 @@ class PostEntityContentPreparator (
         }
 
         postEntity?.answerTo?.let {
-            println("1")
-            println(postRepository.hashCode())
             val sourceMessage: Post? = postRepository.getLocalById(
                 postEntity.threadType,
                 postEntity.threadId,
                 it,
                 onEveryDataUpdate
             )
-            println("2")
             val answerText = sourceMessage?.let {
                 "<blockquote><strong>Ответ ${sourceMessage.authorName} </strong>: ${shortTextPreview(sourceMessage.content)}</blockquote>"
             } ?: "<blockquote><strong>Ответ на сообщение $it</strong></blockquote>"
-            println("3")
             text = answerText + text
         }
         return this

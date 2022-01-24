@@ -14,7 +14,10 @@ import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.ui.user.UserProfileFragment.Companion.userId
+import com.google.gson.TypeAdapter
 import com.google.gson.annotations.SerializedName
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -24,16 +27,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.net.URI
 
-@AssistedFactory
-interface UrlHandlerFactory {
-    fun create(navController: NavController): UrlHandler
-}
 
 class UrlHandler @AssistedInject constructor(
     @Assisted val navController: NavController,
     @ApplicationContext val context: Context,
     val apiService: ApiService
 ) {
+    @AssistedFactory
+    interface Factory {
+        fun create(navController: NavController): UrlHandler
+    }
+
     private val PRIMARY_HOST = "electro.club"
     private val PATH_USERS = "users"
     private var url: String? = ""
@@ -143,6 +147,21 @@ enum class UrlType(val value: Byte) {
     URL_TYPE_THREAD(1),
     URL_TYPE_MESSAGE_IN_THREAD(2),
     URL_TYPE_USER_ACCOUNT(3);
+}
+
+val urlTypeSerializer = object : TypeAdapter<UrlType>() {
+    override fun write(out: JsonWriter, value: UrlType?) {
+        out.value(value?.value)
+    }
+
+    override fun read(`in`: JsonReader): UrlType? =
+        `in`.nextInt()
+            .toByte()
+            .let { serialized ->
+                UrlType.values().find {
+                    it.value == serialized
+                }
+            }
 }
 
 data class UrlDataResultDto(

@@ -1,5 +1,9 @@
 package club.electro.dto
 
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
+
 data class PostsThread (
     val id: Long,
     val type: Byte,
@@ -15,6 +19,21 @@ enum class ThreadType(val value: Byte) {
     THREAD_TYPE_PUBLIC_CHAT(2),
     THREAD_TYPE_CHANNEL(3),
     THREAD_TYPE_POST_WITH_COMMENTS(4);
+}
+
+val threadTypeSerializer = object : TypeAdapter<ThreadType>() {
+    override fun write(out: JsonWriter, value: ThreadType?) {
+        out.value(value?.value)
+    }
+
+    override fun read(`in`: JsonReader): ThreadType? =
+        `in`.nextInt()
+            .toByte()
+            .let { serialized ->
+                ThreadType.values().find {
+                    it.value == serialized
+                }
+            }
 }
 
 //const val THREAD_TYPE_PERSONAL_CHAT: Byte = 1

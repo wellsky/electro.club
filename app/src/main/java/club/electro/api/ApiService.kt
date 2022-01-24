@@ -1,8 +1,10 @@
 package club.electro.api
 
 import club.electro.dto.*
-import club.electro.utils.UrlDataResult
 import club.electro.utils.UrlDataResultDto
+import club.electro.utils.UrlType
+import club.electro.utils.urlTypeSerializer
+import com.google.gson.GsonBuilder
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Response
@@ -22,11 +24,19 @@ fun okhttp(vararg interceptors: Interceptor): OkHttpClient = OkHttpClient.Builde
     }
     .build()
 
+private val gson = GsonBuilder()
+    .registerTypeAdapter(UrlType::class.java, urlTypeSerializer)
+    .registerTypeAdapter(UrlType::class.java, threadTypeSerializer)
+    .create()
+
 fun retrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
-    .addConverterFactory(GsonConverterFactory.create())
+    .addConverterFactory(GsonConverterFactory.create(gson))
     .baseUrl(BASE_SERVER_URL)
     .client(client)
     .build()
+
+
+
 
 
 interface ApiService {

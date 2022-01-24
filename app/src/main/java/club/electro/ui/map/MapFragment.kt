@@ -45,8 +45,8 @@ class MapFragment : Fragment() {
         viewModel.markers.observe(viewLifecycleOwner) { markersList ->
             googleMap.clear()
 
-            val socketIcon = BitmapDescriptorFactory.fromResource(R.drawable.socket);
-            val groupIcon = BitmapDescriptorFactory.fromResource(R.drawable.socket);
+            val socketIcon = BitmapDescriptorFactory.fromResource(R.drawable.map_socket);
+            val groupIcon = BitmapDescriptorFactory.fromResource(R.drawable.map_group);
 
             markersList.forEach { marker ->
                val coords = LatLng(marker.lat, marker.lng)
@@ -157,7 +157,7 @@ fun Marker.loadIcon(context: Context, url: String?) {
         .asBitmap()
         .load(url)
         .timeout(5_000)
-        .error(R.drawable.socket) // to show a default icon in case of any errors
+        .error(R.drawable.map_group) // to show a default icon in case of any errors
         .listener(object : RequestListener<Bitmap> {
             override fun onLoadFailed(
                 e: GlideException?,
@@ -178,7 +178,8 @@ fun Marker.loadIcon(context: Context, url: String?) {
                 return resource?.let {
                     BitmapDescriptorFactory.fromBitmap(it)
                 }?.let {
-                    setIcon(it); true
+                    setIcon(it)
+                    true
                 } ?: false
             }
         }).submit()

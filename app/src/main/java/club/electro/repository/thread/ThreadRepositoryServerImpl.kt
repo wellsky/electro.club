@@ -32,7 +32,7 @@ class ThreadRepositoryServerImpl @Inject constructor(
     private val appAuth: AppAuth,
     private val postRepository: PostRepository,
     private val networkStatus: NetworkStatus
-        ) : ThreadRepository {
+) : ThreadRepository {
     override val lastUpdateTime: MutableLiveData<Long> = MutableLiveData(0L)
 
     private lateinit var updaterJob: Job

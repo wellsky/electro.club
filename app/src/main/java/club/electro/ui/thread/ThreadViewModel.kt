@@ -1,6 +1,7 @@
 package club.electro.ui.thread
 
 import androidx.lifecycle.*
+import androidx.paging.cachedIn
 import club.electro.auth.AppAuth
 import club.electro.dto.Post
 import club.electro.repository.thread.ThreadLoadTarget
