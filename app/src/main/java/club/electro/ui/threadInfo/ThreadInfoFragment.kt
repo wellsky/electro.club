@@ -16,6 +16,7 @@ import club.electro.utils.LongArg
 import club.electro.utils.loadCircleCrop
 import dagger.hilt.android.AndroidEntryPoint
 
+
 @AndroidEntryPoint
 class ThreadInfoFragment : Fragment() {
     companion object {
@@ -27,7 +28,6 @@ class ThreadInfoFragment : Fragment() {
 
     private var _binding: FragmentThreadInfoBinding? = null
     private val binding get() = _binding!!
-
     private var firstUpdateTimeReceived = false
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -64,6 +64,8 @@ class ThreadInfoFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        var firstUpdateTimeReceived = false
+
         _binding = FragmentThreadInfoBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
@@ -80,13 +82,10 @@ class ThreadInfoFragment : Fragment() {
             }
         }
 
-        // TODO реализовано криво. Вообще логику обновления лучше не выносить за репозиторий.
-        // Но почему-то вызванная из checkForUpdates() функция reloadPosts() не релодит посты
-        viewModel.lastUpdateTime.observe(viewLifecycleOwner) {
-            if (it > 0L) {
+        viewModel.threadStatus.observe(viewLifecycleOwner) {
+            if (it.lastUpdateTime > 0L) {
                 if (firstUpdateTimeReceived) {
                     viewModel.getThread()
-                    //viewModel.reloadPosts()
                 } else {
                     firstUpdateTimeReceived = true
                 }

@@ -23,10 +23,14 @@ class ThreadViewModel @Inject constructor(
     val mutablePosts = MutableStateFlow(value = ThreadLoadTarget((state.get("postId") ?: 0L)))
 
     val posts = mutablePosts.flatMapLatest { refreshTarget ->
-        repository.posts(refreshTarget)
+        repository.posts(refreshTarget).cachedIn(viewModelScope)
     }
 
-    val lastUpdateTime = repository.lastUpdateTime
+//    val thread = repository.thread.asLiveData()
+//    val posts = repository.posts.cachedIn(viewModelScope)
+//>>>>>>> master
+
+    val threadStatus = repository.threadStatus
 
     val editorPost = MutableLiveData(emptyPost) // Пост, который в данный момент в текстовом редакторе
     val editedPost = MutableLiveData(emptyPost) // Опубликованный пост, который в данный момент редактируется в текстовом редакторе

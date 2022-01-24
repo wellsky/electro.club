@@ -12,7 +12,7 @@ class ThreadInfoViewModel @Inject constructor(
     val repository: ThreadRepository
 ) : ViewModel() {
     var thread: LiveData<PostsThread> = repository.thread.asLiveData()
-    val lastUpdateTime = repository.lastUpdateTime
+    val threadStatus = repository.threadStatus
 
     fun getThread() = viewModelScope.launch {
         repository.getThread()
