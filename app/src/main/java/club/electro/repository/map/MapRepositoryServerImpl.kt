@@ -1,9 +1,11 @@
-package club.electro.repository
+package club.electro.repository.map
 
-import club.electro.di.DependencyContainer
+import android.content.Context
+import club.electro.api.ApiService
+import club.electro.dao.MapMarkerDao
+import club.electro.dao.SocketDao
 import club.electro.dto.MARKER_TYPE_GROUP
 import club.electro.dto.MARKER_TYPE_SOCKET
-import club.electro.dto.MapMarker
 import club.electro.dto.Socket
 import club.electro.entity.MapMarkerEntity
 import club.electro.entity.toDto
@@ -11,17 +13,20 @@ import club.electro.entity.toEntity
 import club.electro.error.ApiError
 import club.electro.error.NetworkError
 import club.electro.error.UnknownError
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import java.io.IOException
+import javax.inject.Inject
 
-class MapRepositoryServerImpl(diContainer: DependencyContainer): MapRepository {
-    val apiService = diContainer.apiService
-    val appAuth = diContainer.appAuth
-    val resources = diContainer.context
+class MapRepositoryServerImpl @Inject constructor(
+    @ApplicationContext context: Context,
+    private val apiService: ApiService,
+    private val markerDao: MapMarkerDao,
+    private val socketDao: SocketDao
+): MapRepository {
 
-    val markerDao =diContainer.appDb.mapMarkerDao()
-    val socketDao =diContainer.appDb.socketDao()
+    val resources = context.resources
 
     var targetFlow = MutableStateFlow(value = listOf<Byte>())
 

@@ -37,7 +37,7 @@
         android:layout_height="40dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/bg_rounded_gray"
         app:srcCompat="@drawable/ic_baseline_keyboard_arrow_up_24"
@@ -50,7 +50,7 @@
         android:layout_height="40dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/swiperefresh"
-        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/bg_rounded_gray"
         app:srcCompat="@drawable/ic_baseline_keyboard_arrow_down_24"
@@ -64,7 +64,7 @@
         android:layout_height="60dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="Test"
         />
@@ -96,7 +96,7 @@
             app:layout_constraintBottom_toTopOf="@id/editorPostContent"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
-            android:layout_marginLeft="12dp"
+            android:layout_marginStart="12dp"
             android:src="@drawable/ic_baseline_edit_24"
             />
 
@@ -104,9 +104,8 @@
             android:id="@+id/editedPostContent"
             android:layout_width="0dp"
             android:layout_height="20dp"
-            android:text="Edited message"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
             android:ellipsize="end"
             android:singleLine="true"
             app:layout_constraintStart_toEndOf="@id/editedImage"
@@ -114,6 +113,7 @@
             app:layout_constraintEnd_toStartOf="@id/cancelEdit"
             app:layout_constraintTop_toTopOf="@id/editedImage"
             app:layout_constraintBottom_toBottomOf="@id/editedImage"
+            tools:text="Edited message"
         />
 
         <ImageButton
@@ -146,7 +146,7 @@
             app:layout_constraintBottom_toTopOf="@id/editorPostContent"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
-            android:layout_marginLeft="12dp"
+            android:layout_marginStart="12dp"
             android:src="@drawable/ic_baseline_reply_24"
             />
 
@@ -154,9 +154,8 @@
             android:id="@+id/answerToContent"
             android:layout_width="0dp"
             android:layout_height="20dp"
-            android:text="Answer to message"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
             android:ellipsize="end"
             android:singleLine="true"
             app:layout_constraintStart_toEndOf="@id/answerToImage"
@@ -164,6 +163,7 @@
             app:layout_constraintEnd_toStartOf="@id/cancelAnswer"
             app:layout_constraintTop_toTopOf="@id/answerToImage"
             app:layout_constraintBottom_toBottomOf="@id/answerToImage"
+            tools:text="Answer to message"
             />
 
         <ImageButton
@@ -206,9 +206,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="@dimen/common_spacing"
-            android:layout_marginLeft="@dimen/common_spacing"
             android:layout_marginEnd="@dimen/common_spacing"
-            android:layout_marginRight="@dimen/common_spacing"
             android:background="@android:color/transparent"
             android:contentDescription="@string/save_description"
             app:layout_constraintBottom_toBottomOf="parent"

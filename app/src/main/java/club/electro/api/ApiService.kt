@@ -1,13 +1,12 @@
 package club.electro.api
 
-import club.electro.BuildConfig
-import club.electro.di.DependencyContainer
 import club.electro.dto.*
-import club.electro.utils.UrlDataResult
+import club.electro.utils.UrlDataResultDto
+import club.electro.utils.UrlType
+import club.electro.utils.urlTypeSerializer
+import com.google.gson.GsonBuilder
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.RequestBody
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -16,63 +15,41 @@ import retrofit2.http.*
 const val BASE_SERVER_URL = "https://electro.club/api/v1/"
 const val UPDATES_SERVER_URL = "https://srv1.electro.club/api/"
 
-val logging = HttpLoggingInterceptor().apply {
-    if (BuildConfig.DEBUG) {
-        level = HttpLoggingInterceptor.Level.BODY
+
+fun okhttp(vararg interceptors: Interceptor): OkHttpClient = OkHttpClient.Builder()
+    .apply {
+        interceptors.forEach {
+            this.addInterceptor(it)
+        }
     }
-}
-
-// https://stackoverflow.com/questions/34791244/retrofit2-modifying-request-body-in-okhttp-interceptor
-val addTokensInterceptor = Interceptor {
-    val request = it.request()
-    val body = request.body
-
-    val diContainer = DependencyContainer.getInstance()
-
-    val accessTokenString = "&access_token=" + diContainer.accessToken
-    val userTokenString = if (diContainer.appAuth.myToken() != null) "&user_token=" + diContainer.appAuth.myToken() else ""
-
-    val newRequest = request.newBuilder()
-        .post(
-            RequestBody.create(
-                body?.contentType(),
-                body.bodyToString() + accessTokenString + userTokenString
-            )
-        )
-        .build()
-    it.proceed(newRequest)
-}
-
-fun RequestBody?.bodyToString(): String {
-    if (this == null) return ""
-    val buffer = okio.Buffer()
-    writeTo(buffer)
-    return buffer.readUtf8()
-}
-
-
-val okhttp = OkHttpClient.Builder()
-        .addInterceptor(addTokensInterceptor)
-        .addInterceptor(logging)
-        .build()
-
-val retrofit = Retrofit.Builder()
-    .addConverterFactory(GsonConverterFactory.create())
-    .baseUrl(BASE_SERVER_URL)
-    .client(okhttp)
     .build()
+
+private val gson = GsonBuilder()
+    .registerTypeAdapter(UrlType::class.java, urlTypeSerializer)
+    .registerTypeAdapter(ThreadType::class.java, threadTypeSerializer)
+    .create()
+
+fun retrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
+    .addConverterFactory(GsonConverterFactory.create(gson))
+    .baseUrl(BASE_SERVER_URL)
+    .client(client)
+    .build()
+
+
+
+
 
 interface ApiService {
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
-    suspend fun getFeedPosts(@FieldMap params: HashMap<String?, String?>): Response<ApiResponse<ApiFeedPostsData>>
+    suspend fun getFeedPosts(@Field("method") method: String = "getFeedPosts"): Response<ApiResponse<ApiFeedPostsData>>
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
     suspend fun getUrlData(
         @Field("method") method: String = "getUrlData",
-        @Field("url") url: String ,
-    ): Response<ApiResponse<UrlDataResult>>
+        @Field("url") url: String,
+    ): Response<ApiResponse<UrlDataResultDto>>
 
     @FormUrlEncoded
     @POST(UPDATES_SERVER_URL)
@@ -172,12 +149,6 @@ interface ApiService {
         @Field("user_id") userId: Long,
     ): Response<ApiResponse<ApiUserProfile>>
 
-}
-
-object Api {
-    val service: ApiService by lazy {
-        retrofit.create(ApiService::class.java)
-    }
 }
 
 data class ApiResponse<D> (

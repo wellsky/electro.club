@@ -1,24 +1,34 @@
 package club.electro.ui.thread
 
-import android.app.Application
 import androidx.lifecycle.*
 import androidx.paging.cachedIn
-import club.electro.application.ElectroClubApp
+import club.electro.auth.AppAuth
 import club.electro.dto.Post
-import club.electro.repository.*
+import club.electro.repository.thread.ThreadLoadTarget
+import club.electro.repository.thread.ThreadRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ThreadViewModel(
-        application: Application,
-        val threadType: Byte,
-        val threadId: Long,
-        val targetPost: ThreadLoadTarget
-) : AndroidViewModel(application) {
-
-    private val repository: ThreadRepository = ThreadRepositoryServerImpl((application as ElectroClubApp).diContainer, threadType, threadId, targetPost)
-
+@HiltViewModel
+class ThreadViewModel @Inject constructor(
+    state : SavedStateHandle,
+    val repository: ThreadRepository,
+    val appAuth: AppAuth
+) : ViewModel() {
     val thread = repository.thread.asLiveData()
-    val posts = repository.posts.cachedIn(viewModelScope)
+
+    val mutablePosts = MutableStateFlow(value = ThreadLoadTarget((state.get("postId") ?: 0L)))
+
+    val posts = mutablePosts.flatMapLatest { refreshTarget ->
+        repository.posts(refreshTarget).cachedIn(viewModelScope)
+    }
+
+//    val thread = repository.thread.asLiveData()
+//    val posts = repository.posts.cachedIn(viewModelScope)
+//>>>>>>> master
 
     val threadStatus = repository.threadStatus
 
@@ -35,7 +45,7 @@ class ThreadViewModel(
     }
 
     fun reloadPosts(target: ThreadLoadTarget) {
-        repository.reloadPosts(target)
+        mutablePosts.value = target
     }
 
     fun changeEditorPostContent(content: String) {

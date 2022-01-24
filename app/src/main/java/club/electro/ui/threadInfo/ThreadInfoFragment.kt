@@ -5,25 +5,30 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import club.electro.MainViewModel
 import club.electro.ToolBarConfig
 import club.electro.databinding.FragmentThreadInfoBinding
-import club.electro.ui.threadInfo.ThreadInfoViewModelFactory
+import club.electro.ui.thread.ThreadViewModel
 import club.electro.utils.ByteArg
 import club.electro.utils.LongArg
 import club.electro.utils.loadCircleCrop
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class ThreadInfoFragment : Fragment() {
     companion object {
         var Bundle.threadInfoType: Byte by ByteArg
         var Bundle.threadInfoId: Long by LongArg
     }
 
+    private val viewModel: ThreadViewModel by viewModels()
+
     private var _binding: FragmentThreadInfoBinding? = null
     private val binding get() = _binding!!
-
-    private lateinit var viewModel: ThreadInfoViewModel
+    private var firstUpdateTimeReceived = false
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -43,14 +48,13 @@ class ThreadInfoFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val threadType = requireArguments().threadInfoType
-        val threadId = requireArguments().threadInfoId
+//        val threadType = requireArguments().threadInfoType
+//        val threadId = requireArguments().threadInfoId
 
-        viewModel = ViewModelProvider(this, ThreadInfoViewModelFactory(
-            requireActivity().getApplication(),
-            threadType,
-            threadId,
-        )).get(ThreadInfoViewModel::class.java)
+//        viewModel = ViewModelProvider(this, ThreadInfoViewModelFactory(
+//            threadType,
+//            threadId,
+//        )).get(ThreadInfoViewModel::class.java)
 
         viewModel.getThread()
     }
@@ -96,5 +100,6 @@ class ThreadInfoFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.stopCheckUpdates()
+        _binding = null
     }
 }

@@ -5,30 +5,43 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import club.electro.R
-import club.electro.di.DependencyContainer
+import club.electro.api.ApiService
+import club.electro.dao.PostDao
+import club.electro.dao.PostRemoteKeyDao
+import club.electro.db.AppDb
 import club.electro.entity.PostEntity
 import club.electro.entity.PostRemoteKeyEntity
 import club.electro.entity.toEntity
 import club.electro.error.ApiError
 import club.electro.model.NetworkStatus
+import club.electro.repository.post.PostRepository
+import club.electro.repository.thread.ThreadLoadTarget
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import java.io.IOException
 
+@AssistedFactory
+interface PostRemoteMediatorFactory {
+    fun create(threadType: Byte, threadId: Long, target: ThreadLoadTarget): PostRemoteMediator
+}
+
 @OptIn(ExperimentalPagingApi::class)
-class PostRemoteMediator(
-    val diContainer: DependencyContainer,
+class PostRemoteMediator @AssistedInject constructor(
+    @Assisted
     val threadType: Byte,
+    @Assisted
     val threadId: Long,
-    val target: ThreadLoadTarget
+    @Assisted
+    val target: ThreadLoadTarget,
+
+    private val apiService: ApiService,
+    private val db: AppDb,
+    private val postDao: PostDao,
+    private val postRemoteKeyDao: PostRemoteKeyDao,
+    private val repository: PostRepository,
+    private val networkStatus: NetworkStatus,
 ) : RemoteMediator<Int, PostEntity>() {
-    val resources = diContainer.resources
-    val apiService = diContainer.apiService
-    val repository = diContainer.postRepository
-    val networkStatus = diContainer.networkStatus
-    val appAuth = diContainer.appAuth
-    val db = diContainer.appDb
-    val postDao = db.postDao()
-    val postRemoteKeyDao = db.postRemoteKeyDao()
 
     override suspend fun load(
         loadType: LoadType,
@@ -105,6 +118,7 @@ class PostRemoteMediator(
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
+
             val body = response.body() ?: throw ApiError(
                 response.code(),
                 response.message(),

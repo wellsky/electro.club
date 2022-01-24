@@ -1,29 +1,25 @@
 package ru.netology.nmedia.viewmodel
 
-import AccountRepositoryServerImpl
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import club.electro.application.ElectroClubApp
-import club.electro.repository.AccountRepository
+import androidx.lifecycle.*
+import club.electro.auth.AppAuth
+import club.electro.repository.account.AccountRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-
+import javax.inject.Inject
 
 enum class LoginFormState {
     LOGGED, NOT_LOGGED, SUCCESS, ERROR
 }
 
-class LoginViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    val appAuth: AppAuth,
+    val repository: AccountRepository,
+) : ViewModel() {
     private val _state = MutableLiveData<LoginFormState>()
 
     val state: LiveData<LoginFormState>
         get() = _state
-
-    val appAuth = (application as ElectroClubApp).diContainer.appAuth
-
-    private val repository: AccountRepository = AccountRepositoryServerImpl((application as ElectroClubApp).diContainer)
 
     init {
         if (appAuth.myId() == 0L) {

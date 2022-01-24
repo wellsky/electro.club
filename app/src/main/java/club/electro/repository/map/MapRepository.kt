@@ -1,4 +1,4 @@
-package club.electro.repository
+package club.electro.repository.map
 
 import club.electro.dto.MapMarker
 import club.electro.dto.Socket

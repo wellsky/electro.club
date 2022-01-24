@@ -7,8 +7,6 @@ import androidx.appcompat.app.AlertDialog
 import club.electro.adapter.PostAdapter
 import club.electro.adapter.PostInteractionListener
 import club.electro.databinding.FragmentThreadBinding
-import club.electro.utils.LongArg
-import club.electro.utils.ByteArg
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -22,32 +20,37 @@ import club.electro.util.AndroidUtils
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import club.electro.ToolBarConfig
-import club.electro.di.DependencyContainer
 import club.electro.dto.*
-import club.electro.repository.ThreadLoadTarget
-import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST
-import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST_UNREAD
-import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_LAST
+import club.electro.repository.thread.ThreadLoadTarget
+import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST
+import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST_UNREAD
+import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_LAST
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
-import club.electro.utils.HtmlToText
-import club.electro.utils.UrlHandler
+import club.electro.utils.*
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
-class ThreadFragment : Fragment() {
+@AndroidEntryPoint
+class ThreadFragment: Fragment() {
     companion object {
         var Bundle.threadType: Byte by ByteArg
         var Bundle.threadId: Long by LongArg
         var Bundle.postId: Long by LongArg // Может быть -1 (загрузить с последнего сообщения) и -2 (с первого непрочитанного)
     }
 
+    private val viewModel: ThreadViewModel by viewModels()
+
     private var threadType: Byte = 0
     private var threadId: Long = 0
 
-    private lateinit var viewModel: ThreadViewModel
-    private var _binding: FragmentThreadBinding? = null
+    @Inject
+    lateinit var urlHandlerFactory: UrlHandler.Factory
 
+    private var _binding: FragmentThreadBinding? = null
     private val binding get() = _binding!!
 
     private var currentTargetPost: ThreadLoadTarget? = null // Задается при вызове загрузки постов и сбрасывается в null при первом поступлении новых данных
@@ -56,12 +59,10 @@ class ThreadFragment : Fragment() {
     private var scrolledToTop: Boolean = true
     private var scrolledToBottom: Boolean = true
 
-    private val appAuth = DependencyContainer.getInstance().appAuth
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        activity?.run {
+        requireActivity().run {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
             viewModel.thread.observe(viewLifecycleOwner) {
                 it?.let {
@@ -72,29 +73,31 @@ class ThreadFragment : Fragment() {
                             findNavController().navigate(
                                 R.id.action_threadFragment_to_threadInfoFragment,
                                 Bundle().apply {
-                                    threadInfoType = it.type
-                                    threadInfoId = it.id
+                                    threadType = it.type
+                                    threadId = it.id
                                 }
                             )
                         }
                     ))
                 }
             }
-        } ?: throw Throwable("Invalid activity")
+        }
     }
 
     // https://www.vogella.com/tutorials/AndroidActionBar/article.html
     override fun onPrepareOptionsMenu(menu: Menu) {
         menu.clear()
-        viewModel.thread.value?.let { thread ->
-            activity?.run {
-                if (thread.type == THREAD_TYPE_PUBLIC_CHAT) {
-                    menuInflater.inflate(R.menu.menu_thread, menu)
-                    if (thread.subscriptionStatus.equals(SUBSCRIPTION_STATUS_NONE)) {
-                        menu.findItem(R.id.thread_unsubscribe).isVisible = false
-                        menu.findItem(R.id.thread_mute).isVisible = false
-                    } else {
-                        menu.findItem(R.id.thread_subscribe).isVisible = false
+        if (viewModel.appAuth.authorized()) {
+            viewModel.thread.value?.let { thread ->
+                requireActivity().run {
+                    if (thread.type == ThreadType.THREAD_TYPE_PUBLIC_CHAT.value) {
+                        menuInflater.inflate(R.menu.menu_thread, menu)
+                        if (thread.subscriptionStatus.equals(SUBSCRIPTION_STATUS_NONE)) {
+                            menu.findItem(R.id.thread_unsubscribe).isVisible = false
+                            menu.findItem(R.id.thread_mute).isVisible = false
+                        } else {
+                            menu.findItem(R.id.thread_subscribe).isVisible = false
+                        }
                     }
                 }
             }
@@ -138,21 +141,7 @@ class ThreadFragment : Fragment() {
 
         val postId = requireArguments().postId
 
-//        currentTargetPost = when (postId) {
-//             0L -> ThreadLoadTarget(ThreadLoadTarget.TARGET_POSITION_LAST)
-//            -1L -> ThreadLoadTarget(ThreadLoadTarget.TARGET_POSITION_FIRST)
-//            -2L -> ThreadLoadTarget(ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD)
-//            else -> ThreadLoadTarget(postId)
-//        }
-
         currentTargetPost = ThreadLoadTarget(postId)
-
-        viewModel = ViewModelProvider(this, ThreadViewModelFactory(
-            requireActivity().getApplication(),
-            threadType,
-            threadId,
-            currentTargetPost
-        )).get(ThreadViewModel::class.java)
 
         viewModel.getThread()
     }
@@ -199,15 +188,18 @@ class ThreadFragment : Fragment() {
             }
 
             override fun onUrlClicked(url: String?) {
-                UrlHandler(requireContext(), findNavController()).setUrl(url).open()
+                urlHandlerFactory.create(findNavController()).setUrl(url).open()
             }
-        })
+        }, lifecycleScope)
         adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
         binding.postsList.adapter = adapter
 
+        // TODO непонятный баг. Функция, переданная в LaunchWhenCreated вызывается, даже когда фрагмент восстанавливается, а не только создается
+        // При этом есди использовать lifecycleScope а не viewLifecycleOwner.lifecycleScope, то каждый раз создаются дубликаты Load
+        // В итоге когда пользователь возвращается в чат из "следующего" фрагмента, то все посты перезагружаются с сервера и сбивается текущая позиция скроллинга
+        //lifecycleScope.launchWhenCreated {
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            println("LaunchWhenCreated")
             viewModel.posts.collectLatest {
                 currentTargetPost?.let {
                     setGravityForTarget(it)
@@ -232,7 +224,6 @@ class ThreadFragment : Fragment() {
                             binding.postsList.smoothScrollToPosition(0);
                         } else {
                             //TODO Внизу появились новые сообщения
-                            println("new messages in bottom of the list")
                         }
                     }
                     currentIncomingRefresh = false
@@ -257,11 +248,10 @@ class ThreadFragment : Fragment() {
         viewModel.editedPost.observe(viewLifecycleOwner) {
             if (it.id != 0L) {
                 binding.editedPostGroup.visibility = View.VISIBLE
-                binding.editedPostContent.text = HtmlToText(it.content)
+                binding.editedPostContent.text = htmlToText(it.content)
 
                 with (binding.editorPostContent) {
-                    val editorText = it.content
-                    setText(editorText)
+                    setText(it.content)
                     requestFocus()
                 }
             } else {
@@ -273,13 +263,13 @@ class ThreadFragment : Fragment() {
         viewModel.answerToPost.observe(viewLifecycleOwner) {
             if (it.id != 0L) {
                 binding.answerPostGroup.visibility = View.VISIBLE
-                binding.answerToContent.text = HtmlToText(it.content)
+                binding.answerToContent.text = htmlToText(it.content)
             } else {
                 binding.answerPostGroup.visibility = View.GONE
             }
         }
 
-        appAuth.authState.observe(viewLifecycleOwner) {
+        viewModel.appAuth.authState.observe(viewLifecycleOwner) {
             requireActivity().invalidateOptionsMenu()
             invalidateBottomPanel()
         }
@@ -387,7 +377,7 @@ class ThreadFragment : Fragment() {
         var showBottomPanel = false
         viewModel.thread.value?.let {
             if (it.subscriptionStatus.equals(SUBSCRIPTION_STATUS_SUBSCRIBED)) {
-                if (appAuth.authorized()) {
+                if (viewModel.appAuth.authorized()) {
                     showBottomPanel = true
                 }
             }
@@ -401,6 +391,7 @@ class ThreadFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.stopCheckUpdates()
+        _binding = null
     }
 
 

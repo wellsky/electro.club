@@ -1,25 +1,25 @@
 package club.electro.ui.map
 
-import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.*
-import club.electro.application.ElectroClubApp
-import club.electro.repository.MapRepository
-import club.electro.repository.MapRepositoryServerImpl
-import club.electro.repository.ThreadRepository
-import club.electro.repository.ThreadRepositoryServerImpl
-import com.google.android.gms.maps.model.LatLng
+import club.electro.repository.map.MapRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MapViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository: MapRepository = MapRepositoryServerImpl((application as ElectroClubApp).diContainer)
+@HiltViewModel
+class MapViewModel @Inject constructor(
+    @ApplicationContext context: Context,
+    private val repository: MapRepository
+) : ViewModel() {
     val markers = repository.markers.asLiveData(Dispatchers.Default)
 
     val markersFilter: MutableList<Byte>  = mutableListOf()
 
-    private val prefs = application.getSharedPreferences("map", Context.MODE_PRIVATE)
+    private val prefs = context.getSharedPreferences("map", Context.MODE_PRIVATE)
 
     private val latKey = "lat"
     private val lngKey = "lng"

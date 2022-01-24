@@ -3,6 +3,7 @@ package club.electro.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import club.electro.dto.PostsThread
+import club.electro.dto.ThreadType
 import club.electro.dto.User
 
 @Entity

@@ -1,9 +1,10 @@
 package club.electro.ui.subscriptions
 
-import android.app.ActionBar
 import android.os.Bundle
 import android.view.*
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import club.electro.MainViewModel
@@ -13,30 +14,28 @@ import club.electro.adapter.SubscriptionAreaAdapter
 import club.electro.adapter.SubscriptionAreaInteractionListener
 import club.electro.databinding.FragmentSubscriptionsBinding
 import club.electro.dto.SubscriptionArea
-import club.electro.repository.ThreadLoadTarget
+import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SubscriptionsFragment : Fragment() {
+    private val viewModel: SubscriptionsViewModel by viewModels (
+        ownerProducer = ::requireParentFragment
+    )
 
-    private lateinit var viewModel: SubscriptionsViewModel
     private var _binding: FragmentSubscriptionsBinding? = null
-
     private val binding get() = _binding!!
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        activity?.run {
+        requireActivity().run {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
             mainViewModel.updateActionBarTitle(ToolBarConfig(title1 = getString(R.string.menu_subscriptions)))
-        } ?: throw Throwable("Invalid activity")
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(SubscriptionsViewModel::class.java)
+        }
     }
 
     override fun onCreateView(
@@ -65,6 +64,12 @@ class SubscriptionsFragment : Fragment() {
         viewModel.data.observe(viewLifecycleOwner, { items ->
             adapter.submitList(items)
             binding.swiperefresh.setRefreshing(false)
+        })
+
+        viewModel.appAuth.authState.observe(viewLifecycleOwner, {
+            binding.subscriptionsList.isVisible = it.authorized
+            binding.swiperefresh.isActivated = it.authorized
+            binding.notLoggedHint.isVisible = !it.authorized
         })
 
         binding.swiperefresh.setOnRefreshListener {

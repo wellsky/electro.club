@@ -1,16 +1,16 @@
 package club.electro.ui.user
 
-import android.app.Application
 import androidx.lifecycle.*
-import club.electro.application.ElectroClubApp
 import club.electro.dto.PostsThread
-import club.electro.repository.ThreadRepository
-import club.electro.repository.ThreadRepositoryServerImpl
+import club.electro.repository.thread.ThreadRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ThreadInfoViewModel(application: Application, threadType: Byte, threadId: Long) : AndroidViewModel(application) {
-    private val repository: ThreadRepository = ThreadRepositoryServerImpl((application as ElectroClubApp).diContainer, threadType, threadId)
-
+@HiltViewModel
+class ThreadInfoViewModel @Inject constructor(
+    val repository: ThreadRepository
+) : ViewModel() {
     var thread: LiveData<PostsThread> = repository.thread.asLiveData()
     val threadStatus = repository.threadStatus
 

@@ -1,10 +1,12 @@
 package club.electro.model
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-
-class NetworkStatus {
+@Singleton
+class NetworkStatus @Inject constructor() {
     enum class Status {
         ONLINE, OFFLINE, ERROR
     }
@@ -20,13 +22,13 @@ class NetworkStatus {
         }
     }
 
-    val _status = MutableLiveData(Status.ONLINE)
-    val status: LiveData<Status>
+    val _status = MutableStateFlow(Status.ONLINE)
+    val status: StateFlow<Status>
         get() = _status
 
     fun setStatus(status: Status) {
         if (status != _status.value) {
-            _status.postValue(status)
+            _status.value = status
         }
     }
 }

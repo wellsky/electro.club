@@ -18,7 +18,7 @@ import club.electro.entity.*
     FeedPostEntity::class,
     ThreadEntity::class,
     SocketEntity::class
- ], version = 105, exportSchema = false)
+ ], version = 107, exportSchema = false)
 @TypeConverters(DBTypeConverters::class)
 abstract class AppDb : RoomDatabase() {
     abstract fun postDao(): PostDao
@@ -30,6 +30,7 @@ abstract class AppDb : RoomDatabase() {
     abstract fun threadDao(): ThreadDao
     abstract fun socketDao(): SocketDao
 
+    // TODO удалиьт после внедрения Hilt
     companion object {
         @Volatile
         private var instance: AppDb? = null

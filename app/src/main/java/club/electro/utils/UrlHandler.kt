@@ -4,39 +4,42 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
-import androidx.navigation.fragment.findNavController
 import club.electro.R
-import club.electro.di.DependencyContainer
-import club.electro.dto.THREAD_TYPE_POST_WITH_COMMENTS
+import club.electro.api.ApiService
+import club.electro.dto.ThreadType
 import club.electro.error.ApiError
-import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST
+import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST
 import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.ui.user.UserProfileFragment.Companion.userId
+import com.google.gson.TypeAdapter
+import com.google.gson.annotations.SerializedName
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.net.URI
 
 
+class UrlHandler @AssistedInject constructor(
+    @Assisted val navController: NavController,
+    @ApplicationContext val context: Context,
+    val apiService: ApiService
+) {
+    @AssistedFactory
+    interface Factory {
+        fun create(navController: NavController): UrlHandler
+    }
 
-
-class UrlHandler(val context: Context, val navController: NavController) {
     private val PRIMARY_HOST = "electro.club"
     private val PATH_USERS = "users"
-
-    private val URL_TYPE_THREAD: Byte = 1
-    private val URL_TYPE_MESSAGE_IN_THREAD: Byte  = 2
-    private val URL_TYPE_USER_ACCOUNT: Byte  = 3
-
-    private val diContainer = DependencyContainer.getInstance()
-    private val apiService = diContainer.apiService
-    private val resources = diContainer.context.resources
-
     private var url: String? = ""
 
     fun setUrl(url: String?): UrlHandler {
@@ -49,17 +52,18 @@ class UrlHandler(val context: Context, val navController: NavController) {
             val uri = URI(url)
             val host: String = uri.host
 
-            if (host.equals(PRIMARY_HOST)) {
-                parseUriLocal(uri)?.let {
-                    openUrlData(it)
-                } ?: parseUriRemoteAndOpen(uri)
+            if (host == PRIMARY_HOST) {
+                parseUriLocal(uri)
+                    ?.let(UrlDataResultDto::toDomainModel)
+                    ?.let(this::openUrlData)
+                    ?: parseUriRemoteAndOpen(uri)
             } else {
                 openInBrowser(uri.toString())
             }
         }
     }
 
-    fun parseUriLocal(uri: URI): UrlDataResult? {
+    fun parseUriLocal(uri: URI): UrlDataResultDto? {
         val path: String = uri.path
         if (path.isNotBlank()) {
             val firstPath = path.substringAfter("/").substringBefore("/")
@@ -68,9 +72,9 @@ class UrlHandler(val context: Context, val navController: NavController) {
                 PATH_USERS -> {
                     val urlUserId = path.substringAfter("/").substringAfter("/").toLong()
 
-                    return UrlDataResult(
-                        type = URL_TYPE_USER_ACCOUNT,
-                        user_id = urlUserId
+                    return UrlDataResultDto(
+                        type = UrlType.URL_TYPE_USER_ACCOUNT,
+                        userId = urlUserId
                     )
                 }
             }
@@ -85,47 +89,44 @@ class UrlHandler(val context: Context, val navController: NavController) {
                 url = uri.toString()
             )
 
-            val result = response.body() ?: throw ApiError(response.code(), response.message())
+            val result = response.body()
+                ?.data
+                ?.let(UrlDataResultDto::toDomainModel)
+                ?: throw ApiError(response.code(), response.message())
 
-            openUrlData(result.data)
+            openUrlData(result)
         }
     }
 
     fun openUrlData(data: UrlDataResult) {
-        when (data.type) {
-            URL_TYPE_USER_ACCOUNT -> {
+        when (data) {
+            is UrlDataResult.Thread -> {
+                navController.navigate(
+                    R.id.action_global_threadFragment,
+                    Bundle().apply {
+                        threadType = data.threadType.value
+                        threadId = data.threadId
+                        postId = if (data.threadType == ThreadType.THREAD_TYPE_POST_WITH_COMMENTS) TARGET_POSITION_FIRST else TARGET_POSITION_FIRST
+                    }
+                )
+            }
+            is UrlDataResult.UserAccount -> {
                 navController.navigate(
                     R.id.action_global_userProfileFragment,
                     Bundle().apply {
-                        userId = data.user_id!!
+                        userId = data.userId
                     }
                 )
             }
-
-            URL_TYPE_THREAD -> {
+            is UrlDataResult.MessageInThread -> {
                 navController.navigate(
                     R.id.action_global_threadFragment,
                     Bundle().apply {
-                        threadType = data.thread_type!!
-                        threadId = data.thread_id!!
-                        postId = if (data.thread_type.equals(THREAD_TYPE_POST_WITH_COMMENTS)) TARGET_POSITION_FIRST else TARGET_POSITION_FIRST
+                        threadType = data.threadType.value
+                        threadId = data.threadId
+                        postId = data.postId
                     }
                 )
-            }
-
-            URL_TYPE_MESSAGE_IN_THREAD -> {
-                navController.navigate(
-                    R.id.action_global_threadFragment,
-                    Bundle().apply {
-                        threadType = data.thread_type!!
-                        threadId = data.thread_id!!
-                        postId = data.post_id!!
-                    }
-                )
-            }
-
-            else -> {
-                openInBrowser(url)
             }
         }
     }
@@ -135,7 +136,6 @@ class UrlHandler(val context: Context, val navController: NavController) {
         try {
             val openURL = Intent(Intent.ACTION_VIEW)
             openURL.data = Uri.parse(url)
-
             context.startActivity(openURL)
         } catch (e: Exception) {
             println(e.message.toString())
@@ -143,11 +143,69 @@ class UrlHandler(val context: Context, val navController: NavController) {
     }
 }
 
+enum class UrlType(val value: Byte) {
+    URL_TYPE_THREAD(1),
+    URL_TYPE_MESSAGE_IN_THREAD(2),
+    URL_TYPE_USER_ACCOUNT(3);
+}
 
-data class UrlDataResult (
-    val type: Byte,
-    val thread_type: Byte? = null,
-    val thread_id: Long? = null,
-    val post_id: Long? = null,
-    val user_id: Long? = null,
+val urlTypeSerializer = object : TypeAdapter<UrlType>() {
+    override fun write(out: JsonWriter, value: UrlType?) {
+        out.value(value?.value)
+    }
+
+    override fun read(`in`: JsonReader): UrlType? =
+        `in`.nextInt()
+            .toByte()
+            .let { serialized ->
+                UrlType.values().find {
+                    it.value == serialized
+                }
+            }
+}
+
+data class UrlDataResultDto(
+    @SerializedName("type")
+    val type: UrlType,
+    @SerializedName("thread_type")
+    val threadType: ThreadType? = null,
+    @SerializedName("thread_id")
+    val threadId: Long? = null,
+    @SerializedName("post_id")
+    val postId: Long? = null,
+    @SerializedName("user_id")
+    val userId: Long? = null,
 )
+
+fun UrlDataResultDto.toDomainModel(): UrlDataResult =
+    when (type) {
+        UrlType.URL_TYPE_THREAD -> UrlDataResult.Thread(
+            threadType = requireNotNull(threadType),
+            threadId = requireNotNull(threadId),
+        )
+        UrlType.URL_TYPE_MESSAGE_IN_THREAD -> UrlDataResult.MessageInThread(
+            threadType = requireNotNull(threadType),
+            threadId = requireNotNull(threadId),
+            postId = requireNotNull(postId),
+        )
+        UrlType.URL_TYPE_USER_ACCOUNT -> UrlDataResult.UserAccount(
+            userId = requireNotNull(userId),
+        )
+    }
+
+sealed interface UrlDataResult {
+    data class Thread(
+        val threadType: ThreadType,
+        val threadId: Long,
+    ) : UrlDataResult
+
+    data class UserAccount(
+        val userId: Long
+    ) : UrlDataResult
+
+    data class MessageInThread(
+        val threadType: ThreadType,
+        val threadId: Long,
+        val postId: Long,
+    ) : UrlDataResult
+}

@@ -1,18 +1,20 @@
 package club.electro.ui.subscriptions
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import club.electro.application.ElectroClubApp
-import club.electro.repository.SubscriptionsRepository
-import club.electro.repository.SubscriptionsRepositoryServerImpl
+import club.electro.auth.AppAuth
+import club.electro.repository.subscriptions.SubscriptionsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SubscriptionsViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository: SubscriptionsRepository = SubscriptionsRepositoryServerImpl((application as ElectroClubApp).diContainer)
-
+@HiltViewModel
+class SubscriptionsViewModel @Inject constructor(
+    val repository: SubscriptionsRepository,
+    val appAuth: AppAuth
+) : ViewModel() {
     val data = repository.data.asLiveData(Dispatchers.Default)
 
     init {

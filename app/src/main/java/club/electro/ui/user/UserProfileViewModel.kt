@@ -1,14 +1,21 @@
 package club.electro.ui.user
 
-import android.app.Application
 import androidx.lifecycle.*
-import club.electro.application.ElectroClubApp
 import club.electro.dto.User
-import club.electro.repository.UserRepository
-import club.electro.repository.UserRepositoryServerImpl
-import kotlinx.coroutines.launch
+import club.electro.repository.user.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class UserProfileViewModel(application: Application, userId: Long) : AndroidViewModel(application) {
-    private val repository: UserRepository = UserRepositoryServerImpl((application as ElectroClubApp).diContainer)
-    var currentProfile: LiveData<User> = repository.getUserProfile(userId).asLiveData()
+@HiltViewModel
+class UserProfileViewModel @Inject constructor(
+    state : SavedStateHandle,
+    val repository: UserRepository,
+) : ViewModel() {
+
+    companion object {
+        private val USER_KEY = "userId"
+    }
+
+    val userId: Long = state.get(USER_KEY) ?: 0L
+    val currentProfile: LiveData<User> = repository.getUserProfile(userId).asLiveData()
 }

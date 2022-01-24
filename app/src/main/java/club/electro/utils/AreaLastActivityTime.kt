@@ -4,7 +4,7 @@ import android.content.Context
 import club.electro.R
 import java.util.*
 
-fun AreaLastActivityTime(timestamp: Long, context: Context):String {
+fun areaLastActivityTime(timestamp: Long, context: Context):String {
     val curDate = Date()
     val date = Date(timestamp * 1000)
 

@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@id/authorAvatar"
         app:layout_constraintStart_toEndOf="@id/authorAvatar"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:textStyle="bold"
         tools:text="Author nickname"
         />
@@ -33,7 +33,7 @@
         app:layout_constraintTop_toBottomOf="@id/authorName"
         app:layout_constraintStart_toEndOf="@id/authorAvatar"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         tools:text="Вдоль рядов есть ресторанчик Легендарное Кафе у окон которого расположены 3 розетки, так же рядом BingoBoom для ореинтира. Напротив этого кафе уличная библиотека, есть где присесть пока заряжаетесь."
         />
 

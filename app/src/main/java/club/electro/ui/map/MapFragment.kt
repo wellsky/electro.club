@@ -14,9 +14,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.view.*
+import android.widget.ImageView
 import club.electro.dto.*
-import club.electro.repository.ThreadLoadTarget
+import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
@@ -26,32 +28,15 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.google.android.gms.maps.model.Marker
 import com.bumptech.glide.request.target.Target
+import com.google.android.gms.maps.model.BitmapDescriptorFactory.fromResource
+import com.google.firebase.FirebaseOptions.fromResource
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MapFragment : Fragment() {
-    private val viewModel: MapViewModel by viewModels (
-        ownerProducer = ::requireParentFragment
-    )
+    private val viewModel: MapViewModel by viewModels ()
 
     private val callback = OnMapReadyCallback { googleMap ->
-        /**
-         * Manipulates the map once available.
-         * This callback is triggered when the map is ready to be used.
-         * This is where we can add markers or lines, add listeners or move the camera.
-         * In this case, we just add a marker near Sydney, Australia.
-         * If Google Play services is not installed on the device, the user will be prompted to
-         * install it inside the SupportMapFragment. This method will only be triggered once the
-         * user has installed Google Play services and returned to the app.
-         */
-        /**
-         * Manipulates the map once available.
-         * This callback is triggered when the map is ready to be used.
-         * This is where we can add markers or lines, add listeners or move the camera.
-         * In this case, we just add a marker near Sydney, Australia.
-         * If Google Play services is not installed on the device, the user will be prompted to
-         * install it inside the SupportMapFragment. This method will only be triggered once the
-         * user has installed Google Play services and returned to the app.
-         */
         viewModel.setFilter(MARKER_TYPE_GROUP, true)
         viewModel.getAllMarkers()
 
@@ -59,27 +44,28 @@ class MapFragment : Fragment() {
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(cameraPosition.lat, cameraPosition.lng), cameraPosition.zoom))
 
-        viewModel.markers.observe(viewLifecycleOwner) {
+        viewModel.markers.observe(viewLifecycleOwner) { markersList ->
             googleMap.clear()
 
-            val socketIcon = BitmapDescriptorFactory.fromResource(R.drawable.socket);
-            val groupIcon = BitmapDescriptorFactory.fromResource(R.drawable.socket);
+            val socketIcon = fromResource(R.drawable.map_socket)
+            val groupIcon = fromResource(R.drawable.map_group)
 
-            it.forEach {
-               val coords = LatLng(it.lat, it.lng)
 
-               val marker = when (it.type) {
+            markersList.forEach { marker ->
+               val coords = LatLng(marker.lat, marker.lng)
+
+               val mapMarker = when (marker.type) {
                     MARKER_TYPE_SOCKET -> googleMap.addMarker(MarkerOptions().position(coords).icon(socketIcon))
                     MARKER_TYPE_GROUP -> googleMap.addMarker(MarkerOptions().position(coords).icon(groupIcon))
                     else -> null
-                }
+               }
 
-                marker?.let { marker->
-                    marker.tag = it
-                    it.icon?.let { icon ->
-                        marker.loadIcon(requireContext(), icon)
+               mapMarker?.let { it ->
+                    it.tag = marker
+                    marker.icon?.let { icon ->
+                        mapMarker.loadIcon(requireContext(), icon)
                     }
-                }
+               }
             }
         }
 
@@ -170,10 +156,18 @@ data class MapCameraPosition (
 
 // https://stackoverflow.com/questions/63491864/kotlin-for-android-setting-a-google-maps-marker-image-to-a-url
 fun Marker.loadIcon(context: Context, url: String?) {
+    val img = ImageView(context)
+        // Чтобы вызвать RequestListener.onResourceReady на UI-потоке, необходимо построить запрос Glide с помощью метода into()
+        // Для этого нужен фейковый ImageView
+        // Если вызывать не на главном потоке, то setIcon() выдаст ошибку
+        // https://bumptech.github.io/glide/javadocs/4120/index.html?com/bumptech/glide/request/RequestListener.html
+
     Glide.with(context)
         .asBitmap()
+        .override(100, 100)
         .load(url)
-        .error(R.drawable.socket) // to show a default icon in case of any errors
+        .timeout(5_000)
+        //.error(R.drawable.map_group) // to show a default icon in case of any errors
         .listener(object : RequestListener<Bitmap> {
             override fun onLoadFailed(
                 e: GlideException?,
@@ -194,9 +188,14 @@ fun Marker.loadIcon(context: Context, url: String?) {
                 return resource?.let {
                     BitmapDescriptorFactory.fromBitmap(it)
                 }?.let {
-                    setIcon(it); true
+                    try {
+                        setIcon(it)
+                        true
+                    } catch (e: Exception) {
+                        false
+                    }
                 } ?: false
             }
-        }).submit()
+        }).into(img)
 }
 

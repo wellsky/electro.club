@@ -1,4 +1,4 @@
-package club.electro.repository
+package club.electro.repository.feed
 
 import club.electro.dto.FeedPost
 import kotlinx.coroutines.flow.Flow

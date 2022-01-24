@@ -1,9 +1,11 @@
-package club.electro.repository
+package club.electro.repository.post
 
+import android.content.Context
 import androidx.work.*
-import club.electro.R
 import club.electro.adapter.PostsEntitiesPreparator
-import club.electro.di.DependencyContainer
+import club.electro.api.ApiService
+import club.electro.auth.AppAuth
+import club.electro.dao.PostDao
 import club.electro.dto.Post
 import club.electro.entity.PostEntity
 import club.electro.entity.toEntity
@@ -11,20 +13,22 @@ import club.electro.error.ApiError
 import club.electro.error.UnknownError
 import club.electro.model.NetworkStatus
 import club.electro.workers.SavePostWorker
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import java.io.IOException
+import javax.inject.Inject
 
-class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository {
-    private val dao = diContainer.appDb.postDao()
-    private val appAuth = diContainer.appAuth
-    private val apiService = diContainer.apiService
-    private val networkStatus = diContainer.networkStatus
+class PostRepositoryServerImpl @Inject constructor(
+    @ApplicationContext private val context : Context,
+    private val dao : PostDao,
+    private val apiService: ApiService,
+    private val appAuth: AppAuth,
+    private val networkStatus: NetworkStatus,
+    private val postsEntitiesPreparatorFactory: PostsEntitiesPreparator.Factory
+): PostRepository {
 
-    lateinit var workManager: WorkManager
 
-    override fun setupWorkManager(workManager: WorkManager) {
-        this.workManager = workManager
-    }
+    private val workManager: WorkManager = WorkManager.getInstance(context)
 
     override suspend fun getLocalById(threadType: Byte, threadId:Long, id: Long, onLoadedCallback:  (suspend () -> Unit)?): Post? {
         return dao.getById(threadType, threadId, id)?.let {
@@ -94,7 +98,7 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
     }
 
     override suspend fun prepareAndSaveLocal(postsEntities: List<PostEntity>) {
-        PostsEntitiesPreparator(
+        postsEntitiesPreparatorFactory.create(
             postsEntities = postsEntities,
             onFirstResult = {
                 dao.insert(it)
@@ -113,14 +117,6 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
     override suspend fun prepareAndSaveLocal(postEntity: PostEntity) {
         prepareAndSaveLocal(listOf(postEntity))
     }
-
-//    override suspend fun updateLocalPostPreparedContent(threadType: Byte, threadId: Long, id: Long, preparedContent: String) {
-//        dao.updatePreparedContent(threadType, threadId, id, preparedContent)
-//    }
-
-//    override suspend fun savePostToChache(post: Post) {
-//        dao.insert(post.toEntity())
-//    }
 
     override suspend fun savePostToServer(post: Post) {
         val savingEntity = if (post.id == 0L) {
@@ -160,10 +156,7 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
     }
 
     override suspend fun savePostWork(localId: Long) {
-        val entity = dao.getByLocalId(localId)
-
-        entity?.let { entity ->
-            println("Saving work for post: " + entity.localId)
+        dao.getByLocalId(localId)?.let { entity ->
             try {
                 val response = apiService.savePost(
                     threadType = entity.threadType,
@@ -182,10 +175,8 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
 
                 val newPost = PostEntity.fromDto(body.data.message).copy(localId = localId, fresh = (currentCached?.fresh ?: false))
 
-                //dao.insert(newPost)
                 prepareAndSaveLocal(newPost)
 
-                println("Have response new post id:" + body.data.message.id)
                 networkStatus.setStatus(NetworkStatus.Status.ONLINE)
             } catch (e: IOException) {
                 networkStatus.setStatus(NetworkStatus.Status.ERROR)
@@ -217,7 +208,6 @@ class PostRepositoryServerImpl(diContainer: DependencyContainer): PostRepository
             }
 
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            //dao.insert(PostEntity.fromDto(body))
             networkStatus.setStatus(NetworkStatus.Status.ONLINE)
         } catch (e: IOException) {
             networkStatus.setStatus(NetworkStatus.Status.ERROR)

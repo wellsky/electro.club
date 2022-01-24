@@ -1,3 +1,5 @@
+package club.electro.ui.login
+
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -7,26 +9,30 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import club.electro.R
 import club.electro.auth.AppAuth
+import club.electro.databinding.FragmentFeedBinding
 import club.electro.databinding.FragmentLoginBinding
 import club.electro.util.AndroidUtils
-import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.viewmodel.LoginFormState
 import ru.netology.nmedia.viewmodel.LoginViewModel
-import androidx.fragment.app.activityViewModels
 import club.electro.utils.loadCircleCrop
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-
-class LoginFragment : Fragment() {
+@AndroidEntryPoint
+class LoginFragment: Fragment() {
     private val viewModel: LoginViewModel by viewModels (
         ownerProducer = ::requireParentFragment
     )
+
+    private var _binding: FragmentLoginBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding = FragmentLoginBinding.inflate(inflater, container, false)
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
 
         binding.submit.setOnClickListener {
             AndroidUtils.hideKeyboard(requireView())
@@ -45,18 +51,16 @@ class LoginFragment : Fragment() {
             binding.loginFormGroup.isVisible = true
 
             when (it) {
-                LoginFormState.SUCCESS, LoginFormState.LOGGED -> {
-                    binding.loggedUserGroup.isVisible = true
-                    binding.loginFormGroup.isVisible = false
-
-                    val appAuth = AppAuth.getInstance()
-                    binding.userName.text = appAuth.myName()
-
-                    appAuth.myAvatar()?.let {
-                        binding.userAvatar.loadCircleCrop(appAuth.myAvatar())
-                    }
+                LoginFormState.LOGGED -> {
+                    setUserLogged(viewModel.appAuth)
                 }
                 LoginFormState.SUCCESS -> {
+                    setUserLogged(viewModel.appAuth)
+                    AndroidUtils.hideKeyboard(requireView())
+                    Snackbar.make(binding.root, R.string.success_auth, Snackbar.LENGTH_LONG)
+                        .show()
+                }
+                LoginFormState.NOT_LOGGED -> {
                     AndroidUtils.hideKeyboard(requireView())
                     Snackbar.make(binding.root, R.string.success_auth, Snackbar.LENGTH_LONG)
                         .show()
@@ -66,9 +70,28 @@ class LoginFragment : Fragment() {
                     Snackbar.make(binding.root, R.string.error_auth, Snackbar.LENGTH_LONG)
                         .show()
                 }
+                else -> {
+
+                }
             }
         })
 
         return binding.root
+    }
+
+    fun setUserLogged(appAuth: AppAuth) {
+        binding.loggedUserGroup.isVisible = true
+        binding.loginFormGroup.isVisible = false
+
+        binding.userName.text = appAuth.myName()
+
+        appAuth.myAvatar()?.let {
+            binding.userAvatar.loadCircleCrop(appAuth.myAvatar())
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

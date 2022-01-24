@@ -2,6 +2,8 @@ package club.electro.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -9,6 +11,7 @@ import club.electro.databinding.FeedPostItemBinding
 import club.electro.dto.FeedPost
 import club.electro.utils.load
 import club.electro.utils.loadCircleCrop
+import java.text.DateFormat.getDateTimeInstance
 
 interface OnFeedPostInteractionListener {
     fun onClick(feedPost: FeedPost) {}
@@ -33,24 +36,33 @@ class FeedPostViewHolder(
     private val onInteractionListener: OnFeedPostInteractionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
+    companion object {
+        private val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
+    }
+
     fun bind(feedPost: FeedPost) {
         binding.apply {
-            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
             val date = java.util.Date(feedPost.published * 1000)
 
             channelName.text = feedPost.channelName
             content.text = feedPost.content
             published.text = sdf.format(date).toString()
 
-            views.setText(feedPost.views.toString())
-            comments.setText(feedPost.comments.toString())
+            views.text = feedPost.views.toString()
+            comments.text = feedPost.comments.toString()
 
             if (!feedPost.channelAvatar.isEmpty()) {
+                channelAvatar.isVisible = true
                 channelAvatar.loadCircleCrop(feedPost.channelAvatar)
+            } else {
+                channelAvatar.isVisible = false
             }
 
             if (!feedPost.image.isEmpty()) {
+                titleImage.isVisible = true
                 titleImage.load(feedPost.image)
+            } else {
+                titleImage.isVisible = false
             }
 
 

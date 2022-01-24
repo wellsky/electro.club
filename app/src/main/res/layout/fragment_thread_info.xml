@@ -1,148 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     android:orientation="vertical">
-    <RelativeLayout
+
+    <View
+        android:id="@+id/logoBackground"
         android:layout_width="match_parent"
-        android:layout_height="320dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:background="@drawable/bg_orange_gradient"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="350dp"
-                android:layout_height="170dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="25dp"
-                android:orientation="vertical"
-                >
-                <ImageView
-                    android:id="@+id/threadImage"
-                    android:layout_width="90dp"
-                    android:layout_height="90dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/electro_club_icon_white_256"
-                    />
-                <TextView
-                    android:id="@+id/threadName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text=""
-                    android:layout_gravity="center"
-                    android:textAlignment="center"
-                    android:textColor="#fff"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-        </LinearLayout>
-        <androidx.cardview.widget.CardView
-            android:layout_width="320dp"
-            android:layout_height="110dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="200dp">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:weightSum="2">
-                <LinearLayout
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/profile_messages"
-                        android:textSize="20sp"
-                        />
-                    <TextView
-                        android:id="@+id/messages"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textStyle="bold"
-                        android:textSize="20sp"
-                        android:paddingTop="10dp"
-                        android:textColor="@color/endOrange"/>
-                </LinearLayout>
-                <LinearLayout
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/subscribers_count"
-                        android:textSize="20sp"
-                        />
-                    <TextView
-                        android:id="@+id/subscribers"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textStyle="bold"
-                        android:textSize="20sp"
-                        android:paddingTop="10dp"
-                        android:textColor="@color/endOrange"/>
-                </LinearLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-    </RelativeLayout>
-    <LinearLayout
-        android:layout_width="360dp"
-        android:layout_height="wrap_content"
+        android:layout_height="250dp"
+        android:background="@drawable/bg_orange_gradient"
         android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/threadImage"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_marginTop="25dp"
+        android:src="@drawable/electro_club_icon_white_256"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/threadName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="45dp"
+        android:layout_marginTop="10dp"
+        android:textAlignment="center"
+        android:textColor="#fff"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/threadImage"
+        tools:text="Name" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/title"
+        android:layout_width="320dp"
+        android:layout_height="110dp"
+        app:layout_constraintBottom_toBottomOf="@id/logoBackground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/logoBackground">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/messagesTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_messages"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toTopOf="@id/messages"
+                app:layout_constraintEnd_toStartOf="@id/subscribersTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+            <TextView
+                android:id="@+id/messages"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:text=""
+                android:textColor="@color/endOrange"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/messagesTitle"
+                app:layout_constraintStart_toStartOf="@id/messagesTitle"
+                app:layout_constraintTop_toBottomOf="@id/messagesTitle" />
+
+            <TextView
+                android:id="@+id/subscribersTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/subscribers_count"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toTopOf="@id/subscribers"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/messagesTitle"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+            <TextView
+                android:id="@+id/subscribers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:text=""
+                android:textColor="@color/endOrange"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/subscribersTitle"
+                app:layout_constraintStart_toStartOf="@id/subscribersTitle"
+                app:layout_constraintTop_toBottomOf="@id/subscribersTitle" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/shareGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:visibility="gone"
-        >
-        <LinearLayout
-            android:orientation="horizontal"
-            android:paddingLeft="25dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:src="@drawable/ic_baseline_share_24"/>
-            <TextView
-                android:textStyle="bold"
-                android:layout_gravity="center_vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="20dp"
-                android:text="Wiliam@gmail.com"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_marginTop="25dp"
-            android:orientation="horizontal"
-            android:paddingLeft="25dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:src="@drawable/ic_baseline_share_24"/>
-            <TextView
-                android:textStyle="bold"
-                android:layout_gravity="center_vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="20dp"
-                android:text="+266 225 225"/>
-        </LinearLayout>
-    </LinearLayout>
-</LinearLayout>
+        app:constraint_referenced_ids="emailIcon,emailText,phoneIcon,phoneText"
+        tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/emailIcon"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="45dp"
+        android:src="@drawable/ic_baseline_share_24"
+        app:layout_constraintStart_toStartOf="@id/title"
+        app:layout_constraintTop_toBottomOf="@id/title" />
+
+    <TextView
+        android:id="@+id/emailText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:paddingHorizontal="20dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/emailIcon"
+        app:layout_constraintStart_toEndOf="@id/emailIcon"
+        app:layout_constraintTop_toTopOf="@id/emailIcon"
+        tools:text="Wiliam@gmail.com" />
+
+    <ImageView
+        android:id="@+id/phoneIcon"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="25dp"
+        android:src="@drawable/ic_baseline_share_24"
+        app:layout_constraintStart_toStartOf="@id/title"
+        app:layout_constraintTop_toBottomOf="@id/emailIcon" />
+
+    <TextView
+        android:id="@+id/phoneText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:paddingHorizontal="20dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/phoneIcon"
+        app:layout_constraintStart_toEndOf="@id/phoneIcon"
+        app:layout_constraintTop_toTopOf="@id/phoneIcon"
+        tools:text="+266 225 225" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

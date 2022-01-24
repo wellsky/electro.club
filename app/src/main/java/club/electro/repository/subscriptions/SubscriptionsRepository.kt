@@ -1,4 +1,4 @@
-package club.electro.repository
+package club.electro.repository.subscriptions
 
 import club.electro.dto.SubscriptionArea
 import kotlinx.coroutines.Job

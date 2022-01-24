@@ -6,34 +6,32 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import club.electro.MainViewModel
 import club.electro.R
 import club.electro.ToolBarConfig
 import club.electro.databinding.FragmentUserProfileBinding
-import club.electro.di.DependencyContainer
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.utils.LongArg
 import club.electro.utils.loadCircleCrop
 import com.bumptech.glide.Glide
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class UserProfileFragment : Fragment() {
     companion object {
         var Bundle.userId: Long by LongArg
     }
 
-    val diContainer: DependencyContainer = DependencyContainer.getInstance()
-
     private var _binding: FragmentUserProfileBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: UserProfileViewModel
+    //private lateinit var viewModel: UserProfileViewModel
 
-//    private val viewModel: UserProfileViewModel by viewModels (
-//        ownerProducer = ::requireParentFragment
-//    )
+    private val viewModel: UserProfileViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,10 +43,10 @@ class UserProfileFragment : Fragment() {
 
         val userId = requireArguments().userId
 
-        viewModel = ViewModelProvider(this, UserProfileViewModelFactory(
-            requireActivity().getApplication(),
-            userId
-        )).get(UserProfileViewModel::class.java)
+//        viewModel = ViewModelProvider(this, UserProfileViewModelFactory(
+//            requireActivity().getApplication(),
+//            userId
+//        )).get(UserProfileViewModel::class.java)
 
         viewModel.currentProfile.observe(viewLifecycleOwner) { user->
             with (binding) {
@@ -89,16 +87,17 @@ class UserProfileFragment : Fragment() {
                 }
             }
 
-            activity?.run {
+            requireActivity().run {
                 val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
                 mainViewModel.updateActionBarTitle(ToolBarConfig(title1 = user.name))
-            } ?: throw Throwable("Invalid activity")
+            }
         }
 
-//        arguments?.userId?.let {
-//            viewModel.getUserProfile(it)
-//        }
-
         return root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

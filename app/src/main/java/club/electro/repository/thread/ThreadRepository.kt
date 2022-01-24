@@ -1,17 +1,17 @@
-package club.electro.repository
+package club.electro.repository.thread
 
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.PagingData
 import club.electro.dto.Post
 import club.electro.dto.PostsThread
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
 interface ThreadRepository {
     val thread: Flow<PostsThread>
+    val lastUpdateTime: MutableLiveData<Long>
     val threadStatus: MutableLiveData<ThreadStatus>
-    val posts: Flow<PagingData<Post>>
 
+    fun posts(refreshTarget: ThreadLoadTarget): Flow<PagingData<Post>>
 
     suspend fun getThread()
     suspend fun changeSubscription(newStatus: Byte)
@@ -20,9 +20,6 @@ interface ThreadRepository {
 
     suspend fun removePost(post: Post)
     suspend fun checkForUpdates()
-
-    fun reloadPosts(target: ThreadLoadTarget)
-    fun changeTargetPost(target: ThreadLoadTarget)
 
     fun startCheckUpdates()
     fun stopCheckUpdates()

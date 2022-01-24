@@ -3,6 +3,7 @@ package club.electro.ui.feed
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import club.electro.MainViewModel
@@ -10,19 +11,17 @@ import club.electro.R
 import club.electro.ToolBarConfig
 import club.electro.adapter.*
 import club.electro.databinding.FragmentFeedBinding
-import club.electro.dto.FeedPost
-import club.electro.dto.SUBSCRIPTION_STATUS_NONE
-import club.electro.dto.THREAD_TYPE_POST_WITH_COMMENTS
-import club.electro.dto.THREAD_TYPE_PUBLIC_CHAT
+import club.electro.dto.*
 import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FeedFragment : Fragment() {
+    private val feedViewModel: FeedViewModel by viewModels ()
 
-    private lateinit var feedViewModel: FeedViewModel
     private var _binding: FragmentFeedBinding? = null
-
     private val binding get() = _binding!!
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -39,8 +38,6 @@ class FeedFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        feedViewModel = ViewModelProvider(this).get(FeedViewModel::class.java)
-
         _binding = FragmentFeedBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
@@ -49,7 +46,7 @@ class FeedFragment : Fragment() {
                 findNavController().navigate(
                     R.id.action_nav_feed_to_threadFragment,
                     Bundle().apply {
-                        threadType = THREAD_TYPE_POST_WITH_COMMENTS
+                        threadType = ThreadType.THREAD_TYPE_POST_WITH_COMMENTS.value
                         threadId = feedPost.id
                         postId = -1L
                     }

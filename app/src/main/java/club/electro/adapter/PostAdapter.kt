@@ -3,10 +3,6 @@ package club.electro.adapter
 import ImageGetter
 import QuoteSpanClass
 import android.content.res.Resources
-import android.graphics.Color
-import android.graphics.Rect
-import android.os.Bundle
-import android.provider.Settings.Global.getString
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
@@ -28,11 +24,10 @@ import club.electro.R
 import club.electro.databinding.PostItemBinding
 import club.electro.dto.Post
 import com.bumptech.glide.Glide
-import club.electro.utils.trimWhiteSpaces
 import android.text.SpannableStringBuilder
 import android.widget.TextView
 import android.text.style.ClickableSpan
-
+import androidx.lifecycle.LifecycleCoroutineScope
 
 
 interface PostInteractionListener {
@@ -45,10 +40,11 @@ interface PostInteractionListener {
 
 class PostAdapter(
     private val onInteractionListener: PostInteractionListener,
+    private val lifecycleScope: LifecycleCoroutineScope
 ) : PagingDataAdapter<Post, PostViewHolder>(PostDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = PostItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PostViewHolder(binding, onInteractionListener)
+        return PostViewHolder(binding, onInteractionListener, lifecycleScope)
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
@@ -64,11 +60,15 @@ class PostAdapter(
 class PostViewHolder(
     private val binding: PostItemBinding,
     private val onInteractionListener: PostInteractionListener,
+    private val lifecycleScope: LifecycleCoroutineScope
 ) : RecyclerView.ViewHolder(binding.root) {
+
+    companion object {
+        private val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
+    }
 
     fun bind(post: Post) {
         binding.apply {
-            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
             val date = java.util.Date(post.published * 1000)
 
             authorName.text = post.authorName
@@ -92,8 +92,8 @@ class PostViewHolder(
                     published.setText(R.string.post_status_removing)
                 }
                 Post.STATUS_PUBLISHED -> {
-                    //published.setText(sdf.format(date).toString() + " (id: " + post.id + ")")
-                    published.setText(sdf.format(date).toString())
+                    //published.text = sdf.format(date).toString() + " (id: " + post.id + ")"
+                    published.text = sdf.format(date).toString()
                     content.setTextColor(getColor(this.root.context, R.color.postTextColor))
                     menu.isVisible = true
                 }
@@ -141,7 +141,7 @@ class PostViewHolder(
 
             val preparedContent = post.preparedContent ?: post.content
 
-            val imageGetter = ImageGetter(resources, content)
+            val imageGetter = ImageGetter(resources, content, lifecycleScope)
 
             //Initial span from HtmlCompat will link anchor tags
             val htmlSpan = HtmlCompat.fromHtml(
@@ -151,7 +151,7 @@ class PostViewHolder(
                 null
             ) as Spannable
 
-            val trimmedPostText: CharSequence = trimWhiteSpaces(htmlSpan)
+            val trimmedPostText: CharSequence = htmlSpan.trim()
             val result = trimmedPostText
             replaceQuoteSpans(result as Spannable)
 
@@ -179,13 +179,11 @@ class PostViewHolder(
             }
 
             setTextViewHTML(content, restoreAnchorsSpan)
-
-            //content.setText(result)
         }
     }
 
 
-    protected fun makeLinkClickable(strBuilder: SpannableStringBuilder, span: URLSpan?) {
+    private fun makeLinkClickable(strBuilder: SpannableStringBuilder, span: URLSpan?) {
         val start = strBuilder.getSpanStart(span)
         val end = strBuilder.getSpanEnd(span)
         val flags = strBuilder.getSpanFlags(span)
@@ -193,15 +191,14 @@ class PostViewHolder(
             override fun onClick(view: View) {
                 // Do something with span.getURL() to handle the link click...
                 onInteractionListener.onUrlClicked(span?.getURL())
-                //UrlHandler(span?.getURL(), binding.root.context).run()
             }
         }
         strBuilder.setSpan(clickable, start, end, flags)
         strBuilder.removeSpan(span)
     }
 
-    protected fun setTextViewHTML(text: TextView, html: CharSequence) {
-        val sequence = html //: CharSequence = Html.fromHtml(html)
+    private fun setTextViewHTML(text: TextView, html: CharSequence) {
+        val sequence = html
         val strBuilder = SpannableStringBuilder(sequence)
         val urls = strBuilder.getSpans(0, sequence.length, URLSpan::class.java)
         for (span in urls) {

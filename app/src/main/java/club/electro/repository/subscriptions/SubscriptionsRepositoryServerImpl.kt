@@ -1,8 +1,8 @@
-package club.electro.repository
+package club.electro.repository.subscriptions
 
-import club.electro.R
+import club.electro.api.ApiService
+import club.electro.auth.AppAuth
 import club.electro.dao.AreaDao
-import club.electro.di.DependencyContainer
 import club.electro.dto.SubscriptionArea
 import club.electro.entity.AreaEntity
 import club.electro.entity.toDto
@@ -14,14 +14,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import java.io.IOException
+import javax.inject.Inject
 
-class SubscriptionsRepositoryServerImpl(diContainer: DependencyContainer) : SubscriptionsRepository {
-    val appDb = diContainer.appDb
-    val apiService = diContainer.apiService
-    val appAuth = diContainer.appAuth
-    val networkStatus = diContainer.networkStatus
+class SubscriptionsRepositoryServerImpl @Inject constructor(
+    private val apiService: ApiService,
+    private val appAuth : AppAuth,
+    private val dao: AreaDao,
+    private val networkStatus: NetworkStatus
 
-    private val dao: AreaDao = appDb.areaDao()
+) : SubscriptionsRepository {
+
     override val data: Flow<List<SubscriptionArea>> = dao.getAll().map(List<AreaEntity>::toDto).flowOn(Dispatchers.Default)
 
     private var lastEventTime = 0L
@@ -63,13 +65,13 @@ class SubscriptionsRepositoryServerImpl(diContainer: DependencyContainer) : Subs
                 }
                 val body = response.body() ?: throw ApiError(response.code(), response.message())
 
-                body?.let {
+                body.let {
                     if (it.data.items.isNotEmpty()) {
                         dao.removeAll()
                         dao.insert(body.data.items.toEntity())
                         lastEventTime = body.data.lastEventTime
-                        networkStatus.setStatus(NetworkStatus.Status.ONLINE)
                     }
+                    networkStatus.setStatus(NetworkStatus.Status.ONLINE)
                 }
             }  catch (e: IOException) {
                 networkStatus.setStatus(NetworkStatus.Status.ERROR)

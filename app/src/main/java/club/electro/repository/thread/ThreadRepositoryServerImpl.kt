@@ -1,46 +1,55 @@
-package club.electro.repository
+package club.electro.repository.thread
 
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.*
-import club.electro.di.DependencyContainer
+import club.electro.api.ApiService
+import club.electro.auth.AppAuth
+import club.electro.dao.PostDao
+import club.electro.dao.ThreadDao
 import club.electro.dto.Post
 import club.electro.dto.PostsThread
 import club.electro.entity.toEntity
 import club.electro.error.*
 import club.electro.model.NetworkStatus
-import club.electro.repository.ThreadLoadTarget.Companion.TARGET_POSITION_LAST
+import club.electro.repository.PostRemoteMediatorFactory
+import club.electro.repository.post.PostRepository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.IOException
+import javax.inject.Inject
+import javax.inject.Named
 
-class ThreadRepositoryServerImpl(
-            val diContainer: DependencyContainer,
-            val threadType: Byte,
-            val threadId: Long,
-            val targetPost: ThreadLoadTarget = ThreadLoadTarget(TARGET_POSITION_LAST)
-        ) : ThreadRepository {
+class ThreadRepositoryServerImpl @Inject constructor(
+    @Named("threadType")
+            private val threadType: Byte,
 
-    private val threadDao = diContainer.appDb.threadDao()
-    private val postDao = diContainer.appDb.postDao()
-    private val apiService = diContainer.apiService
-    private val appAuth = diContainer.appAuth
-    private val postRepository = diContainer.postRepository
-    private val networkStatus = diContainer.networkStatus
+    @Named("threadId")
+            private val threadId: Long,
+
+    private val apiService: ApiService,
+    private val threadDao: ThreadDao,
+    private val postDao: PostDao,
+    private val appAuth: AppAuth,
+    private val postRepository: PostRepository,
+    private val networkStatus: NetworkStatus
+) : ThreadRepository {
+    override val lastUpdateTime: MutableLiveData<Long> = MutableLiveData(0L)
 
     override val threadStatus: MutableLiveData<ThreadStatus> = MutableLiveData(ThreadStatus())
 
     private lateinit var updaterJob: Job
 
-    // https://stackoverflow.com/questions/64692260/paging-3-0-list-with-new-params-in-kotlin?noredirect=1&lq=1
-    var targetFlow = MutableStateFlow(value = targetPost)
+    @Inject
+    lateinit var mediatorFactory: PostRemoteMediatorFactory
 
-    override val posts = targetFlow.flatMapLatest { refreshTarget ->
-        println("Creating pager")
 
+   override val thread: Flow<PostsThread> = threadDao.get(threadType, threadId)
+
+   override fun posts(refreshTarget: ThreadLoadTarget): Flow<PagingData<Post>> =
         @OptIn(ExperimentalPagingApi::class)
         Pager(
             config = PagingConfig(pageSize = 20),
-            remoteMediator = PostRemoteMediator(diContainer, threadType, threadId, target = refreshTarget),
+            remoteMediator = mediatorFactory.create(threadType, threadId, refreshTarget),
             pagingSourceFactory = {
                 postDao.freshPosts(threadType, threadId)
             },
@@ -49,9 +58,7 @@ class ThreadRepositoryServerImpl(
                 it.toDto()
             }
         }
-    }
 
-    override val thread: Flow<PostsThread> = threadDao.get(threadType, threadId)
 
     override suspend fun getThread() {
         appAuth.myToken()?.let { myToken ->
@@ -96,14 +103,6 @@ class ThreadRepositoryServerImpl(
 
             }
         }
-    }
-
-    override fun reloadPosts(target: ThreadLoadTarget) {
-        changeTargetPost(target)
-    }
-
-    override fun changeTargetPost(target: ThreadLoadTarget) {
-        targetFlow.value = target
     }
 
     override suspend fun savePostToServer(post: Post) {
