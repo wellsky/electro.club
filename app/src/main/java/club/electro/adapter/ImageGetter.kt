@@ -6,10 +6,8 @@ import android.graphics.drawable.Drawable
 import android.text.Html
 import android.widget.TextView
 import androidx.lifecycle.LifecycleCoroutineScope
-import com.bumptech.glide.Glide
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 

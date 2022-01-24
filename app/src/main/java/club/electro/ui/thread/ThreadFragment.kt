@@ -144,13 +144,6 @@ class ThreadFragment constructor(): Fragment() {
 
         currentTargetPost = ThreadLoadTarget(postId)
 
-//        viewModel = ViewModelProvider(this, ThreadViewModelFactory(
-//            requireActivity().getApplication(),
-//            threadType,
-//            threadId,
-//            currentTargetPost!!
-//        )).get(ThreadViewModel::class.java)
-
         viewModel.getThread()
     }
 
@@ -206,7 +199,6 @@ class ThreadFragment constructor(): Fragment() {
         // В итоге когда пользователь возвращается в чат из "следующего" фрагмента, то все посты перезагружаются с сервера и сбивается текущая позиция скроллинга
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
         //lifecycleScope.launchWhenCreated {
-            println("LaunchWhenCreated")
             viewModel.posts.collectLatest {
                 currentTargetPost?.let {
                     setGravityForTarget(it)

@@ -66,8 +66,6 @@ class FCMService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        //println("Message invoked " + Gson().toJson(message))
-
         val recipient = message.data.get(recipientId)
         val currenUserId = appAuth.myId()
 

@@ -208,7 +208,6 @@ class PostRepositoryServerImpl @Inject constructor(
             }
 
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            //dao.insert(PostEntity.fromDto(body))
             networkStatus.setStatus(NetworkStatus.Status.ONLINE)
         } catch (e: IOException) {
             networkStatus.setStatus(NetworkStatus.Status.ERROR)

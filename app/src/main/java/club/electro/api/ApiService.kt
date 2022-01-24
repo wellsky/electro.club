@@ -26,7 +26,7 @@ fun okhttp(vararg interceptors: Interceptor): OkHttpClient = OkHttpClient.Builde
 
 private val gson = GsonBuilder()
     .registerTypeAdapter(UrlType::class.java, urlTypeSerializer)
-    .registerTypeAdapter(UrlType::class.java, threadTypeSerializer)
+    .registerTypeAdapter(ThreadType::class.java, threadTypeSerializer)
     .create()
 
 fun retrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()

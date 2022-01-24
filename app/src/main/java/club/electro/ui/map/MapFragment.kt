@@ -14,7 +14,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.view.*
+import android.widget.ImageView
 import club.electro.dto.*
 import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.ui.thread.ThreadFragment.Companion.postId
@@ -26,13 +28,13 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.google.android.gms.maps.model.Marker
 import com.bumptech.glide.request.target.Target
+import com.google.android.gms.maps.model.BitmapDescriptorFactory.fromResource
+import com.google.firebase.FirebaseOptions.fromResource
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MapFragment : Fragment() {
-    private val viewModel: MapViewModel by viewModels (
-        ownerProducer = ::requireParentFragment
-    )
+    private val viewModel: MapViewModel by viewModels ()
 
     private val callback = OnMapReadyCallback { googleMap ->
         viewModel.setFilter(MARKER_TYPE_GROUP, true)
@@ -45,8 +47,9 @@ class MapFragment : Fragment() {
         viewModel.markers.observe(viewLifecycleOwner) { markersList ->
             googleMap.clear()
 
-            val socketIcon = BitmapDescriptorFactory.fromResource(R.drawable.map_socket);
-            val groupIcon = BitmapDescriptorFactory.fromResource(R.drawable.map_group);
+            val socketIcon = fromResource(R.drawable.map_socket)
+            val groupIcon = fromResource(R.drawable.map_group)
+
 
             markersList.forEach { marker ->
                val coords = LatLng(marker.lat, marker.lng)
@@ -153,11 +156,18 @@ data class MapCameraPosition (
 
 // https://stackoverflow.com/questions/63491864/kotlin-for-android-setting-a-google-maps-marker-image-to-a-url
 fun Marker.loadIcon(context: Context, url: String?) {
+    val img = ImageView(context)
+        // Чтобы вызвать RequestListener.onResourceReady на UI-потоке, необходимо построить запрос Glide с помощью метода into()
+        // Для этого нужен фейковый ImageView
+        // Если вызывать не на главном потоке, то setIcon() выдаст ошибку
+        // https://bumptech.github.io/glide/javadocs/4120/index.html?com/bumptech/glide/request/RequestListener.html
+
     Glide.with(context)
         .asBitmap()
+        .override(100, 100)
         .load(url)
         .timeout(5_000)
-        .error(R.drawable.map_group) // to show a default icon in case of any errors
+        //.error(R.drawable.map_group) // to show a default icon in case of any errors
         .listener(object : RequestListener<Bitmap> {
             override fun onLoadFailed(
                 e: GlideException?,
@@ -178,10 +188,14 @@ fun Marker.loadIcon(context: Context, url: String?) {
                 return resource?.let {
                     BitmapDescriptorFactory.fromBitmap(it)
                 }?.let {
-                    setIcon(it)
-                    true
+                    try {
+                        setIcon(it)
+                        true
+                    } catch (e: Exception) {
+                        false
+                    }
                 } ?: false
             }
-        }).submit()
+        }).into(img)
 }
 

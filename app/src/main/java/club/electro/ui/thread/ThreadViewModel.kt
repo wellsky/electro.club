@@ -41,7 +41,6 @@ class ThreadViewModel @Inject constructor(
     }
 
     fun reloadPosts(target: ThreadLoadTarget) {
-        //repository.reloadPosts(target)
         mutablePosts.value = target
     }
 

@@ -37,34 +37,11 @@ class ThreadRepositoryServerImpl @Inject constructor(
 
     private lateinit var updaterJob: Job
 
-//    private val targetPost = ThreadLoadTarget(targetPostId)
-
     @Inject
     lateinit var mediatorFactory: PostRemoteMediatorFactory
 
-    // https://stackoverflow.com/questions/64692260/paging-3-0-list-with-new-params-in-kotlin?noredirect=1&lq=1
-//    val targetFlow = MutableStateFlow(value = targetPost)
 
-
-//    override val posts = targetFlow.flatMapLatest { refreshTarget ->
-//        @OptIn(ExperimentalPagingApi::class)
-//        Pager(
-//            config = PagingConfig(pageSize = 20),
-//            remoteMediator = mediatorFactory.create(threadType, threadId, refreshTarget),
-//            pagingSourceFactory = {
-//                postDao.freshPosts(threadType, threadId)
-//            },
-//        ).flow.map { pagingData ->
-//            pagingData.map {
-//                it.toDto()
-//            }
-//        }
-//    }
-
-
-    override val thread: Flow<PostsThread> = threadDao.get(threadType, threadId)
-
-    //fun targetFlow(targetPost: ThreadLoadTarget) = MutableStateFlow(value = targetPost)
+   override val thread: Flow<PostsThread> = threadDao.get(threadType, threadId)
 
    override fun posts(refreshTarget: ThreadLoadTarget): Flow<PagingData<Post>> =
         @OptIn(ExperimentalPagingApi::class)
@@ -126,14 +103,6 @@ class ThreadRepositoryServerImpl @Inject constructor(
         }
     }
 
-//    override fun reloadPosts(target: ThreadLoadTarget) {
-//        changeTargetPost(target)
-//    }
-
-//    override fun changeTargetPost(target: ThreadLoadTarget) {
-//        targetFlow.value = target
-//    }
-
     override suspend fun savePostToServer(post: Post) {
         val newPost = post.copy(
             threadId = threadId,
@@ -147,7 +116,7 @@ class ThreadRepositoryServerImpl @Inject constructor(
     }
 
     override suspend fun checkForUpdates()  {
-        while (false) {
+        while (true) {
             delay(2_000L)
             try {
                 val response = apiService.getAreaModifiedTime(
