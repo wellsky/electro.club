@@ -27,6 +27,7 @@ import com.bumptech.glide.Glide
 import android.text.SpannableStringBuilder
 import android.widget.TextView
 import android.text.style.ClickableSpan
+import androidx.core.text.HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_BLOCKQUOTE
 import androidx.lifecycle.LifecycleCoroutineScope
 
 
@@ -92,8 +93,8 @@ class PostViewHolder(
                     published.setText(R.string.post_status_removing)
                 }
                 Post.STATUS_PUBLISHED -> {
-                    //published.text = sdf.format(date).toString() + " (id: " + post.id + ")"
-                    published.text = sdf.format(date).toString()
+                    published.text = sdf.format(date).toString() + " (id: " + post.id + ")"
+                    //published.text = sdf.format(date).toString()
                     content.setTextColor(getColor(this.root.context, R.color.postTextColor))
                     menu.isVisible = true
                 }
@@ -146,7 +147,7 @@ class PostViewHolder(
             //Initial span from HtmlCompat will link anchor tags
             val htmlSpan = HtmlCompat.fromHtml(
                 preparedContent,
-                HtmlCompat.FROM_HTML_MODE_LEGACY,
+                HtmlCompat.FROM_HTML_MODE_COMPACT + HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_BLOCKQUOTE,
                 imageGetter,
                 null
             ) as Spannable

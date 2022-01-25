@@ -23,8 +23,8 @@ class ThreadViewModel @Inject constructor(
     val mutablePosts = MutableStateFlow(value = ThreadLoadTarget((state.get("postId") ?: 0L)))
 
     val posts = mutablePosts.flatMapLatest { refreshTarget ->
-        repository.posts(refreshTarget).cachedIn(viewModelScope)
-    }
+        repository.posts(refreshTarget)
+    }.cachedIn(viewModelScope)
 
 //    val thread = repository.thread.asLiveData()
 //    val posts = repository.posts.cachedIn(viewModelScope)

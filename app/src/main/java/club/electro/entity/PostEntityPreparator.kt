@@ -101,9 +101,9 @@ class PostEntityContentPreparator @AssistedInject constructor(
 
     fun prepareBasicTags(): PostEntityContentPreparator {
         var newText = text
-        newText = newText.replace("<br /></p>", "</p>")
-        newText = newText.replace("<p>", "")
-        newText = newText.replace("</p>", "<br>")
+        //newText = newText.replace("<br /></p>", "</p>")
+        //newText = newText.replace("<p>", "")
+        //newText = newText.replace("</p>", "<br>")
 
         text = newText
         return this
