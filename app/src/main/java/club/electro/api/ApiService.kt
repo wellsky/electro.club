@@ -75,6 +75,7 @@ interface ApiService {
         @Field("from") from: String? = null,
         @Field("included") included: Byte? = null,
         @Field("count") count: Int? = null,
+        @Field("nearest") nearest: Int? = null,
     ): Response<ApiResponse<ApiPostsData>>
 
     @FormUrlEncoded

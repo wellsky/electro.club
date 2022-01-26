@@ -51,39 +51,35 @@ class PostRemoteMediator @AssistedInject constructor(
             val response = when (loadType) {
                 LoadType.REFRESH -> {
 
-                    // Если надо начать от последнего сообщения, то при рефреше загружаем отрицательное число постов (т.е. вверх по списку)
-                    var count =
-                        if (target.targetPostId == ThreadLoadTarget.TARGET_POSITION_LAST)
-                            -state.config.pageSize else state.config.pageSize
-
-
                     // Если anchorPosition не null, значит был вызван adapter.refresh() (особенности библиотеки) и надо обновить видимые посты
-                    val from = state.anchorPosition?.let {
-                        println(
-                            "anchor: " + state.anchorPosition + " postId: " + state.closestItemToPosition(
-                                it
-                            )?.id + " gravity: " + target.targetPostId
+                    state.anchorPosition?.let {
+                        val from = state.closestItemToPosition(it)?.id.toString()
+
+                        println("REFRESH FROM " + from + " NEAREST=" + state.config.pageSize + " anchor: " + state.anchorPosition)
+
+                        apiService.getThreadPosts(
+                            threadType = threadType,
+                            threadId = threadId,
+                            from = from,
+                            nearest = state.config.pageSize,
                         )
+                    } ?: run {
+                        // Это не adapter.refresh(), начинаем загрузку с указанного в цели значения
+                        val from = target.targetApiParameter()
 
-                        // В зависимости от "гравитации" ближайший видимый пост будет либо выше, либо ниже видимой области экрана
-                        // Значит загрузку надо начать с сообщений либо до либо после этого поста
-                        count =
-                            if (target.targetPostId == ThreadLoadTarget.TARGET_POSITION_LAST)
-                                state.config.pageSize else -state.config.pageSize
+                        // Если надо начать от последнего сообщения, то при рефреше загружаем отрицательное число постов (т.е. вверх по списку)
+                        var count = if (target.targetPostId == ThreadLoadTarget.TARGET_POSITION_LAST) -state.config.pageSize else state.config.pageSize
 
-                        state.closestItemToPosition(it)?.id.toString()
+                        println("REFRESH FROM " + from + " COUNT=" + count + " anchor: " + state.anchorPosition)
+
+                        apiService.getThreadPosts(
+                            threadType = threadType,
+                            threadId = threadId,
+                            from = from,
+                            included = 1, //Включая указанный в from пост
+                            count = count,
+                        )
                     }
-                        ?: target.targetApiParameter() // Это не adapter.refresh(), начинаем загрузку с указанного в цели значения
-
-                    println("REFRESH FROM " + from + " " + count + " anchor: " + state.anchorPosition)
-
-                    apiService.getThreadPosts(
-                        threadType = threadType,
-                        threadId = threadId,
-                        from = from,
-                        included = 1, //Включая указанный в from пост
-                        count = count,
-                    )
                 }
 
                 LoadType.PREPEND -> {

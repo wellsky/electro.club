@@ -21,7 +21,6 @@ class SavePostWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         val id = inputData.getLong(localPostId, 0L)
-        println("doWork: " + id)
         if (id == 0L) {
             return Result.failure()
         }

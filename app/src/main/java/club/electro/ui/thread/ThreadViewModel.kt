@@ -6,6 +6,7 @@ import club.electro.auth.AppAuth
 import club.electro.dto.Post
 import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.repository.thread.ThreadRepository
+import club.electro.repository.thread.ThreadStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -26,11 +27,8 @@ class ThreadViewModel @Inject constructor(
         repository.posts(refreshTarget)
     }.cachedIn(viewModelScope)
 
-//    val thread = repository.thread.asLiveData()
-//    val posts = repository.posts.cachedIn(viewModelScope)
-//>>>>>>> master
-
     val threadStatus = repository.threadStatus
+    var lastThreadStatus: ThreadStatus = ThreadStatus()
 
     val editorPost = MutableLiveData(emptyPost) // Пост, который в данный момент в текстовом редакторе
     val editedPost = MutableLiveData(emptyPost) // Опубликованный пост, который в данный момент редактируется в текстовом редакторе

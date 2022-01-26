@@ -118,7 +118,7 @@ class ThreadRepositoryServerImpl @Inject constructor(
     }
 
     override suspend fun checkForUpdates()  {
-        while (false) {
+        while (true) {
             delay(2_000L)
             try {
                 val response = apiService.getAreaModifiedTime(

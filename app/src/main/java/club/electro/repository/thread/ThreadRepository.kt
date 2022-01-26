@@ -26,6 +26,7 @@ interface ThreadRepository {
 }
 
 data class ThreadStatus (
+    val messagesCount: Long = 0,
     val lastUpdateTime: Long = 0,
-    val lastMessageTime: Long = 0,
+    val lastMessageTime: Long = 0
 )
