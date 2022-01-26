@@ -149,6 +149,7 @@ class PostRepositoryServerImpl @Inject constructor(
                 .setInputData(data)
                 .setConstraints(constraints)
                 .build()
+            println("workManager enqueue " + localId)
             workManager.enqueue(request)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -156,6 +157,7 @@ class PostRepositoryServerImpl @Inject constructor(
     }
 
     override suspend fun savePostWork(localId: Long) {
+        println("savePostWork " + localId)
         dao.getByLocalId(localId)?.let { entity ->
             try {
                 val response = apiService.savePost(
@@ -165,18 +167,19 @@ class PostRepositoryServerImpl @Inject constructor(
                     postContent = entity.content,
                     answerTo = entity.answerTo
                 )
-
+                println("1")
                 if (!response.isSuccessful) {
                     throw ApiError(response.code(), response.message())
                 }
+                println("2")
                 val body = response.body() ?: throw ApiError(response.code(), response.message())
-
+                println("3")
                 val currentCached = dao.getByLocalId(localId)
-
+                println("4")
                 val newPost = PostEntity.fromDto(body.data.message).copy(localId = localId, fresh = (currentCached?.fresh ?: false))
-
+                println("5")
                 prepareAndSaveLocal(newPost)
-
+                println("6")
                 networkStatus.setStatus(NetworkStatus.Status.ONLINE)
             } catch (e: IOException) {
                 networkStatus.setStatus(NetworkStatus.Status.ERROR)

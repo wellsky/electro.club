@@ -39,7 +39,13 @@ class SubscriptionAreaViewHolder(
         binding.apply {
             areaName.text = area.name
             areaLastMessage.text = htmlToText(area.last_text)
-            areaLastName.text = area.last_name + ": "
+
+            if (area.last_name.isNotBlank()) {
+                areaLastName.text = area.last_name + ": "
+            } else {
+                areaLastName.text = ""
+            }
+
             areaLastMessageTime.text = areaLastActivityTime(area.last_time, this.root.context)
 
             areaUnreadMessagesCount.isVisible = (area.count > 0)

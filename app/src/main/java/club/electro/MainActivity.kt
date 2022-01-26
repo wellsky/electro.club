@@ -1,6 +1,7 @@
 package club.electro
 
 import android.os.Bundle
+import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -17,7 +18,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import club.electro.auth.AppAuth
 import club.electro.databinding.ActivityMainBinding
+import club.electro.dto.ThreadType
 import club.electro.model.NetworkStatus
+import club.electro.repository.thread.ThreadLoadTarget
+import club.electro.ui.thread.ThreadFragment.Companion.postId
+import club.electro.ui.thread.ThreadFragment.Companion.threadId
+import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.utils.loadCircleCrop
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -46,7 +52,7 @@ class MainActivity: AppCompatActivity() {
 
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_feed, R.id.nav_subscriptions, R.id.nav_map
+                R.id.nav_feed, R.id.nav_subscriptions, R.id.nav_map, R.id.nav_info
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -62,6 +68,25 @@ class MainActivity: AppCompatActivity() {
             navController.navigate(
                 R.id.action_global_nav_login
             )
+        }
+
+        val navigationView: NavigationView = findViewById(R.id.nav_view) as NavigationView
+        navigationView.menu!!.findItem(R.id.nav_info).setOnMenuItemClickListener { menuItem: MenuItem? ->
+            //write your implementation here
+            //to close the navigation drawer
+            navController.navigate(
+                R.id.action_global_threadFragment,
+                Bundle().apply {
+                    threadType = 2
+                    threadId = 8510
+                    postId = ThreadLoadTarget.TARGET_POSITION_FIRST
+                }
+            )
+
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START)
+            }
+            true
         }
 
         viewModel.appAuth.authState.observe(this, { authState ->
