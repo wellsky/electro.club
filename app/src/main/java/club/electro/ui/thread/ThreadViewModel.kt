@@ -9,6 +9,7 @@ import club.electro.repository.thread.ThreadRepository
 import club.electro.repository.thread.ThreadStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,17 +23,42 @@ class ThreadViewModel @Inject constructor(
     val thread = repository.thread.asLiveData()
 
     val mutablePosts = MutableStateFlow(value = ThreadLoadTarget((state.get("postId") ?: 0L)))
-
     val posts = mutablePosts.flatMapLatest { refreshTarget ->
         repository.posts(refreshTarget)
     }.cachedIn(viewModelScope)
 
-    val threadStatus = repository.threadStatus
-    var lastThreadStatus: ThreadStatus = ThreadStatus()
-
     val editorPost = MutableLiveData(emptyPost) // Пост, который в данный момент в текстовом редакторе
     val editedPost = MutableLiveData(emptyPost) // Опубликованный пост, который в данный момент редактируется в текстовом редакторе
     val answerToPost = MutableLiveData(emptyPost) // Пост, на который в данный момент пишется ответ
+
+    val lastUpdateTime: MutableLiveData<Long> = MutableLiveData(0L)
+    var lastThreadStatus: ThreadStatus = ThreadStatus()
+
+    private var _incomingChangesStatus: IncomingChangesStatus? = null
+
+    val incomingChangesStatus
+        get() = _incomingChangesStatus
+
+    init {
+        viewModelScope.launch {
+            repository.threadStatus.asFlow().collectLatest { newThreadStatus->
+                println("thread status changed")
+                if (newThreadStatus.lastUpdateTime > lastThreadStatus.lastUpdateTime) {
+                    if (lastThreadStatus.lastUpdateTime > 0) {
+                        if (newThreadStatus.messagesCount > lastThreadStatus.messagesCount) {
+                            // TODO Появились новые сообщения
+                        }
+                        lastUpdateTime.value = newThreadStatus.lastUpdateTime
+                    }
+                    lastThreadStatus = newThreadStatus
+                }
+            }
+        }
+    }
+
+    fun setIncomingChangesStatus(status: IncomingChangesStatus?) {
+        _incomingChangesStatus = status
+    }
 
     fun getThread() = viewModelScope.launch {
         repository.getThread()
@@ -43,6 +69,9 @@ class ThreadViewModel @Inject constructor(
     }
 
     fun reloadPosts(target: ThreadLoadTarget) {
+        _incomingChangesStatus = IncomingChangesStatus(
+            targetPost = target
+        )
         mutablePosts.value = target
     }
 
@@ -57,6 +86,14 @@ class ThreadViewModel @Inject constructor(
 
     fun saveEditorPost() {
         editorPost.value?.let {
+            if (it.id == 0L) {
+                println("New message saved")
+                _incomingChangesStatus = IncomingChangesStatus(
+                    newMessages = 1,
+                    targetPost = ThreadLoadTarget(ThreadLoadTarget.TARGET_POSITION_LAST)
+                )
+            }
+
             viewModelScope.launch {
                 try {
                     repository.savePostToServer(it)
@@ -116,4 +153,9 @@ private val emptyPost = Post(
     authorAvatar = "",
     content = "",
     published = 0,
+)
+
+data class IncomingChangesStatus(
+    val targetPost: ThreadLoadTarget? = null,
+    val newMessages: Int? = null
 )

@@ -82,8 +82,8 @@ class ThreadInfoFragment : Fragment() {
             }
         }
 
-        viewModel.threadStatus.observe(viewLifecycleOwner) {
-            if (it.lastUpdateTime > 0L) {
+        viewModel.lastUpdateTime.observe(viewLifecycleOwner) {
+            if (it > 0L) {
                 if (firstUpdateTimeReceived) {
                     viewModel.getThread()
                 } else {

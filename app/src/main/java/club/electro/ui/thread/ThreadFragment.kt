@@ -55,7 +55,7 @@ class ThreadFragment: Fragment() {
 
     //private var currentTargetPost: ThreadLoadTarget? = null // Задается при вызове загрузки постов и сбрасывается в null при первом поступлении новых данных
     //private var currentIncomingRefresh: Boolean = false // Становится true, если тема обновляется из-за изменений на сервере
-    private var incomingChangesStatus: IncomingChangesStatus? = null
+    //private var incomingChangesStatus: IncomingChangesStatus? = null
 
     private var scrolledToTop: Boolean = true
     private var scrolledToBottom: Boolean = true
@@ -142,8 +142,10 @@ class ThreadFragment: Fragment() {
 
         val postId = requireArguments().postId
 
-        incomingChangesStatus = IncomingChangesStatus(
-            targetPost = ThreadLoadTarget(postId)
+        viewModel.setIncomingChangesStatus(
+            IncomingChangesStatus(
+                targetPost = ThreadLoadTarget(postId)
+            )
         )
 
         viewModel.getThread()
@@ -153,7 +155,7 @@ class ThreadFragment: Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        var firstUpdateTimeReceived = false
+        //var firstUpdateTimeReceived = false
 
         _binding = FragmentThreadBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -199,9 +201,7 @@ class ThreadFragment: Fragment() {
 
         binding.postsList.adapter = adapter
 
-        // TODO непонятный баг. Функция, переданная в LaunchWhenCreated вызывается, даже когда фрагмент восстанавливается, а не только создается
-        // При этом есди использовать lifecycleScope а не viewLifecycleOwner.lifecycleScope, то каждый раз создаются дубликаты Load
-        // В итоге когда пользователь возвращается в чат из "следующего" фрагмента, то все посты перезагружаются с сервера и сбивается текущая позиция скроллинга
+        // TODO как лучше?
         // lifecycleScope.launchWhenCreated {
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             viewModel.posts.collectLatest {
@@ -217,34 +217,25 @@ class ThreadFragment: Fragment() {
         adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
             // https://stackoverflow.com/questions/51889154/recycler-view-not-scrolling-to-the-top-after-adding-new-item-at-the-top-as-chan
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                incomingChangesStatus?.targetPost?.let {
+                viewModel.incomingChangesStatus?.targetPost?.let {
                     setGravityForTarget(it)
                 }
 
-                incomingChangesStatus?.newMessages?.let {
+                viewModel.incomingChangesStatus?.newMessages?.let {
                     // TODO появились новые посты
                     showOrScrollToNewMessages()
                 }
 
-                incomingChangesStatus = null
+                viewModel.setIncomingChangesStatus(null)
             }
         })
 
+
         // Обновляет видимые посты, если увеличилось время последнего изменения на сервере подписок
-        viewModel.threadStatus.observe(viewLifecycleOwner) { newThreadStatus ->
-            if (newThreadStatus.lastUpdateTime > viewModel.lastThreadStatus.lastUpdateTime) {
-                if (firstUpdateTimeReceived) {
-                    println("adapter.refresh")
-                    adapter.refresh()
-
-                    incomingChangesStatus = null
-                } else {
-                    firstUpdateTimeReceived = true
-                }
-                viewModel.lastThreadStatus = newThreadStatus
-            }
+        viewModel.lastUpdateTime.observe(viewLifecycleOwner) {
+            println("adapter.refresh")
+            adapter.refresh()
         }
-
 
         viewModel.editedPost.observe(viewLifecycleOwner) {
             if (it.id != 0L) {
@@ -323,19 +314,11 @@ class ThreadFragment: Fragment() {
         }
 
         binding.buttonScrollToBegin.setOnClickListener {
-            val newTarget = ThreadLoadTarget(TARGET_POSITION_FIRST)
-            incomingChangesStatus = IncomingChangesStatus(
-                targetPost = newTarget
-            )
-            viewModel.reloadPosts(newTarget)
+            viewModel.reloadPosts(ThreadLoadTarget(TARGET_POSITION_FIRST))
         }
 
         binding.buttonScrollToEnd.setOnClickListener {
-            val newTarget = ThreadLoadTarget(TARGET_POSITION_LAST)
-            incomingChangesStatus = IncomingChangesStatus(
-                targetPost = newTarget
-            )
-            viewModel.reloadPosts(newTarget)
+            viewModel.reloadPosts(ThreadLoadTarget(TARGET_POSITION_LAST))
         }
 
         binding.editorPostSave.setOnClickListener {
@@ -344,15 +327,6 @@ class ThreadFragment: Fragment() {
                     Snackbar.make(binding.root, R.string.error_empty_post, Snackbar.LENGTH_LONG)
                         .show()
                     return@setOnClickListener
-                }
-
-                viewModel.editorPost.value?.let {
-                    if (it.id == 0L) {
-                       println("New message saved")
-                        incomingChangesStatus = IncomingChangesStatus(
-                           newMessages = 1,
-                       )
-                    }
                 }
 
                 viewModel.changeEditorPostContent(text.toString())
@@ -477,9 +451,4 @@ class ThreadFragment: Fragment() {
             }
         }
     }
-
-    data class IncomingChangesStatus(
-        val targetPost: ThreadLoadTarget? = null,
-        val newMessages: Int? = null
-    )
 }
