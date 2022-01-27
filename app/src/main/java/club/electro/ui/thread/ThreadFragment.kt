@@ -30,6 +30,8 @@ import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
 import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
 import club.electro.utils.*
+import com.squareup.picasso.Picasso
+import com.stfalcon.imageviewer.StfalconImageViewer
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -193,7 +195,12 @@ class ThreadFragment: Fragment() {
             }
 
             override fun onAttachmentsClicked(post: Post) {
-                println("ATTAHCMENT")
+                post.attachments?.let {
+                    val images = it
+                    StfalconImageViewer.Builder(context, images) { view, image ->
+                        Picasso.get().load(image.url).into(view)
+                    }.show()
+                }
             }
 
             override fun onUrlClicked(url: String?) {
@@ -463,3 +470,8 @@ class ThreadFragment: Fragment() {
         }
     }
 }
+
+data class Poster(
+    val url: String,
+    val title: String
+)
