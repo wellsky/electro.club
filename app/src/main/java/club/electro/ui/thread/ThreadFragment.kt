@@ -192,6 +192,10 @@ class ThreadFragment: Fragment() {
                 )
             }
 
+            override fun onAttachmentsClicked(post: Post) {
+                println("ATTAHCMENT")
+            }
+
             override fun onUrlClicked(url: String?) {
                 urlHandlerFactory.create(findNavController()).setUrl(url).open()
             }

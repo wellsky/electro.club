@@ -42,6 +42,7 @@ interface PostInteractionListener {
     fun onRemoveClicked(post: Post) {}
     fun onAvatarClicked(post: Post) {}
     fun onUrlClicked(url: String?) {}
+    fun onAttachmentsClicked(post: Post) {}
 }
 
 class PostAdapter(
@@ -82,6 +83,10 @@ class PostViewHolder(
 
             authorAvatar.setOnClickListener {
                 onInteractionListener.onAvatarClicked(post)
+            }
+
+            attachments.setOnClickListener {
+                onInteractionListener.onAttachmentsClicked(post)
             }
 
             menu.isVisible = false
