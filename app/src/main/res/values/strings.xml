@@ -56,4 +56,5 @@
     <string name="network_status_error">Network status: error</string>
     <string name="subscriptions_only_to_authorized">Subscriptions are displayed only to authorized users</string>
     <string name="menu_info">Info</string>
+    <string name="attachments">Attachments: %1$s</string>
 </resources>

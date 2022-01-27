@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import club.electro.dto.Post
+import club.electro.dto.PostAttachment
 
 @Entity(indices = [Index(value = ["threadType", "threadId", "id"], unique = true)])
 data class PostEntity(
@@ -26,6 +27,8 @@ data class PostEntity(
     val canEdit: Boolean = false,
     val canRemove: Boolean = false,
 
+    val attachments: List<PostAttachment>? = null,
+
     val fresh: Boolean = false,
 ) {
     fun toDto() = Post(
@@ -44,7 +47,8 @@ data class PostEntity(
         likes = likes,
         views = views,
         canEdit = canEdit,
-        canRemove = canRemove
+        canRemove = canRemove,
+        attachments = attachments
     )
 
     companion object {
@@ -65,7 +69,8 @@ data class PostEntity(
                 likes = dto.likes,
                 views = dto.views,
                 canEdit = dto.canEdit,
-                canRemove = dto.canRemove
+                canRemove = dto.canRemove,
+                attachments = dto.attachments
             )
     }
 }

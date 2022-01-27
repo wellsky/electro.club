@@ -17,7 +17,9 @@ data class Post (
     val views: Int = 0,
 
     val canEdit: Boolean = false,
-    val canRemove: Boolean = false
+    val canRemove: Boolean = false,
+
+    val attachments: List<PostAttachment>? = null,
 ) {
     companion object {
         const val STATUS_PUBLISHED: Byte = 0
@@ -27,3 +29,8 @@ data class Post (
         const val STATUS_WAITING_FOR_LOAD: Byte = 104
     }
 }
+
+data class PostAttachment(
+    val type: Byte,
+    val url: String,
+)

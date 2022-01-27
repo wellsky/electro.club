@@ -2,7 +2,10 @@ package club.electro.adapter
 
 import ImageGetter
 import QuoteSpanClass
+import android.R.attr
+import android.content.Context
 import android.content.res.Resources
+import android.provider.Settings.Global.getString
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
@@ -29,6 +32,8 @@ import android.widget.TextView
 import android.text.style.ClickableSpan
 import androidx.core.text.HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_BLOCKQUOTE
 import androidx.lifecycle.LifecycleCoroutineScope
+import android.R.attr.button
+import android.graphics.Paint
 
 
 interface PostInteractionListener {
@@ -80,6 +85,7 @@ class PostViewHolder(
             }
 
             menu.isVisible = false
+            attachments.isVisible = false
             content.setTextColor(getColor(this.root.context, R.color.postInactiveTextColor))
 
             when(post.status) {
@@ -98,6 +104,12 @@ class PostViewHolder(
                     content.setTextColor(getColor(this.root.context, R.color.postTextColor))
                     menu.isVisible = true
                 }
+            }
+
+            post.attachments?.let {
+                attachments.isVisible = true
+                attachments.text = attachments.context.getString(R.string.attachments, post.attachments.size.toString())
+                attachments.setPaintFlags(attachments.getPaintFlags() or Paint.UNDERLINE_TEXT_FLAG)
             }
 
             post.authorAvatar?.let {
