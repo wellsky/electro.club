@@ -64,7 +64,7 @@ class ThreadInfoFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        var firstUpdateTimeReceived = false
+        var firstStatusReceived = false // Должен быть объявлен во View
 
         _binding = FragmentThreadInfoBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -82,12 +82,14 @@ class ThreadInfoFragment : Fragment() {
             }
         }
 
-        viewModel.lastUpdateTime.observe(viewLifecycleOwner) {
-            if (it > 0L) {
-                if (firstUpdateTimeReceived) {
+        viewModel.threadStatus.observe(viewLifecycleOwner) {
+            //if (it > 0) viewModel.getThread()
+            if (it.lastUpdateTime > 0) {
+                if (firstStatusReceived) {
+                    println("adapter.refresh")
                     viewModel.getThread()
                 } else {
-                    firstUpdateTimeReceived = true
+                    firstStatusReceived = true
                 }
             }
         }

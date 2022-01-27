@@ -155,7 +155,7 @@ class ThreadFragment: Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        //var firstUpdateTimeReceived = false
+        var firstStatusReceived = false // Должен быть объявлен именно во View
 
         _binding = FragmentThreadBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -202,15 +202,16 @@ class ThreadFragment: Fragment() {
         binding.postsList.adapter = adapter
 
         // TODO как лучше?
-        // lifecycleScope.launchWhenCreated {
+        //lifecycleScope.launchWhenCreated {
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             viewModel.posts.collectLatest {
                 adapter.submitData(it)
             }
+        }
 
+        lifecycleScope.launchWhenCreated {
             adapter.loadStateFlow.collectLatest { state ->
-                binding.swiperefresh.isRefreshing =
-                    state.refresh is LoadState.Loading
+                binding.swiperefresh.isRefreshing = state.refresh is LoadState.Loading
             }
         }
 
@@ -232,9 +233,15 @@ class ThreadFragment: Fragment() {
 
 
         // Обновляет видимые посты, если увеличилось время последнего изменения на сервере подписок
-        viewModel.lastUpdateTime.observe(viewLifecycleOwner) {
-            println("adapter.refresh")
-            adapter.refresh()
+        viewModel.threadStatus.observe(viewLifecycleOwner) {
+            if (it.lastUpdateTime > 0) {
+                if (firstStatusReceived) {
+                    println("adapter.refresh")
+                    adapter.refresh()
+                } else {
+                    firstStatusReceived = true
+                }
+            }
         }
 
         viewModel.editedPost.observe(viewLifecycleOwner) {

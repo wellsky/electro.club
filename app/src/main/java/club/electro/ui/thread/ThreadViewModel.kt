@@ -31,26 +31,36 @@ class ThreadViewModel @Inject constructor(
     val editedPost = MutableLiveData(emptyPost) // Опубликованный пост, который в данный момент редактируется в текстовом редакторе
     val answerToPost = MutableLiveData(emptyPost) // Пост, на который в данный момент пишется ответ
 
-    val lastUpdateTime: MutableLiveData<Long> = MutableLiveData(0L)
-    var lastThreadStatus: ThreadStatus = ThreadStatus()
+    // Текущее состояние группы. Время последнего изменения, количество сообщений.
+    // Постоянно обновляется с сервера подписок. Если есть изменения, отправляется запрос на сервер сообщений.
+    private val _threadStatus = MutableLiveData(ThreadStatus())
+    val threadStatus
+        get() = _threadStatus
 
+    // После изменения состояния группы отправляется запрос на обновление сообщений
+    // incomingChangesStatus сохраняет информацию о предстоящем ответе (появились ли новые сообщения, переходить ли к определенному посту)
     private var _incomingChangesStatus: IncomingChangesStatus? = null
-
     val incomingChangesStatus
         get() = _incomingChangesStatus
 
+    //val lastUpdateTime = MutableLiveData(0L)
+
     init {
         viewModelScope.launch {
-            repository.threadStatus.asFlow().collectLatest { newThreadStatus->
-                println("thread status changed")
-                if (newThreadStatus.lastUpdateTime > lastThreadStatus.lastUpdateTime) {
-                    if (lastThreadStatus.lastUpdateTime > 0) {
-                        if (newThreadStatus.messagesCount > lastThreadStatus.messagesCount) {
-                            // TODO Появились новые сообщения
+            repository.threadStatus.asFlow().collectLatest { newStatus->
+                println("Repository thread status changed")
+                if (newStatus.lastUpdateTime > 0) { // Не инициализация переменной в репозитории
+                    _threadStatus.value?.let { currentStatus-> // Не первые полученные данные
+                        println("Viewmodel thread status changed")
+                        if (newStatus.messagesCount > currentStatus.messagesCount) {
+                            // Появились новые сообщения
+                            _incomingChangesStatus = IncomingChangesStatus(
+                                newMessages = newStatus.messagesCount - currentStatus.messagesCount
+                            )
                         }
-                        lastUpdateTime.value = newThreadStatus.lastUpdateTime
+
                     }
-                    lastThreadStatus = newThreadStatus
+                    _threadStatus.value = newStatus
                 }
             }
         }
@@ -157,5 +167,5 @@ private val emptyPost = Post(
 
 data class IncomingChangesStatus(
     val targetPost: ThreadLoadTarget? = null,
-    val newMessages: Int? = null
+    val newMessages: Long? = null
 )

@@ -61,7 +61,7 @@ class PostRemoteMediator @AssistedInject constructor(
                             threadType = threadType,
                             threadId = threadId,
                             from = from,
-                            nearest = state.config.pageSize,
+                            nearest = state.config.pageSize / 2,
                         )
                     } ?: run {
                         // Это не adapter.refresh(), начинаем загрузку с указанного в цели значения
