@@ -29,13 +29,14 @@ import java.net.URI
 
 
 class UrlHandler @AssistedInject constructor(
-    @Assisted val navController: NavController,
+    //@Assisted val navController: NavController,
+    @Assisted val urlHandlerAction: UrlHandlerAction,
     @ApplicationContext val context: Context,
     val apiService: ApiService
 ) {
     @AssistedFactory
     interface Factory {
-        fun create(navController: NavController): UrlHandler
+        fun create(urlHandlerAction: UrlHandlerAction): UrlHandler
     }
 
     private val PRIMARY_HOST = "electro.club"
@@ -101,32 +102,13 @@ class UrlHandler @AssistedInject constructor(
     fun openUrlData(data: UrlDataResult) {
         when (data) {
             is UrlDataResult.Thread -> {
-                navController.navigate(
-                    R.id.action_global_threadFragment,
-                    Bundle().apply {
-                        threadType = data.threadType.value
-                        threadId = data.threadId
-                        postId = if (data.threadType == ThreadType.THREAD_TYPE_POST_WITH_COMMENTS) TARGET_POSITION_FIRST else TARGET_POSITION_FIRST
-                    }
-                )
-            }
-            is UrlDataResult.UserAccount -> {
-                navController.navigate(
-                    R.id.action_global_userProfileFragment,
-                    Bundle().apply {
-                        userId = data.userId
-                    }
-                )
+                urlHandlerAction.openThread(data)
             }
             is UrlDataResult.MessageInThread -> {
-                navController.navigate(
-                    R.id.action_global_threadFragment,
-                    Bundle().apply {
-                        threadType = data.threadType.value
-                        threadId = data.threadId
-                        postId = data.postId
-                    }
-                )
+                urlHandlerAction.openMessageInThread(data)
+            }
+            is UrlDataResult.UserAccount -> {
+                urlHandlerAction.openUserAccount(data)
             }
         }
     }
@@ -141,6 +123,41 @@ class UrlHandler @AssistedInject constructor(
             println(e.message.toString())
         }
     }
+}
+
+
+open class UrlHandlerAction(val navController: NavController) {
+    open fun openThread(data: UrlDataResult.Thread) {
+        navController.navigate(
+            R.id.action_global_threadFragment,
+            Bundle().apply {
+                threadType = data.threadType.value
+                threadId = data.threadId
+                postId = if (data.threadType == ThreadType.THREAD_TYPE_POST_WITH_COMMENTS) TARGET_POSITION_FIRST else TARGET_POSITION_FIRST
+            }
+        )
+    }
+
+    open fun openMessageInThread(data: UrlDataResult.MessageInThread) {
+        navController.navigate(
+            R.id.action_global_threadFragment,
+            Bundle().apply {
+                threadType = data.threadType.value
+                threadId = data.threadId
+                postId = data.postId
+            }
+        )
+    }
+
+    open fun openUserAccount(data: UrlDataResult.UserAccount) {
+        navController.navigate(
+            R.id.action_global_userProfileFragment,
+            Bundle().apply {
+                userId = data.userId
+            }
+        )
+    }
+
 }
 
 enum class UrlType(val value: Byte) {

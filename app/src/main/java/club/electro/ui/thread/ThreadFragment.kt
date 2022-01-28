@@ -204,7 +204,26 @@ class ThreadFragment: Fragment() {
             }
 
             override fun onUrlClicked(url: String?) {
-                urlHandlerFactory.create(findNavController()).setUrl(url).open()
+                val action = object : UrlHandlerAction(findNavController()) {
+                    override fun openThread(data: UrlDataResult.Thread) {
+                        if ((data.threadType.value == threadType) && (data.threadId == threadId)) {
+                            Snackbar.make(binding.root, getString(R.string.you_are_viewing_this_thread), Snackbar.LENGTH_LONG)
+                                .show()
+                        } else {
+                            super.openThread(data)
+                        }
+                    }
+
+                    override fun openMessageInThread(data: UrlDataResult.MessageInThread) {
+                        if ((data.threadType.value == threadType) && (data.threadId == threadId)) {
+                            viewModel.reloadPosts(ThreadLoadTarget(data.postId))
+                        } else {
+                            super.openMessageInThread(data)
+                        }
+                    }
+                }
+
+                urlHandlerFactory.create(action).setUrl(url).open()
             }
         }, lifecycleScope)
 
@@ -229,8 +248,18 @@ class ThreadFragment: Fragment() {
         adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
             // https://stackoverflow.com/questions/51889154/recycler-view-not-scrolling-to-the-top-after-adding-new-item-at-the-top-as-chan
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+
                 viewModel.incomingChangesStatus?.targetPost?.let {
                     setGravityForTarget(it)
+
+                    if ((binding.postsList.layoutManager as LinearLayoutManager).stackFromEnd) {
+                        // Верхняя гравитация
+                        binding.postsList.scrollToPosition(positionStart - 1)
+                    } else {
+                        // Нижняя гравитация
+                        binding.postsList.scrollToPosition(0);
+                    }
                 }
 
                 viewModel.incomingChangesStatus?.newMessages?.let {
@@ -430,7 +459,7 @@ class ThreadFragment: Fragment() {
      * Устанавливает гравитацию в зависимости от целевого поста
      */
     fun setGravityForTarget(target: ThreadLoadTarget) {
-        println("Svee gravity for target")
+        println("Set gravity for target " + target.targetPostId)
         if (target.targetPostId > 0) {
             println("1")
             setGravityTop()

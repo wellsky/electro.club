@@ -57,4 +57,5 @@
     <string name="subscriptions_only_to_authorized">Subscriptions are displayed only to authorized users</string>
     <string name="menu_info">Info</string>
     <string name="attachments">Attachments: %1$s</string>
+    <string name="you_are_viewing_this_thread">You are viewing this thread</string>
 </resources>
