@@ -21,7 +21,9 @@
 
     <style name="Theme.Electroclub.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="Theme.Electroclub.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="Theme.Electroclub.AppBarPopup" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:buttonTint">@color/grey_5</item>
+    </style>
 
     <style name="OptionsButton" parent="Widget.AppCompat.CompoundButton.CheckBox">
         <item name="icon">@drawable/ic_baseline_more_vert_24</item>
