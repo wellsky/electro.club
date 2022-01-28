@@ -42,13 +42,14 @@ class MapRepositoryServerImpl @Inject constructor(
         try {
             val response = apiService.getMapObjects(
                 types = MARKER_TYPE_SOCKET.toString() + "+" + MARKER_TYPE_GROUP.toString()
-                //types = MARKER_TYPE_GROUP.toString()
             )
 
             if (!response.isSuccessful) {
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
+
+            markerDao.clear()
             markerDao.insert(body.data.mapObjects.toEntity())
         } catch (e: IOException) {
             throw NetworkError

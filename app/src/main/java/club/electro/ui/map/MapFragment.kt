@@ -88,6 +88,7 @@ class MapFragment : Fragment() {
                         }
                     )
                 }
+
                 MARKER_TYPE_GROUP -> {
                     findNavController().navigate(
                         R.id.action_nav_map_to_threadFragment,

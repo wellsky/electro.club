@@ -489,7 +489,7 @@ class ThreadFragment: Fragment() {
 
     fun scrollToTop() {
         binding.postsList.getAdapter()?.let {
-            binding.postsList.scrollToPosition(it.getItemCount() - 1);
+            binding.postsList.smoothScrollToPosition(it.getItemCount() - 1);
         }
     }
 
