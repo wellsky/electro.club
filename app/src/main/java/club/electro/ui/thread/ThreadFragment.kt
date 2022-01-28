@@ -362,10 +362,12 @@ class ThreadFragment: Fragment() {
 
         binding.buttonScrollToBegin.setOnClickListener {
             viewModel.reloadPosts(ThreadLoadTarget(TARGET_POSITION_FIRST))
+            scrollToTop()
         }
 
         binding.buttonScrollToEnd.setOnClickListener {
             viewModel.reloadPosts(ThreadLoadTarget(TARGET_POSITION_LAST))
+            scrollToBottom()
         }
 
         binding.editorPostSave.setOnClickListener {
@@ -485,13 +487,23 @@ class ThreadFragment: Fragment() {
         }
     }
 
+    fun scrollToTop() {
+        binding.postsList.getAdapter()?.let {
+            binding.postsList.scrollToPosition(it.getItemCount() - 1);
+        }
+    }
+
+    fun scrollToBottom() {
+        binding.postsList.smoothScrollToPosition(0);
+    }
+
     fun showOrScrollToNewMessages() {
         println("showOrScrollToNewMessages")
         if (binding.postsList.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
             println("Scroll is idle")
             if (scrolledToBottom) {
                 println("Scrolled to bottom")
-                binding.postsList.smoothScrollToPosition(0);
+                scrollToBottom()
             } else {
                 //TODO Внизу появились новые сообщения
                 println("Show new messages hint")
