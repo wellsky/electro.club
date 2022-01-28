@@ -3,6 +3,7 @@ package club.electro.ui.map
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.*
+import androidx.paging.cachedIn
 import club.electro.repository.map.MapRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

@@ -36,10 +36,13 @@ import dagger.hilt.android.AndroidEntryPoint
 class MapFragment : Fragment() {
     private val viewModel: MapViewModel by viewModels ()
 
-    private val callback = OnMapReadyCallback { googleMap ->
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         viewModel.setFilter(MARKER_TYPE_GROUP, true)
         viewModel.getAllMarkers()
+    }
 
+    private val callback = OnMapReadyCallback { googleMap ->
         val cameraPosition = viewModel.loadCameraState()
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(cameraPosition.lat, cameraPosition.lng), cameraPosition.zoom))
@@ -190,7 +193,12 @@ fun Marker.loadIcon(context: Context, url: String?) {
                     BitmapDescriptorFactory.fromBitmap(it)
                 }?.let {
                     try {
-                        setIcon(it)
+                        try {
+                            setIcon(it)
+                        } catch (e: Exception) {
+                            // Маркер был удален с карты?
+                            println("Marker removed")
+                        }
                         true
                     } catch (e: Exception) {
                         false
