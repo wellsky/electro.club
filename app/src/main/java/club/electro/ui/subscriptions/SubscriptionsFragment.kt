@@ -34,7 +34,7 @@ class SubscriptionsFragment : Fragment() {
 
         requireActivity().run {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-            mainViewModel.updateActionBarTitle(ToolBarConfig(title1 = getString(R.string.menu_subscriptions)))
+            mainViewModel.updateActionBarConfig(ToolBarConfig(title1 = getString(R.string.menu_subscriptions)))
         }
     }
 

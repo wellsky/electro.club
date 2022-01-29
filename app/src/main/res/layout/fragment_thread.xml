@@ -69,6 +69,14 @@
         android:text="Test"
         />
 
+    <View
+        android:id="@+id/panelLine"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintBottom_toTopOf="@id/bottomPanel"
+        />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomPanel"
         android:layout_width="match_parent"
@@ -76,145 +84,162 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:background="@color/white"
         android:paddingBottom="1dp"
+        android:visibility="gone"
         >
 
-        <View
-            android:id="@+id/panelLine"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/darker_gray"
-            app:layout_constraintTop_toTopOf="parent"
-            />
-
-        <ImageView
-            android:id="@+id/editedImage"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:contentDescription="@string/avatar_description"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/editorPostContent"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
-            android:layout_marginStart="12dp"
-            android:src="@drawable/ic_baseline_edit_24"
-            />
-
         <TextView
-            android:id="@+id/editedPostContent"
-            android:layout_width="0dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="16dp"
-            android:ellipsize="end"
-            android:singleLine="true"
-            app:layout_constraintStart_toEndOf="@id/editedImage"
-            app:layout_constraintLeft_toRightOf="@id/editedImage"
-            app:layout_constraintEnd_toStartOf="@id/cancelEdit"
-            app:layout_constraintTop_toTopOf="@id/editedImage"
-            app:layout_constraintBottom_toBottomOf="@id/editedImage"
-            tools:text="Edited message"
+            android:id="@+id/bottomPanelSubscrube"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="@string/subscribe_and_start_chatting"
+            android:textSize="18sp"
+            android:visibility="gone"
         />
 
-        <ImageButton
-            android:id="@+id/cancelEdit"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_margin="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/editedImage"
-            app:layout_constraintBottom_toBottomOf="@id/editedImage"
-            app:layout_constraintLeft_toRightOf="@id/editedPostContent"
-            app:srcCompat="@drawable/ic_baseline_cancel_24"
-            />
-
-        <androidx.constraintlayout.widget.Group
-            android:id="@+id/editedPostGroup"
-            android:layout_height="match_parent"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/bottomPanelEditor"
             android:layout_width="match_parent"
-            android:visibility="gone"
-            app:constraint_referenced_ids="editedImage, editedPostContent, cancelEdit"
-            />
-
-        <ImageView
-            android:id="@+id/answerToImage"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:contentDescription="@string/avatar_description"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/editorPostContent"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
-            android:layout_marginStart="12dp"
-            android:src="@drawable/ic_baseline_reply_24"
-            />
-
-        <TextView
-            android:id="@+id/answerToContent"
-            android:layout_width="0dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="16dp"
-            android:ellipsize="end"
-            android:singleLine="true"
-            app:layout_constraintStart_toEndOf="@id/answerToImage"
-            app:layout_constraintLeft_toRightOf="@id/answerToImage"
-            app:layout_constraintEnd_toStartOf="@id/cancelAnswer"
-            app:layout_constraintTop_toTopOf="@id/answerToImage"
-            app:layout_constraintBottom_toBottomOf="@id/answerToImage"
-            tools:text="Answer to message"
-            />
-
-        <ImageButton
-            android:id="@+id/cancelAnswer"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_margin="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/answerToImage"
-            app:layout_constraintBottom_toBottomOf="@id/answerToImage"
-            app:layout_constraintLeft_toRightOf="@id/answerToContent"
-            app:srcCompat="@drawable/ic_baseline_cancel_24"
-            />
-
-        <androidx.constraintlayout.widget.Group
-            android:id="@+id/answerPostGroup"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:visibility="gone"
-            app:constraint_referenced_ids="answerToImage, answerToContent, cancelAnswer"
-            />
-
-        <EditText
-            android:id="@+id/editorPostContent"
-            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="@string/message_text"
-            android:importantForAutofill="no"
-            android:inputType="textMultiLine|textCapSentences"
-            android:maxLines="6"
-            android:padding="12dp"
-            android:background="@null"
-            android:textCursorDrawable="@null"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/editorPostSave"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:background="@color/white"
+            android:visibility="gone"
+            >
 
-        <ImageButton
-            android:id="@+id/editorPostSave"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginStart="@dimen/common_spacing"
-            android:layout_marginEnd="@dimen/common_spacing"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/save_description"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/editorPostContent"
-            app:layout_constraintTop_toTopOf="@+id/editorPostContent"
+            <ImageView
+                android:id="@+id/editedImage"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/avatar_description"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/editorPostContent"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:layout_marginStart="12dp"
+                android:src="@drawable/ic_baseline_edit_24"
+                />
 
-            app:srcCompat="@drawable/ic_baseline_send_24" />
+            <TextView
+                android:id="@+id/editedPostContent"
+                android:layout_width="0dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                app:layout_constraintStart_toEndOf="@id/editedImage"
+                app:layout_constraintLeft_toRightOf="@id/editedImage"
+                app:layout_constraintEnd_toStartOf="@id/cancelEdit"
+                app:layout_constraintTop_toTopOf="@id/editedImage"
+                app:layout_constraintBottom_toBottomOf="@id/editedImage"
+                tools:text="Edited message"
+            />
+
+            <ImageButton
+                android:id="@+id/cancelEdit"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_margin="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/editedImage"
+                app:layout_constraintBottom_toBottomOf="@id/editedImage"
+                app:layout_constraintLeft_toRightOf="@id/editedPostContent"
+                app:srcCompat="@drawable/ic_baseline_cancel_24"
+                />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/editedPostGroup"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:visibility="gone"
+                app:constraint_referenced_ids="editedImage, editedPostContent, cancelEdit"
+                />
+
+            <ImageView
+                android:id="@+id/answerToImage"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/avatar_description"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/editorPostContent"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:layout_marginStart="12dp"
+                android:src="@drawable/ic_baseline_reply_24"
+                />
+
+            <TextView
+                android:id="@+id/answerToContent"
+                android:layout_width="0dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="16dp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                app:layout_constraintStart_toEndOf="@id/answerToImage"
+                app:layout_constraintLeft_toRightOf="@id/answerToImage"
+                app:layout_constraintEnd_toStartOf="@id/cancelAnswer"
+                app:layout_constraintTop_toTopOf="@id/answerToImage"
+                app:layout_constraintBottom_toBottomOf="@id/answerToImage"
+                tools:text="Answer to message"
+                />
+
+            <ImageButton
+                android:id="@+id/cancelAnswer"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_margin="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/answerToImage"
+                app:layout_constraintBottom_toBottomOf="@id/answerToImage"
+                app:layout_constraintLeft_toRightOf="@id/answerToContent"
+                app:srcCompat="@drawable/ic_baseline_cancel_24"
+                />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/answerPostGroup"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:visibility="gone"
+                app:constraint_referenced_ids="answerToImage, answerToContent, cancelAnswer"
+                />
+
+            <EditText
+                android:id="@+id/editorPostContent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="@string/message_text"
+                android:importantForAutofill="no"
+                android:inputType="textMultiLine|textCapSentences"
+                android:maxLines="6"
+                android:padding="12dp"
+                android:background="@null"
+                android:textCursorDrawable="@null"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/editorPostSave"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageButton
+                android:id="@+id/editorPostSave"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="@dimen/common_spacing"
+                android:layout_marginEnd="@dimen/common_spacing"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/save_description"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/editorPostContent"
+                app:layout_constraintTop_toTopOf="@+id/editorPostContent"
+
+                app:srcCompat="@drawable/ic_baseline_send_24" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

@@ -69,7 +69,7 @@ class ThreadFragment: Fragment() {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
             viewModel.thread.observe(viewLifecycleOwner) {
                 it?.let {
-                    mainViewModel.updateActionBarTitle(ToolBarConfig(
+                    mainViewModel.updateActionBarConfig(ToolBarConfig(
                         title1 = it.name,
                         title2 = getString(R.string.subscribers_count) + ": " + it.subscribersCount.toString(),
                         onClick = {
@@ -197,6 +197,7 @@ class ThreadFragment: Fragment() {
             override fun onAttachmentsClicked(post: Post) {
                 post.attachments?.let {
                     val images = it
+
                     StfalconImageViewer.Builder(context, images) { view, image ->
                         Picasso.get().load(image.url).into(view)
                     }.show()
@@ -400,6 +401,10 @@ class ThreadFragment: Fragment() {
             viewModel.cancelAnswerPost()
         }
 
+        binding.bottomPanelSubscrube.setOnClickListener {
+            viewModel.changeSubscription(SUBSCRIPTION_STATUS_SUBSCRIBED)
+        }
+
         binding.swiperefresh.setOnRefreshListener {
             adapter.refresh()
         }
@@ -412,15 +417,18 @@ class ThreadFragment: Fragment() {
     }
 
     fun invalidateBottomPanel() {
-        var showBottomPanel = false
         viewModel.thread.value?.let {
-            if (it.subscriptionStatus.equals(SUBSCRIPTION_STATUS_SUBSCRIBED)) {
-                if (viewModel.appAuth.authorized()) {
-                    showBottomPanel = true
+            if (viewModel.appAuth.authorized()) {
+                binding.bottomPanel.isVisible = true
+                if (it.subscriptionStatus.equals(SUBSCRIPTION_STATUS_SUBSCRIBED)) {
+                    binding.bottomPanelEditor.isVisible = true
+                    binding.bottomPanelSubscrube.isVisible = false
+                } else {
+                    binding.bottomPanelEditor.isVisible = false
+                    binding.bottomPanelSubscrube.isVisible = true
                 }
             }
         }
-        binding.bottomPanel.isVisible = showBottomPanel
     }
 
     /**

@@ -29,7 +29,7 @@ class FeedFragment : Fragment() {
 
         activity?.run {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-            mainViewModel.updateActionBarTitle(ToolBarConfig(title1 = getString(R.string.menu_feed)))
+            mainViewModel.updateActionBarConfig(ToolBarConfig(title1 = getString(R.string.menu_feed)))
         } ?: throw Throwable("Invalid activity")
     }
 

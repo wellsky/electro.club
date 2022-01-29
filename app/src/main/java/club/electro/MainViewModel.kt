@@ -13,14 +13,14 @@ class MainViewModel @Inject constructor(
     val appAuth: AppAuth,
     val networkStatus : NetworkStatus
 ): ViewModel() {
-    private val _title = MutableLiveData<ToolBarConfig>()
-    val title: LiveData<ToolBarConfig>
-        get() = _title
-    fun updateActionBarTitle(title: ToolBarConfig) = _title.postValue(title)
+    private val _config = MutableLiveData<ToolBarConfig>()
+    val config: LiveData<ToolBarConfig>
+        get() = _config
+    fun updateActionBarConfig(config: ToolBarConfig) = _config.postValue(config)
 }
 
 data class ToolBarConfig (
-    val title1: String,
+    val title1: String? = null,
     val title2: String? = null,
     val onClick: () -> Unit = {}
 )

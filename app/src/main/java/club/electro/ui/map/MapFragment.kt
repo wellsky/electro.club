@@ -14,9 +14,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.view.*
 import android.widget.ImageView
+import androidx.lifecycle.ViewModelProvider
+import club.electro.MainViewModel
+import club.electro.ToolBarConfig
 import club.electro.dto.*
 import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.ui.thread.ThreadFragment.Companion.postId
@@ -29,12 +31,22 @@ import com.bumptech.glide.request.RequestListener
 import com.google.android.gms.maps.model.Marker
 import com.bumptech.glide.request.target.Target
 import com.google.android.gms.maps.model.BitmapDescriptorFactory.fromResource
-import com.google.firebase.FirebaseOptions.fromResource
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MapFragment : Fragment() {
     private val viewModel: MapViewModel by viewModels ()
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        requireActivity().run {
+            val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+            mainViewModel.updateActionBarConfig(ToolBarConfig(
+                title2 = "",
+                onClick = {}
+            ))
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,36 +60,50 @@ class MapFragment : Fragment() {
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(cameraPosition.lat, cameraPosition.lng), cameraPosition.zoom))
 
         viewModel.markers.observe(viewLifecycleOwner) { markersList ->
-            googleMap.clear()
+            try {
+                googleMap.clear()
 
-            val socketIcon = fromResource(R.drawable.map_socket)
-            val groupIcon = fromResource(R.drawable.map_group)
+                val socketIcon = fromResource(R.drawable.map_socket)
+                val groupIcon = fromResource(R.drawable.map_group)
 
 
-            markersList.forEach { marker ->
-               val coords = LatLng(marker.lat, marker.lng)
+                markersList.forEach { marker ->
+                    val coords = LatLng(marker.lat, marker.lng)
 
-               val mapMarker = when (marker.type) {
-                    MARKER_TYPE_SOCKET -> googleMap.addMarker(MarkerOptions().position(coords).icon(socketIcon))
-                    MARKER_TYPE_GROUP -> googleMap.addMarker(MarkerOptions().position(coords).icon(groupIcon))
-                    else -> null
-               }
-
-               mapMarker?.let { it ->
-                    it.tag = marker
-                    marker.icon?.let { icon ->
-                        mapMarker.loadIcon(requireContext(), icon)
+                    val mapMarker = when (marker.type) {
+                        MARKER_TYPE_SOCKET -> googleMap.addMarker(
+                            MarkerOptions().position(coords).icon(socketIcon)
+                        )
+                        MARKER_TYPE_GROUP -> googleMap.addMarker(
+                            MarkerOptions().position(coords).icon(groupIcon)
+                        )
+                        else -> null
                     }
-               }
+
+                    mapMarker?.let { it ->
+                        it.tag = marker
+                        marker.icon?.let { icon ->
+                            mapMarker.loadIcon(requireContext(), icon)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                println("Place markers exception: " + e.message)
             }
         }
 
         googleMap.setOnCameraMoveListener {
-            viewModel.saveCameraState(MapCameraPosition(
-                lat = googleMap.cameraPosition.target.latitude,
-                lng = googleMap.cameraPosition.target.longitude,
-                zoom = googleMap.cameraPosition.zoom,
-            ))
+            try {
+                viewModel.saveCameraState(
+                    MapCameraPosition(
+                        lat = googleMap.cameraPosition.target.latitude,
+                        lng = googleMap.cameraPosition.target.longitude,
+                        zoom = googleMap.cameraPosition.zoom,
+                    )
+                )
+            } catch (e: Exception) {
+                println("saveCameraState exception")
+            }
         }
 
         googleMap.setOnMarkerClickListener {

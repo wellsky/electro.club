@@ -17,9 +17,12 @@ object ApiServiceModule{
     @Provides
     @Singleton
     fun provideApiService(
-        tokenInt: Interceptor
+        tokenInterceptor: Interceptor
     ): ApiService {
-        return retrofit(okhttp(loggingInterceptor(), tokenInt))
-            .create(ApiService::class.java)
+        return retrofit(okhttp(
+//                loggingInterceptor(),
+                tokenInterceptor
+        ))
+        .create(ApiService::class.java)
     }
 }

@@ -37,7 +37,7 @@ class ThreadInfoFragment : Fragment() {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
             viewModel.thread.observe(viewLifecycleOwner) {
                 it?.let {
-                    mainViewModel.updateActionBarTitle(ToolBarConfig(
+                    mainViewModel.updateActionBarConfig(ToolBarConfig(
                         title1 = it.name,
                     ))
                 }

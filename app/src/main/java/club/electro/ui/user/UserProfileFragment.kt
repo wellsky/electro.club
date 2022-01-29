@@ -13,6 +13,8 @@ import club.electro.MainViewModel
 import club.electro.R
 import club.electro.ToolBarConfig
 import club.electro.databinding.FragmentUserProfileBinding
+import club.electro.repository.thread.ThreadLoadTarget
+import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.utils.LongArg
@@ -81,6 +83,7 @@ class UserProfileFragment : Fragment() {
                             Bundle().apply {
                                 threadType = link.threadType
                                 threadId = link.threadId
+                                postId = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD
                             }
                         )
                     }
@@ -89,7 +92,7 @@ class UserProfileFragment : Fragment() {
 
             requireActivity().run {
                 val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-                mainViewModel.updateActionBarTitle(ToolBarConfig(title1 = user.name))
+                mainViewModel.updateActionBarConfig(ToolBarConfig(title1 = user.name))
             }
         }
 

@@ -106,9 +106,13 @@ class MainActivity: AppCompatActivity() {
 
 
         // https://developer.android.com/guide/fragments/appbar
-        viewModel.title.observe(this, { config->
-            supportActionBar?.title = config.title1
-            supportActionBar?.subtitle = config.title2
+        viewModel.config.observe(this, { config ->
+            config.title1?.let {
+                supportActionBar?.title = it
+            }
+            config.title2?.let {
+                supportActionBar?.subtitle = it
+            }
 
             binding.appBarMain.toolbar.setOnClickListener {
                 //TODO или лучше сразу вызывать onClick, но тогда надо будет поменять параметры функции
