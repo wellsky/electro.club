@@ -204,7 +204,7 @@ class ThreadFragment: Fragment() {
             }
 
             override fun onUrlClicked(url: String?) {
-                val action = object : UrlHandlerAction(findNavController()) {
+                val action = object : UrlHandlerAction(findNavController(), requireContext()) {
                     override fun openThread(data: UrlDataResult.Thread) {
                         if ((data.threadType.value == threadType) && (data.threadId == threadId)) {
                             Snackbar.make(binding.root, getString(R.string.you_are_viewing_this_thread), Snackbar.LENGTH_LONG)

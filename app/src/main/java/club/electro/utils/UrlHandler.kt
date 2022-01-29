@@ -31,7 +31,6 @@ import java.net.URI
 class UrlHandler @AssistedInject constructor(
     //@Assisted val navController: NavController,
     @Assisted val urlHandlerAction: UrlHandlerAction,
-    @ApplicationContext val context: Context,
     val apiService: ApiService
 ) {
     @AssistedFactory
@@ -59,7 +58,7 @@ class UrlHandler @AssistedInject constructor(
                     ?.let(this::openUrlData)
                     ?: parseUriRemoteAndOpen(uri)
             } else {
-                openInBrowser(uri.toString())
+                urlHandlerAction.openUnknown(uri.toString())
             }
         }
     }
@@ -110,23 +109,18 @@ class UrlHandler @AssistedInject constructor(
             is UrlDataResult.UserAccount -> {
                 urlHandlerAction.openUserAccount(data)
             }
-        }
-    }
-
-
-    fun openInBrowser(url: String?) {
-        try {
-            val openURL = Intent(Intent.ACTION_VIEW)
-            openURL.data = Uri.parse(url)
-            context.startActivity(openURL)
-        } catch (e: Exception) {
-            println(e.message.toString())
+            is UrlDataResult.Unknown -> {
+                urlHandlerAction.openUnknown(url.toString())
+            }
         }
     }
 }
 
 
-open class UrlHandlerAction(val navController: NavController) {
+open class UrlHandlerAction(
+    val navController: NavController,
+    val context: Context
+) {
     open fun openThread(data: UrlDataResult.Thread) {
         navController.navigate(
             R.id.action_global_threadFragment,
@@ -158,9 +152,20 @@ open class UrlHandlerAction(val navController: NavController) {
         )
     }
 
+    open fun openUnknown(url: String?) {
+        try {
+            val openURL = Intent(Intent.ACTION_VIEW)
+            openURL.data = Uri.parse(url)
+            context.startActivity(openURL)
+        } catch (e: Exception) {
+            println(e.message.toString())
+        }
+    }
+
 }
 
 enum class UrlType(val value: Byte) {
+    URL_TYPE_UNKNOWN(0),
     URL_TYPE_THREAD(1),
     URL_TYPE_MESSAGE_IN_THREAD(2),
     URL_TYPE_USER_ACCOUNT(3);
@@ -208,9 +213,14 @@ fun UrlDataResultDto.toDomainModel(): UrlDataResult =
         UrlType.URL_TYPE_USER_ACCOUNT -> UrlDataResult.UserAccount(
             userId = requireNotNull(userId),
         )
+        UrlType.URL_TYPE_UNKNOWN -> UrlDataResult.Unknown(0)
     }
 
 sealed interface UrlDataResult {
+    data class Unknown(
+        val type: Byte
+    ) : UrlDataResult
+
     data class Thread(
         val threadType: ThreadType,
         val threadId: Long,
