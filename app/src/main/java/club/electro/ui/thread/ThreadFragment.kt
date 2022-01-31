@@ -93,7 +93,7 @@ class ThreadFragment: Fragment() {
         if (viewModel.appAuth.authorized()) {
             viewModel.thread.value?.let { thread ->
                 requireActivity().run {
-                    if (thread.type == ThreadType.THREAD_TYPE_PUBLIC_CHAT.value) {
+                    if (thread.type != ThreadType.THREAD_TYPE_PERSONAL_CHAT.value) {
                         menuInflater.inflate(R.menu.menu_thread, menu)
                         if (thread.subscriptionStatus.equals(SUBSCRIPTION_STATUS_NONE)) {
                             menu.findItem(R.id.thread_unsubscribe).isVisible = false
@@ -186,12 +186,14 @@ class ThreadFragment: Fragment() {
             }
 
             override fun onAvatarClicked(post: Post) {
-                findNavController().navigate(
-                    R.id.action_threadFragment_to_userProfileFragment,
-                    Bundle().apply {
-                        userId = post.authorId
-                    }
-                )
+                post.authorId?.let {
+                    findNavController().navigate(
+                        R.id.action_threadFragment_to_userProfileFragment,
+                        Bundle().apply {
+                            userId = it
+                        }
+                    )
+                }
             }
 
             override fun onAttachmentsClicked(post: Post) {

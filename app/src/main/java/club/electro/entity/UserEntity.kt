@@ -22,6 +22,8 @@ data class UserEntity(
     val name: String,
     val avatar: String?,
     val messages: Int,
+    val created: Long,
+    val lastVisit: Long,
     val rating: Int,
     val primaryTransport: UserPrimaryTransport?,
     val myChat: ThreadLink?,
@@ -31,6 +33,8 @@ data class UserEntity(
         name = name,
         avatar = avatar,
         messages = messages,
+        created = created,
+        lastVisit = lastVisit,
         rating = rating,
         primaryTransport = primaryTransport,
         myChat = myChat
@@ -43,6 +47,8 @@ data class UserEntity(
                 name = dto.name,
                 avatar = dto.avatar,
                 messages = dto.messages,
+                created = dto.created,
+                lastVisit = dto.lastVisit,
                 rating = dto.rating,
                 primaryTransport = dto.primaryTransport,
                 myChat = dto.myChat

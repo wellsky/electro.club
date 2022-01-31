@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AreaDao {
-    @Query("SELECT * FROM AreaEntity ORDER BY last_time DESC")
+    @Query("SELECT * FROM AreaEntity ORDER BY lastTime DESC")
     fun getAll(): Flow<List<AreaEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

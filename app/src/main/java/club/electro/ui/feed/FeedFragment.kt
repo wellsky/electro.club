@@ -26,12 +26,15 @@ class FeedFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
-        activity?.run {
+        requireActivity().run {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-            mainViewModel.updateActionBarConfig(ToolBarConfig(title1 = getString(R.string.menu_feed)))
-        } ?: throw Throwable("Invalid activity")
+            mainViewModel.updateActionBarConfig(ToolBarConfig(
+                title2 = "",
+                onClick = {}
+            ))
+        }
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,

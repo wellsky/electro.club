@@ -72,6 +72,7 @@ class ThreadRepositoryServerImpl @Inject constructor(
                     throw ApiError(response.code(), response.message())
                 }
                 val body = response.body() ?: throw ApiError(response.code(), response.message())
+
                 threadDao.insert(body.data.thread.toEntity())
                 networkStatus.setStatus(NetworkStatus.Status.ONLINE)
             } catch (e: IOException) {

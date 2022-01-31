@@ -7,7 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import club.electro.MainViewModel
 import club.electro.R
+import club.electro.ToolBarConfig
 import club.electro.auth.AppAuth
 import club.electro.databinding.FragmentFeedBinding
 import club.electro.databinding.FragmentLoginBinding
@@ -27,6 +30,17 @@ class LoginFragment: Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        requireActivity().run {
+            val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+            mainViewModel.updateActionBarConfig(ToolBarConfig(
+                title2 = "",
+                onClick = {}
+            ))
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

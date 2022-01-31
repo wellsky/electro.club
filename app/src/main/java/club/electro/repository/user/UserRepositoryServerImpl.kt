@@ -28,6 +28,8 @@ class UserRepositoryServerImpl @Inject constructor(
             dao.insert(User(
                 id = id,
                 name = "",
+                created = 0,
+                lastVisit = 0,
             ).toEntity())
 
             CoroutineScope(Dispatchers.Default).launch {
@@ -60,7 +62,7 @@ class UserRepositoryServerImpl @Inject constructor(
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            return body.data.user.toDto()
+            return body.data.user
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {

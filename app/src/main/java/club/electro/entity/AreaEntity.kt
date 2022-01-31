@@ -10,24 +10,24 @@ data class AreaEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
     val type: Byte,
-    val object_id: Long,
+    val objectId: Long,
     val name: String,
     val image: String,
     val count: Int = 0,
-    val last_name: String,
-    val last_text: String,
-    val last_time: Long = 0,
+    val lastName: String,
+    val lastText: String,
+    val lastTime: Long = 0,
     val url: String = ""
 ) {
     fun toDto() = SubscriptionArea(
         id = id,
         type = type,
-        object_id = object_id,
+        objectId = objectId,
         image = image,
         name = name,
-        last_name = last_name,
-        last_text = last_text,
-        last_time = last_time,
+        lastName = lastName,
+        lastText = lastText,
+        lastTime = lastTime,
         count = count
     )
 
@@ -36,12 +36,12 @@ data class AreaEntity(
             AreaEntity(
                 id = dto.id,
                 type = dto.type,
-                object_id = dto.object_id,
+                objectId = dto.objectId,
                 image = dto.image,
                 name = dto.name,
-                last_name = dto.last_name,
-                last_text = dto.last_text,
-                last_time = dto.last_time,
+                lastName = dto.lastName,
+                lastText = dto.lastText,
+                lastTime = dto.lastTime,
                 count = dto.count
             )
     }

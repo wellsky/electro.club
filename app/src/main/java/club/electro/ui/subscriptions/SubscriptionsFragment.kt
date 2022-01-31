@@ -31,10 +31,12 @@ class SubscriptionsFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
         requireActivity().run {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-            mainViewModel.updateActionBarConfig(ToolBarConfig(title1 = getString(R.string.menu_subscriptions)))
+            mainViewModel.updateActionBarConfig(ToolBarConfig(
+                title2 = "",
+                onClick = {}
+            ))
         }
     }
 
@@ -52,7 +54,7 @@ class SubscriptionsFragment : Fragment() {
                     R.id.action_nav_subscriptions_to_threadFragment,
                     Bundle().apply {
                         threadType = area.type
-                        threadId = area.object_id
+                        threadId = area.objectId
                         postId = if (area.count > 0) ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD else ThreadLoadTarget.TARGET_POSITION_LAST // Если есть непрочитанные, то грузить с первого непрочитанного, иначе с последнего сообщения в теме
                     }
                 )

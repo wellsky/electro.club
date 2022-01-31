@@ -50,7 +50,7 @@ class MapRepositoryServerImpl @Inject constructor(
             val body = response.body() ?: throw ApiError(response.code(), response.message())
 
             markerDao.clear()
-            markerDao.insert(body.data.mapObjects.toEntity())
+            markerDao.insert(body.data.map_objects.toEntity())
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {

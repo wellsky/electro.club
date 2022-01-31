@@ -1,6 +1,8 @@
 package club.electro.dto
 
+import com.google.gson.annotations.SerializedName
+
 data class ThreadLink (
-    val threadType: Byte,
-    val threadId: Long,
+    @SerializedName("thread_type")  val threadType: Byte,
+    @SerializedName("thread_id")  val threadId: Long,
 )

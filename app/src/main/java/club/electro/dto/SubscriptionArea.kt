@@ -1,14 +1,16 @@
 package club.electro.dto
 
+import com.google.gson.annotations.SerializedName
+
 data class SubscriptionArea (
     val id: Long,
     val type: Byte,
-    val object_id: Long,
+    @SerializedName("object_id")  val objectId: Long,
     val name: String,
     val image: String,
     val count: Int = 0,
-    val last_name: String,
-    val last_text: String,
-    val last_time: Long = 0,
+    @SerializedName("last_name")  val lastName: String,
+    @SerializedName("last_text")  val lastText: String,
+    @SerializedName("last_time")  val lastTime: Long = 0,
     val url: String = ""
 )

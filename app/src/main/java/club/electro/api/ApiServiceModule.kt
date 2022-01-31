@@ -20,7 +20,7 @@ object ApiServiceModule{
         tokenInterceptor: Interceptor
     ): ApiService {
         return retrofit(okhttp(
-//                loggingInterceptor(),
+                loggingInterceptor(),
                 tokenInterceptor
         ))
         .create(ApiService::class.java)

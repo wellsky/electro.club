@@ -1,6 +1,7 @@
 package club.electro.dto
 
 import com.google.gson.TypeAdapter
+import com.google.gson.annotations.SerializedName
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 
@@ -10,8 +11,8 @@ data class PostsThread (
     val name: String,
     val image: String,
     val messages: Long,
-    val subscribersCount: Long,
-    val subscriptionStatus: Byte
+    @SerializedName("subscribers_count")  val subscribersCount: Long,
+    @SerializedName("subscription_status")  val subscriptionStatus: Byte
 )
 
 enum class ThreadType(val value: Byte) {

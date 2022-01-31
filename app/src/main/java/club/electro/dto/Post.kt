@@ -1,18 +1,20 @@
 package club.electro.dto
 
+import com.google.gson.annotations.SerializedName
+
 data class Post (
     val localId: Long,
     val id: Long,
     val status: Byte,
-    val threadType: Byte,
-    val threadId: Long,
-    val authorId: Long,
-    val authorName: String,
-    val authorAvatar: String? = null,
+    @SerializedName("thread_type")  val threadType: Byte,
+    @SerializedName("thread_id") val threadId: Long,
+    @SerializedName("author_id") val authorId: Long?,
+    @SerializedName("author_name") val authorName: String? = null,
+    @SerializedName("author_avatar") val authorAvatar: String? = null,
     val content: String = "",
     val preparedContent: String? = null,
     val published: Long,
-    val answerTo: Long? = null,
+    @SerializedName("answer_to") val answerTo: Long? = null,
     val likes: Int = 0,
     val views: Int = 0,
 

@@ -192,7 +192,7 @@ data class ApiAccountUserData (
 )
 
 data class ApiMapObjects(
-    val mapObjects: List<MapMarker>
+    val map_objects: List<MapMarker>
 )
 
 data class ApiAreaLastUpdateTime (
@@ -200,7 +200,7 @@ data class ApiAreaLastUpdateTime (
 )
 
 data class ApiUserProfile (
-    val user: ApiUserProfileData
+    val user: User
 )
 
 data class ApiSavedPost (
@@ -210,25 +210,3 @@ data class ApiSavedPost (
 data class ApiSocketDetails (
     val socket: Socket
 )
-
-data class ApiUserProfileData (
-    val user_id: Long,
-    val nickname: String,
-    val thumbnail: String,
-    val account_created: Long,
-    val last_visit: Long,
-    val messages: Int,
-    val rating: Int,
-    val primaryTransport: UserPrimaryTransport?,
-    val myChat: ThreadLink?
-) {
-    fun toDto() = User (
-        id = user_id,
-        name = nickname,
-        avatar = thumbnail,
-        messages = messages,
-        rating = rating,
-        primaryTransport = primaryTransport,
-        myChat = myChat
-    )
-}

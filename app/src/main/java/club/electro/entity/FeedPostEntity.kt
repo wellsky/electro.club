@@ -13,7 +13,7 @@ data class FeedPostEntity(
     val channelId: Long,
     val channelName: String,
     val channelAvatar: String,
-    val title: String,
+    val title: String?,
     val content: String,
     val image: String,
     val published: Long,

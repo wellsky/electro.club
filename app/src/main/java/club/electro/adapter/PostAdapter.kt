@@ -89,11 +89,13 @@ class PostViewHolder(
                 onInteractionListener.onAttachmentsClicked(post)
             }
 
+            header.isVisible = (post.authorId != null)
+
             menu.isVisible = false
             attachments.isVisible = false
             content.setTextColor(getColor(this.root.context, R.color.postInactiveTextColor))
 
-            when(post.status) {
+            when (post.status) {
                 Post.STATUS_CREATED_LOCAL -> {
                     published.setText(R.string.post_status_publishing)
                 }
@@ -107,13 +109,16 @@ class PostViewHolder(
                     published.text = sdf.format(date).toString() + " (id: " + post.id + ")"
                     //published.text = sdf.format(date).toString()
                     content.setTextColor(getColor(this.root.context, R.color.postTextColor))
-                    menu.isVisible = true
+                    menu.isVisible = header.isVisible
                 }
             }
 
             post.attachments?.let {
                 attachments.isVisible = true
-                attachments.text = attachments.context.getString(R.string.attachments, post.attachments.size.toString())
+                attachments.text = attachments.context.getString(
+                    R.string.attachments,
+                    post.attachments.size.toString()
+                )
                 attachments.setPaintFlags(attachments.getPaintFlags() or Paint.UNDERLINE_TEXT_FLAG)
             }
 
@@ -126,6 +131,7 @@ class PostViewHolder(
                     .error(R.drawable.ic_error_100dp)
                     .into(authorAvatar)
             }
+
 
             menu.setOnClickListener { it ->
                 PopupMenu(it.context, it).apply {
@@ -153,6 +159,7 @@ class PostViewHolder(
                     }
                 }.show()
             }
+
 
             val resources: Resources = this.root.resources
 

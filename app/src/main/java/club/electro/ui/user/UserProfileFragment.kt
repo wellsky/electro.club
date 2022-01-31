@@ -35,6 +35,17 @@ class UserProfileFragment : Fragment() {
 
     private val viewModel: UserProfileViewModel by viewModels()
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        requireActivity().run {
+            val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+            mainViewModel.updateActionBarConfig(ToolBarConfig(
+                title2 = "",
+                onClick = {}
+            ))
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -42,13 +53,6 @@ class UserProfileFragment : Fragment() {
     ): View? {
         _binding = FragmentUserProfileBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
-        val userId = requireArguments().userId
-
-//        viewModel = ViewModelProvider(this, UserProfileViewModelFactory(
-//            requireActivity().getApplication(),
-//            userId
-//        )).get(UserProfileViewModel::class.java)
 
         viewModel.currentProfile.observe(viewLifecycleOwner) { user->
             with (binding) {
