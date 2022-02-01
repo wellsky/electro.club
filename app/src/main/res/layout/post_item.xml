@@ -112,6 +112,7 @@
                 app:layout_constraintTop_toBottomOf="@id/content"
                 style="@style/AttachmentsIcon"
                 android:text="@string/attachments"
+                android:visibility="gone"
                 />
 
 

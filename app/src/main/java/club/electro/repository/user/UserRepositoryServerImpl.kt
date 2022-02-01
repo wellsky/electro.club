@@ -42,6 +42,7 @@ class UserRepositoryServerImpl @Inject constructor(
     }
 
     // TODO по сути выполняет то же самое, что getLocalById, но через Flow, а не через callback
+    // Но создает фейкового пользователя, чтобы предотвратить запросы к серверу из других тэгов о том же пользователе
     override fun getUserProfile(id: Long): Flow<User> = flow {
         dao.getById(id)?.let {
             emit(it.toDto())

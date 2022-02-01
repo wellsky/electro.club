@@ -18,8 +18,8 @@ data class Post (
     val likes: Int = 0,
     val views: Int = 0,
 
-    val canEdit: Boolean = false,
-    val canRemove: Boolean = false,
+    @SerializedName("can_edit") val canEdit: Boolean = false,
+    @SerializedName("can_remove") val canRemove: Boolean = false,
 
     val attachments: List<PostAttachment>? = null,
 ) {
