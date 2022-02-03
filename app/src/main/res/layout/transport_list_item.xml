@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="10dp"
+    android:paddingRight="@dimen/fab_margin"
+    android:paddingTop="8dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    >
+
+    <ImageView
+        android:id="@+id/transportImage"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/transportName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/fab_margin"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textColor="@color/grey_26"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toRightOf="@id/transportImage"
+        app:layout_constraintStart_toEndOf="@id/transportImage"
+        app:layout_constraintTop_toTopOf="@id/transportImage"
+        tools:text="Название транспорта очень длинное"/>
+
+
+    <TextView
+        android:id="@+id/areaLastMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textColor="@color/grey_7"
+        android:layout_marginStart="@dimen/fab_margin"
+        app:layout_constraintTop_toBottomOf="@id/transportName"
+        app:layout_constraintLeft_toRightOf="@id/transportImage"
+        app:layout_constraintStart_toEndOf="@id/transportImage"
+        tools:text="Описание транспорта или что-то такое"/>
+
+    <View
+        android:id="@+id/panelLine"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:background="@color/grey_f6"
+        app:layout_constraintTop_toBottomOf="@id/transportImage"
+        app:layout_constraintStart_toEndOf="@id/transportImage"
+        android:layout_marginTop="8dp"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

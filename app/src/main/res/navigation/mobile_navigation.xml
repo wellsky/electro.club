@@ -78,4 +78,8 @@
         android:id="@+id/socketFragment"
         android:name="club.electro.ui.map.socket.SocketFragment"
         android:label="Power socket" />
+    <fragment
+        android:id="@+id/nav_transport_list"
+        android:name="club.electro.ui.transport.TransportListFragment"
+        android:label="TransportListFragment" />
 </navigation>

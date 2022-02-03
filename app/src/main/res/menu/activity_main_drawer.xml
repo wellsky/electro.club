@@ -13,6 +13,10 @@
             android:icon="@drawable/ic_menu_subscriptions"
             android:title="@string/menu_subscriptions" />
         <item
+            android:id="@+id/nav_transport_list"
+            android:icon="@drawable/ic_baseline_electric_scooter_24"
+            android:title="@string/menu_transport" />
+        <item
             android:id="@+id/nav_map"
             android:icon="@drawable/ic_menu_map"
             android:title="@string/menu_map" />

@@ -59,4 +59,5 @@
     <string name="attachments">Attachments: %1$s</string>
     <string name="you_are_viewing_this_thread">You are viewing this thread</string>
     <string name="subscribe_and_start_chatting">Subscribe and start chatting</string>
+    <string name="menu_transport">Transport</string>
 </resources>

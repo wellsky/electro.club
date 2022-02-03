@@ -1,0 +1,72 @@
+package club.electro.ui.transport
+
+import android.os.Bundle
+import android.view.*
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import club.electro.MainViewModel
+import club.electro.R
+import club.electro.ToolBarConfig
+import club.electro.adapter.SubscriptionAreaAdapter
+import club.electro.adapter.SubscriptionAreaInteractionListener
+import club.electro.adapter.TransportPreviewAdapter
+import club.electro.adapter.TransportPreviewInteractionListener
+import club.electro.databinding.FragmentTransportListBinding
+import club.electro.dto.SubscriptionArea
+import club.electro.dto.TransportPreview
+import club.electro.repository.thread.ThreadLoadTarget
+import club.electro.ui.thread.ThreadFragment.Companion.postId
+import club.electro.ui.thread.ThreadFragment.Companion.threadId
+import club.electro.ui.thread.ThreadFragment.Companion.threadType
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
+class TransportListFragment : Fragment() {
+    private var _binding: FragmentTransportListBinding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel: TransportListViewModel by viewModels(
+        ownerProducer = ::requireParentFragment
+    )
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        requireActivity().run {
+            val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+            mainViewModel.updateActionBarConfig(ToolBarConfig(
+                title2 = "",
+                onClick = {}
+            ))
+        }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentTransportListBinding.inflate(inflater, container, false)
+        val root: View = binding.root
+
+        val adapter = TransportPreviewAdapter(object : TransportPreviewInteractionListener {
+            override fun onClick(transport: TransportPreview) {
+                // TODO
+            }
+        })
+
+        binding.transportList.adapter = adapter
+
+        viewModel.transportList.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
+
+        return root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}
