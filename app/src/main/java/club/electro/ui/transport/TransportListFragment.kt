@@ -1,6 +1,8 @@
 package club.electro.ui.transport
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -48,6 +50,23 @@ class TransportListFragment : Fragment() {
         })
 
         binding.transportList.adapter = adapter
+
+        binding.search.addTextChangedListener(object: TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun onTextChanged(filter: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                filter?.let {
+                    viewModel.queueNewSearch(filter.toString())
+                }
+            }
+
+            override fun afterTextChanged(p0: Editable?) {
+
+            }
+
+        })
 
         viewModel.transportList.observe(viewLifecycleOwner) {
             adapter.submitList(it)

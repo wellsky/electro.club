@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TransportDao {
-    @Query("SELECT * FROM TransportEntity ORDER BY rating DESC")
-    fun getAll(): Flow<List<TransportEntity>>
+    @Query("SELECT * FROM TransportEntity WHERE name LIKE '%' || :filter || '%' ORDER BY rating DESC LIMIT 100")
+    fun getFilteredList(filter: String): Flow<List<TransportEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(transport: TransportEntity)

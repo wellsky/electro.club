@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface TransportRepository {
     val list: Flow<List<TransportPreview>>
-    //fun getTransportPreview(id: Long): TransportPreview
+
     suspend fun getPreviewList(filter: String)
+    fun setPreviewListFilter(filter: String)
 }
