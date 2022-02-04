@@ -81,5 +81,13 @@
     <fragment
         android:id="@+id/nav_transport_list"
         android:name="club.electro.ui.transport.TransportListFragment"
-        android:label="Transport" />
+        android:label="Transport" >
+        <action
+            android:id="@+id/action_nav_transport_list_to_transportFragment"
+            app:destination="@id/transportFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/transportFragment"
+        android:name="club.electro.ui.transport.TransportFragment"
+        android:label="TransportFragment" />
 </navigation>

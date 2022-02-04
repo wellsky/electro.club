@@ -32,7 +32,7 @@ class TransportPreviewAdapter (
 
 class TransportPreviewViewHolder(
     private val binding: TransportListItemBinding,
-    private val omInteractionListener: TransportPreviewInteractionListener
+    private val onInteractionListener: TransportPreviewInteractionListener
 ): RecyclerView.ViewHolder(binding.root) {
 
     fun bind(transport: TransportPreview) {
@@ -40,6 +40,10 @@ class TransportPreviewViewHolder(
             transportName.text = transport.name
             if (!transport.image.isEmpty()) {
                 transportImage.load(transport.image)
+            }
+
+            root.setOnClickListener {
+                onInteractionListener.onClick(transport)
             }
         }
     }

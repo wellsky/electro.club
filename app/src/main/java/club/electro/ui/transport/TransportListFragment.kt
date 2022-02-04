@@ -7,7 +7,9 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import club.electro.MainViewModel
+import club.electro.R
 import club.electro.ToolBarConfig
 import club.electro.adapter.TransportPreviewAdapter
 import club.electro.adapter.TransportPreviewInteractionListener
@@ -45,7 +47,9 @@ class TransportListFragment : Fragment() {
 
         val adapter = TransportPreviewAdapter(object : TransportPreviewInteractionListener {
             override fun onClick(transport: TransportPreview) {
-                // TODO
+                findNavController().navigate(
+                    R.id.action_nav_transport_list_to_transportFragment
+                )
             }
         })
 
