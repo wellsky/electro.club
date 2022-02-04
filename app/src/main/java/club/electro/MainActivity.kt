@@ -16,9 +16,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import club.electro.auth.AppAuth
 import club.electro.databinding.ActivityMainBinding
-import club.electro.dto.ThreadType
 import club.electro.model.NetworkStatus
 import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.ui.thread.ThreadFragment.Companion.postId
@@ -30,7 +28,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity: AppCompatActivity() {
@@ -107,10 +104,10 @@ class MainActivity: AppCompatActivity() {
 
         // https://developer.android.com/guide/fragments/appbar
         viewModel.config.observe(this, { config ->
-            config.title1?.let {
+            config.title?.let {
                 supportActionBar?.title = it
             }
-            config.title2?.let {
+            config.subtitle?.let {
                 supportActionBar?.subtitle = it
             }
 

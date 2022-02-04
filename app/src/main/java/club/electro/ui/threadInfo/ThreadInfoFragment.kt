@@ -38,7 +38,7 @@ class ThreadInfoFragment : Fragment() {
             viewModel.thread.observe(viewLifecycleOwner) {
                 it?.let {
                     mainViewModel.updateActionBarConfig(ToolBarConfig(
-                        title1 = it.name,
+                        title = it.name,
                     ))
                 }
             }

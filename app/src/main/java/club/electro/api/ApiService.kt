@@ -150,6 +150,13 @@ interface ApiService {
         @Field("user_id") userId: Long,
     ): Response<ApiResponse<ApiUserProfile>>
 
+    @FormUrlEncoded
+    @POST(BASE_SERVER_URL)
+    suspend fun getTransportList(
+        @Field("method") method: String = "getTransportList",
+        @Field("filter") filter: String,
+    ): Response<ApiResponse<ApiTransportListData>>
+
 }
 
 data class ApiResponse<D> (
@@ -177,6 +184,10 @@ data class ApiFeedPostsData (
 
 data class ApiAccountData (
     val user: ApiAccountUserData
+)
+
+data class ApiTransportListData (
+    val list: List<TransportPreview>
 )
 
 data class ApiAccountUserData (

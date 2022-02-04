@@ -1,40 +1,44 @@
 package club.electro.repository.transport
 
+import club.electro.api.ApiService
+import club.electro.dao.TransportDao
 import club.electro.dto.TransportPreview
+import club.electro.entity.*
+import club.electro.error.ApiError
+import club.electro.error.UnknownError
+import club.electro.model.NetworkStatus
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import java.io.IOException
 import javax.inject.Inject
 
 class TransportRepositoryServerImpl @Inject constructor(
-
+    private val dao: TransportDao,
+    private val apiService: ApiService,
+    private val networkStatus: NetworkStatus,
 ): TransportRepository {
-    override fun getTransportPreview(id: Long): TransportPreview {
-        TODO("Not yet implemented")
-    }
 
-    override fun getTransportPreview(filter: String): Flow<List<TransportPreview>> = flow {
-        emit(listOf(
-            TransportPreview(
-                1,
-                "Transport1",
-                "https://electro.club/data/transport/400/80.jpg?upd=1534494032",
-                25,
-                4.5F
-            ),
-            TransportPreview(
-                2,
-                "Transport2",
-                "https://electro.club/data/transport/928/80.jpg?upd=1606214880",
-                25,
-                4.5F
-            ),
-            TransportPreview(
-                3,
-                "Transport3",
-                "https://electro.club/data/transport/864/80.jpg?upd=1597670783",
-                25,
-                4.5F
-            )
-        ))
+    override val  list: Flow<List<TransportPreview>> = dao.getAll().map(List<TransportEntity>::toPreviewDto).flowOn(Dispatchers.Default)
+
+    override suspend fun getPreviewList(filter: String) {
+        try {
+            val response = apiService.getTransportList(filter = "")
+
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+
+            dao.removeAll()
+            dao.insert(body.data.list.toEntity())
+
+            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
+        } catch (e: IOException) {
+            networkStatus.setStatus(NetworkStatus.Status.ERROR)
+        } catch (e: Exception) {
+            throw UnknownError
+        }
     }
 }

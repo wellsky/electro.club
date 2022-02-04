@@ -4,6 +4,7 @@ import club.electro.dto.TransportPreview
 import kotlinx.coroutines.flow.Flow
 
 interface TransportRepository {
-    fun getTransportPreview(id: Long): TransportPreview
-    fun getTransportPreview(filter: String): Flow<List<TransportPreview>>
+    val list: Flow<List<TransportPreview>>
+    //fun getTransportPreview(id: Long): TransportPreview
+    suspend fun getPreviewList(filter: String)
 }

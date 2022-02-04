@@ -12,7 +12,6 @@ import club.electro.MainViewModel
 import club.electro.R
 import club.electro.ToolBarConfig
 import club.electro.auth.AppAuth
-import club.electro.databinding.FragmentFeedBinding
 import club.electro.databinding.FragmentLoginBinding
 import club.electro.util.AndroidUtils
 import com.google.android.material.snackbar.Snackbar
@@ -20,7 +19,6 @@ import ru.netology.nmedia.viewmodel.LoginFormState
 import ru.netology.nmedia.viewmodel.LoginViewModel
 import club.electro.utils.loadCircleCrop
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class LoginFragment: Fragment() {
@@ -36,7 +34,7 @@ class LoginFragment: Fragment() {
         requireActivity().run {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
             mainViewModel.updateActionBarConfig(ToolBarConfig(
-                title2 = "",
+                subtitle = "",
                 onClick = {}
             ))
         }

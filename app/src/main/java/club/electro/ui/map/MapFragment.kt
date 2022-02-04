@@ -42,7 +42,7 @@ class MapFragment : Fragment() {
         requireActivity().run {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
             mainViewModel.updateActionBarConfig(ToolBarConfig(
-                title2 = "",
+                subtitle = "",
                 onClick = {}
             ))
         }

@@ -20,7 +20,7 @@ class MainViewModel @Inject constructor(
 }
 
 data class ToolBarConfig (
-    val title1: String? = null,
-    val title2: String? = null,
+    val title: String? = null,
+    val subtitle: String? = null,
     val onClick: () -> Unit = {}
 )

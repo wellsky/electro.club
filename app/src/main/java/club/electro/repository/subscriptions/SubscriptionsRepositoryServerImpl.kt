@@ -21,7 +21,6 @@ class SubscriptionsRepositoryServerImpl @Inject constructor(
     private val appAuth : AppAuth,
     private val dao: AreaDao,
     private val networkStatus: NetworkStatus
-
 ) : SubscriptionsRepository {
 
     override val data: Flow<List<SubscriptionArea>> = dao.getAll().map(List<AreaEntity>::toDto).flowOn(Dispatchers.Default)

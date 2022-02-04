@@ -40,7 +40,7 @@ class UserProfileFragment : Fragment() {
         requireActivity().run {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
             mainViewModel.updateActionBarConfig(ToolBarConfig(
-                title2 = "",
+                subtitle = "",
                 onClick = {}
             ))
         }
@@ -96,7 +96,7 @@ class UserProfileFragment : Fragment() {
 
             requireActivity().run {
                 val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-                mainViewModel.updateActionBarConfig(ToolBarConfig(title1 = user.name))
+                mainViewModel.updateActionBarConfig(ToolBarConfig(title = user.name))
             }
         }
 
