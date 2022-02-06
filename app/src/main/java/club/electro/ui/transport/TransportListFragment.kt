@@ -15,6 +15,8 @@ import club.electro.adapter.TransportPreviewAdapter
 import club.electro.adapter.TransportPreviewInteractionListener
 import club.electro.databinding.FragmentTransportListBinding
 import club.electro.dto.TransportPreview
+import club.electro.ui.transport.TransportFragment.Companion.transportId
+//import club.electro.dto.Transport
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -48,7 +50,10 @@ class TransportListFragment : Fragment() {
         val adapter = TransportPreviewAdapter(object : TransportPreviewInteractionListener {
             override fun onClick(transport: TransportPreview) {
                 findNavController().navigate(
-                    R.id.action_nav_transport_list_to_transportFragment
+                    R.id.action_nav_transport_list_to_transportFragment,
+                    Bundle().apply {
+                       transportId = transport.id
+                    }
                 )
             }
         })
@@ -56,19 +61,13 @@ class TransportListFragment : Fragment() {
         binding.transportList.adapter = adapter
 
         binding.search.addTextChangedListener(object: TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-            }
-
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(filter: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 filter?.let {
                     viewModel.queueNewSearch(filter.toString())
                 }
             }
-
-            override fun afterTextChanged(p0: Editable?) {
-
-            }
+            override fun afterTextChanged(p0: Editable?) {}
 
         })
 

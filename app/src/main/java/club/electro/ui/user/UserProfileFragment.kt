@@ -76,7 +76,7 @@ class UserProfileFragment : Fragment() {
 
                 user.avatar?.let {
                     avatar.loadCircleCrop(it)
-               }
+                }
 
                 chat.isVisible = false
                 user.myChat?.let { link ->

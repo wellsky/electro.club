@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import club.electro.databinding.TransportListItemBinding
 import club.electro.dto.TransportPreview
 import club.electro.utils.load
-import club.electro.utils.loadCircleCrop
 
 interface TransportPreviewInteractionListener {
     fun onClick(item: TransportPreview)
@@ -38,8 +37,8 @@ class TransportPreviewViewHolder(
     fun bind(transport: TransportPreview) {
         binding.apply {
             transportName.text = transport.name
-            if (!transport.image.isEmpty()) {
-                transportImage.load(transport.image)
+            transport.image?.let {
+                transportImage.load(it)
             }
 
             root.setOnClickListener {

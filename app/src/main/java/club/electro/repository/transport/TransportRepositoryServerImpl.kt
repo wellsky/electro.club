@@ -2,9 +2,10 @@ package club.electro.repository.transport
 
 import club.electro.api.ApiService
 import club.electro.dao.TransportDao
-import club.electro.dto.TransportPreview
+import club.electro.dto.Transport
 import club.electro.entity.*
 import club.electro.error.ApiError
+import club.electro.error.NetworkError
 import club.electro.error.UnknownError
 import club.electro.model.NetworkStatus
 import kotlinx.coroutines.Dispatchers
@@ -47,5 +48,28 @@ class TransportRepositoryServerImpl @Inject constructor(
         targetList.value = filter
     }
 
+    override fun getTransportById(id: Long): Flow<Transport> = flow {
+        dao.getTransportById(id)?.let {
+            emit(it.toDto())
+        }
+
+        try {
+            val response = apiService.getTransport(
+                transportId = id
+            )
+
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+
+            dao.insert(body.data.transport.toEntity())
+            emit(body.data.transport)
+        } catch (e: IOException) {
+            throw NetworkError
+        } catch (e: Exception) {
+            throw UnknownError
+        }
+    }.flowOn(Dispatchers.Default)
 
 }

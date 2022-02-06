@@ -1,10 +1,7 @@
 package club.electro.entity
 
 import androidx.room.TypeConverter
-import club.electro.dto.MarkerCustomData
-import club.electro.dto.PostAttachment
-import club.electro.dto.ThreadLink
-import club.electro.dto.UserPrimaryTransport
+import club.electro.dto.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -55,5 +52,17 @@ class DBTypeConverters {
     fun toPostAttachments(primaryString: String?): List<PostAttachment>? {
         val type = object : TypeToken<List<PostAttachment>>() {}.type
         return Gson().fromJson<List<PostAttachment>>(primaryString, type)
+    }
+
+    @TypeConverter
+    fun fromTransportSpecs(primary: TransportSpecs?): String? {
+        val type = object : TypeToken<TransportSpecs>() {}.type
+        return Gson().toJson(primary, type)
+    }
+
+    @TypeConverter
+    fun toTransportSpecs(primaryString: String?): TransportSpecs? {
+        val type = object : TypeToken<TransportSpecs>() {}.type
+        return Gson().fromJson<TransportSpecs>(primaryString, type)
     }
 }
