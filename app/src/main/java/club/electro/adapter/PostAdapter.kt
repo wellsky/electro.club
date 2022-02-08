@@ -2,10 +2,7 @@ package club.electro.adapter
 
 import ImageGetter
 import QuoteSpanClass
-import android.R.attr
-import android.content.Context
 import android.content.res.Resources
-import android.provider.Settings.Global.getString
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
@@ -24,7 +21,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import club.electro.R
-import club.electro.databinding.PostItemBinding
+import club.electro.databinding.ItemPostBinding
 import club.electro.dto.Post
 import com.bumptech.glide.Glide
 import android.text.SpannableStringBuilder
@@ -50,7 +47,7 @@ class PostAdapter(
     private val lifecycleScope: LifecycleCoroutineScope
 ) : PagingDataAdapter<Post, PostViewHolder>(PostDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
-        val binding = PostItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return PostViewHolder(binding, onInteractionListener, lifecycleScope)
     }
 
@@ -65,7 +62,7 @@ class PostAdapter(
 }
 
 class PostViewHolder(
-    private val binding: PostItemBinding,
+    private val binding: ItemPostBinding,
     private val onInteractionListener: PostInteractionListener,
     private val lifecycleScope: LifecycleCoroutineScope
 ) : RecyclerView.ViewHolder(binding.root) {

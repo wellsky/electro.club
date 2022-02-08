@@ -15,7 +15,7 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf = "parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/feed_post_item"
+        tools:listitem="@layout/item_feed_post"
         >
     </androidx.recyclerview.widget.RecyclerView>
 

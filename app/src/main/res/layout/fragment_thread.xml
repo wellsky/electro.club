@@ -26,7 +26,7 @@
 
             app:layout_constraintBottom_toBottomOf = "parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:listitem="@layout/post_item"
+            tools:listitem="@layout/item_post"
             >
         </androidx.recyclerview.widget.RecyclerView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

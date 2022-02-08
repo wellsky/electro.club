@@ -16,8 +16,9 @@ import club.electro.entity.*
     FeedPostEntity::class,
     ThreadEntity::class,
     SocketEntity::class,
-    TransportEntity::class
- ], version = 116, exportSchema = false)
+    TransportEntity::class,
+    DiscussionEntity::class
+ ], version = 121, exportSchema = false)
 @TypeConverters(DBTypeConverters::class)
 abstract class AppDb : RoomDatabase() {
     abstract fun postDao(): PostDao
@@ -29,4 +30,5 @@ abstract class AppDb : RoomDatabase() {
     abstract fun threadDao(): ThreadDao
     abstract fun socketDao(): SocketDao
     abstract fun transportDao(): TransportDao
+    abstract fun discussionDao(): DiscussionDao
 }

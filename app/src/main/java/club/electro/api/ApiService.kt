@@ -193,7 +193,8 @@ data class ApiAccountData (
 )
 
 data class ApiTransportData (
-    val transport: Transport
+    val transport: Transport,
+    val discussions: List<Discussion>? = null
 )
 
 data class ApiTransportListData (

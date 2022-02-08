@@ -1,5 +1,6 @@
 package club.electro.repository.transport
 
+import club.electro.dto.Discussion
 import club.electro.dto.Transport
 import club.electro.dto.TransportPreview
 import kotlinx.coroutines.flow.Flow
@@ -10,4 +11,5 @@ interface TransportRepository {
     suspend fun getPreviewList(filter: String)
     fun setPreviewListFilter(filter: String)
     fun getTransportById(id: Long): Flow<Transport>
+    fun getDiscussionsByTransportId(id: Long): Flow<List<Discussion>>
 }

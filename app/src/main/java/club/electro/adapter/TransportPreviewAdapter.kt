@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import club.electro.databinding.TransportListItemBinding
+import club.electro.databinding.ItemTransportListBinding
 import club.electro.dto.TransportPreview
 import club.electro.utils.load
 
@@ -18,7 +18,7 @@ class TransportPreviewAdapter (
 ) : ListAdapter<TransportPreview, TransportPreviewViewHolder>(TransportPreviewDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransportPreviewViewHolder {
-        val binding = TransportListItemBinding.inflate(LayoutInflater.from(parent.context))
+        val binding = ItemTransportListBinding.inflate(LayoutInflater.from(parent.context))
         return TransportPreviewViewHolder(binding, onInteractionListener)
     }
 
@@ -30,7 +30,7 @@ class TransportPreviewAdapter (
 }
 
 class TransportPreviewViewHolder(
-    private val binding: TransportListItemBinding,
+    private val binding: ItemTransportListBinding,
     private val onInteractionListener: TransportPreviewInteractionListener
 ): RecyclerView.ViewHolder(binding.root) {
 

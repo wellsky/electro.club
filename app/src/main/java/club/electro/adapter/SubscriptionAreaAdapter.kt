@@ -6,7 +6,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import club.electro.databinding.SubscriptionItemBinding
+import club.electro.databinding.ItemSubscriptionBinding
 import club.electro.dto.SubscriptionArea
 import club.electro.utils.areaLastActivityTime
 import club.electro.utils.htmlToText
@@ -20,7 +20,7 @@ class SubscriptionAreaAdapter (
     private val onInteractionListener: SubscriptionAreaInteractionListener,
 ) : ListAdapter<SubscriptionArea, SubscriptionAreaViewHolder>(SubscriptionAreaDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubscriptionAreaViewHolder {
-        val binding = SubscriptionItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemSubscriptionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return SubscriptionAreaViewHolder(binding, onInteractionListener)
     }
 
@@ -31,7 +31,7 @@ class SubscriptionAreaAdapter (
 }
 
 class SubscriptionAreaViewHolder(
-    private val binding: SubscriptionItemBinding,
+    private val binding: ItemSubscriptionBinding,
     private val onInteractionListener: SubscriptionAreaInteractionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 

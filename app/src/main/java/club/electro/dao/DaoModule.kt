@@ -27,4 +27,6 @@ object DaoModule {
     fun provideUserDao(db: AppDb): UserDao = db.userDao()
     @Provides
     fun provideTransportDao(db: AppDb): TransportDao = db.transportDao()
+    @Provides
+    fun provideDiscussionDao(db: AppDb): DiscussionDao = db.discussionDao()
 }

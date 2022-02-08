@@ -3,15 +3,14 @@ package club.electro.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import club.electro.databinding.FeedPostItemBinding
+import club.electro.databinding.ItemFeedPostBinding
 import club.electro.dto.FeedPost
 import club.electro.utils.load
 import club.electro.utils.loadCircleCrop
-import java.text.DateFormat.getDateTimeInstance
+
 
 interface OnFeedPostInteractionListener {
     fun onClick(feedPost: FeedPost) {}
@@ -21,7 +20,7 @@ class FeedPostAdapter (
     private val onInteractionListener: OnFeedPostInteractionListener,
 ) : ListAdapter<FeedPost, FeedPostViewHolder>(FeedPostDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedPostViewHolder {
-        val binding = FeedPostItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemFeedPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return FeedPostViewHolder(binding, onInteractionListener)
     }
 
@@ -32,7 +31,7 @@ class FeedPostAdapter (
 }
 
 class FeedPostViewHolder(
-    private val binding: FeedPostItemBinding,
+    private val binding: ItemFeedPostBinding,
     private val onInteractionListener: OnFeedPostInteractionListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 

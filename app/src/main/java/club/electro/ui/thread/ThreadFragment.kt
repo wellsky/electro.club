@@ -71,7 +71,7 @@ class ThreadFragment: Fragment() {
                 it?.let {
                     mainViewModel.updateActionBarConfig(ToolBarConfig(
                         title = it.name,
-                        subtitle = getString(R.string.subscribers_count) + ": " + it.subscribersCount.toString(),
+                        subtitle = getString(R.string.subscribers_count) + it.subscribersCount.toString(),
                         onClick = {
                             findNavController().navigate(
                                 R.id.action_threadFragment_to_threadInfoFragment,

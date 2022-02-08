@@ -38,8 +38,7 @@
     <string name="post_status_publishing">Publishing...</string>
     <string name="post_status_saving">Saving...</string>
     <string name="post_status_removing">Removing...</string>
-
-    <string name="subscribers_count">Subscribers</string>
+    <string name="subscribers_count">"Subscribers: "</string>
     <string name="transport_not_set">Primary transport is not set</string>
     <string name="action_subscribe">Subscribe</string>
     <string name="action_unsubscribe">Unsubscribe</string>
@@ -61,4 +60,10 @@
     <string name="subscribe_and_start_chatting">Subscribe and start chatting</string>
     <string name="menu_transport">Transport</string>
     <string name="search">Search...</string>
+    <string name="discussion">Discussion</string>
+    <string name="rating">"Rating: "</string>
+    <string name="messages">"Messages: "</string>
+    <string name="owners_count">"Owners: "</string>
+    <string name="weight">Weight</string>
+    <string name="power">Power</string>
 </resources>

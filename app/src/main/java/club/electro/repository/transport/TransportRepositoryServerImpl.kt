@@ -1,7 +1,10 @@
 package club.electro.repository.transport
 
+import androidx.lifecycle.LiveData
 import club.electro.api.ApiService
+import club.electro.dao.DiscussionDao
 import club.electro.dao.TransportDao
+import club.electro.dto.Discussion
 import club.electro.dto.Transport
 import club.electro.entity.*
 import club.electro.error.ApiError
@@ -14,7 +17,8 @@ import java.io.IOException
 import javax.inject.Inject
 
 class TransportRepositoryServerImpl @Inject constructor(
-    private val dao: TransportDao,
+    private val transportDao: TransportDao,
+    private val discussionDao: DiscussionDao,
     private val apiService: ApiService,
     private val networkStatus: NetworkStatus,
 ): TransportRepository {
@@ -22,7 +26,7 @@ class TransportRepositoryServerImpl @Inject constructor(
     val targetList = MutableStateFlow(value = "")
 
     override val list = targetList.flatMapLatest { filter->
-        dao.getFilteredList(filter).map(List<TransportEntity>::toPreviewDto).flowOn(Dispatchers.Default)
+        transportDao.getFilteredList(filter).map(List<TransportEntity>::toPreviewDto).flowOn(Dispatchers.Default)
     }
 
     override suspend fun getPreviewList(filter: String) {
@@ -34,7 +38,7 @@ class TransportRepositoryServerImpl @Inject constructor(
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
 
-            dao.insert(body.data.list.toEntity())
+            transportDao.insert(body.data.list.toEntity())
 
             networkStatus.setStatus(NetworkStatus.Status.ONLINE)
         } catch (e: IOException) {
@@ -49,7 +53,7 @@ class TransportRepositoryServerImpl @Inject constructor(
     }
 
     override fun getTransportById(id: Long): Flow<Transport> = flow {
-        dao.getTransportById(id)?.let {
+        transportDao.getTransportById(id)?.let {
             emit(it.toDto())
         }
 
@@ -63,7 +67,11 @@ class TransportRepositoryServerImpl @Inject constructor(
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
 
-            dao.insert(body.data.transport.toEntity())
+            transportDao.insert(body.data.transport.toEntity())
+            body.data.discussions?.let {
+                discussionDao.insert(it.toEntity())
+            }
+
             emit(body.data.transport)
         } catch (e: IOException) {
             throw NetworkError
@@ -72,4 +80,5 @@ class TransportRepositoryServerImpl @Inject constructor(
         }
     }.flowOn(Dispatchers.Default)
 
+    override fun getDiscussionsByTransportId(id: Long): Flow<List<Discussion>> = discussionDao.getByTransportId(id).map{ it.toDto() }
 }
