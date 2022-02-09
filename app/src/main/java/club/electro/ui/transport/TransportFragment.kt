@@ -77,6 +77,7 @@ class TransportFragment : Fragment() {
         viewModel.transportDiscussions(transportId).observe(viewLifecycleOwner) {
             println("Discussions observed " + it.size)
             if (it.size > 0) {
+                binding.discussionTitle.isVisible = true
                 binding.discussionItem.root.isVisible = true
                 val discussion = it[0]
                 with (binding.discussionItem) {
@@ -85,7 +86,7 @@ class TransportFragment : Fragment() {
                     discussionName.text = discussion.title
                     discussionMessagesCount.text = discussion.messages.toString()
                     discussionImage.loadCircleCrop(discussion.image)
-                    discussionLastMessageTime.text = areaLastActivityTime(discussion.lastMessageTime, requireContext())
+                    //discussionLastMessageTime.text = areaLastActivityTime(discussion.lastMessageTime, requireContext())
                 }
 
                 binding.discussionItem.root.setOnClickListener {
@@ -100,6 +101,7 @@ class TransportFragment : Fragment() {
                 }
 
             } else {
+                binding.discussionTitle.isVisible = false
                 binding.discussionItem.root.isVisible = false
             }
         }

@@ -37,6 +37,10 @@ class TransportPreviewViewHolder(
     fun bind(transport: TransportPreview) {
         binding.apply {
             transportName.text = transport.name
+
+            usersValue.text = transport.users.toString()
+            ratingValue.text = transport.rating.toString()
+
             transport.image?.let {
                 transportImage.load(it)
             }

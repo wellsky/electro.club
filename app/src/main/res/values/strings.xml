@@ -60,10 +60,10 @@
     <string name="subscribe_and_start_chatting">Subscribe and start chatting</string>
     <string name="menu_transport">Transport</string>
     <string name="search">Search...</string>
-    <string name="discussion">Discussion</string>
+    <string name="discussion">Discussions</string>
     <string name="rating">"Rating: "</string>
     <string name="messages">"Messages: "</string>
     <string name="owners_count">"Owners: "</string>
-    <string name="weight">Weight</string>
-    <string name="power">Power</string>
+    <string name="weight">Weight, kg</string>
+    <string name="power">Power, W</string>
 </resources>

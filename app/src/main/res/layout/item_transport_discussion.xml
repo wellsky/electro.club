@@ -25,8 +25,9 @@
         app:layout_constraintTop_toTopOf="@id/discussionImage"
         app:layout_constraintStart_toEndOf="@id/discussionImage"
         app:layout_constraintLeft_toRightOf="@id/discussionImage"
-        app:layout_constraintEnd_toStartOf="@id/discussionLastMessageTime"
+        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="@dimen/fab_margin"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="4dp"
         android:textColor="@color/grey_26"
         android:textStyle="bold"
@@ -38,20 +39,6 @@
         >
     </TextView>
 
-    <TextView
-        android:id="@+id/discussionLastMessageTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/discussionName"
-        app:layout_constraintBottom_toBottomOf="@id/discussionName"
-        app:layout_constraintEnd_toStartOf="@id/arrowRight"
-        app:layout_constraintStart_toEndOf="@id/discussionName"
-        android:layout_marginStart="@dimen/fab_margin"
-        android:textColor="@color/grey_7"
-        android:textFontWeight="700"
-        tools:text="12:12"
-        >
-    </TextView>
 
     <TextView
         android:id="@+id/discussionLastName"
@@ -77,25 +64,13 @@
         app:layout_constraintBottom_toBottomOf="@id/discussionLastName"
         app:layout_constraintStart_toEndOf="@id/discussionLastName"
         app:layout_constraintLeft_toRightOf="@id/discussionImage"
-        app:layout_constraintEnd_toStartOf="@id/arrowRight"
+        app:layout_constraintEnd_toEndOf="parent"
         android:ellipsize="end"
         android:singleLine="true"
         android:textColor="@color/grey_7"
         tools:text="123"
         >
     </TextView>
-
-    <ImageView
-        android:id="@+id/arrowRight"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/discussionLastMessageTime"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="10dp"
-        android:src="@drawable/ic_baseline_keyboard_arrow_right_24"
-        />
-
 
     <View
         android:id="@+id/panelLine"

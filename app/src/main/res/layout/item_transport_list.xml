@@ -12,8 +12,8 @@
 
     <ImageView
         android:id="@+id/transportImage"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
@@ -35,26 +35,58 @@
         tools:text="Название транспорта очень длинное"/>
 
 
-    <TextView
-        android:id="@+id/areaLastMessage"
-        android:layout_width="0dp"
+
+
+    <ImageView
+        android:id="@+id/usersIcon"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:singleLine="true"
-        android:textColor="@color/grey_7"
-        android:layout_marginStart="@dimen/fab_margin"
         app:layout_constraintTop_toBottomOf="@id/transportName"
         app:layout_constraintStart_toEndOf="@id/transportImage"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:text="Описание транспорта или что-то такое"/>
+        android:src="@drawable/ic_baseline_people_alt_24"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+    />
+
+    <TextView
+        android:id="@+id/usersValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/usersIcon"
+        app:layout_constraintBottom_toBottomOf="@id/usersIcon"
+        app:layout_constraintStart_toEndOf="@id/usersIcon"
+        android:layout_marginStart="8dp"
+        tools:text="256"
+        />
+
+    <ImageView
+        android:id="@+id/ratingIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/usersIcon"
+        app:layout_constraintStart_toEndOf="@id/usersValue"
+        android:src="@drawable/ic_baseline_star_rate_24"
+        android:layout_marginStart="24dp"
+        />
+
+    <TextView
+        android:id="@+id/ratingValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/ratingIcon"
+        app:layout_constraintBottom_toBottomOf="@id/ratingIcon"
+        app:layout_constraintStart_toEndOf="@id/ratingIcon"
+        android:layout_marginStart="8dp"
+        tools:text="4.5"
+        />
 
     <View
         android:id="@+id/panelLine"
         android:layout_width="wrap_content"
         android:layout_height="1dp"
-        android:background="@color/grey_f6"
+        android:background="@color/grey_d"
         app:layout_constraintTop_toBottomOf="@id/transportImage"
-        app:layout_constraintStart_toEndOf="@id/transportImage"
+        app:layout_constraintStart_toStartOf="@id/transportImage"
         android:layout_marginTop="8dp"
         />
 
