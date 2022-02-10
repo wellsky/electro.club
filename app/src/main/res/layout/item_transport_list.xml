@@ -93,6 +93,7 @@
         app:layout_constraintStart_toEndOf="@id/transportImage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/transportImage"
+        android:layout_marginBottom="4dp"
         android:text="14kg, 1200W"
         tools:text="14kg, 1200W"/>
 

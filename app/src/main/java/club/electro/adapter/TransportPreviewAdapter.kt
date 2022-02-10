@@ -44,12 +44,15 @@ class TransportPreviewViewHolder(
 
             transportText.text = ""
                 .plus(transport.specs.weight)
+                .plus(" ")
                 .plus(this.root.context.getString(R.string.measure_weight))
-                .plus(", ")
+                .plus("   ")
                 .plus(transport.specs.power)
+                .plus(" ")
                 .plus(this.root.context.getString(R.string.measure_power))
-                .plus(", ")
+                .plus("   ")
                 .plus(transport.specs.batteryCapacityAh)
+                .plus(" ")
                 .plus(this.root.context.getString(R.string.measure_battery_capacity))
 
 

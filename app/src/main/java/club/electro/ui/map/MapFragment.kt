@@ -36,6 +36,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MapFragment : Fragment() {
     private val viewModel: MapViewModel by viewModels ()
+    private var currentMarkers: List<MapMarker> = listOf()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -58,37 +59,39 @@ class MapFragment : Fragment() {
     private val callback = OnMapReadyCallback { googleMap ->
         val cameraPosition = viewModel.loadCameraState()
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(cameraPosition.lat, cameraPosition.lng), cameraPosition.zoom))
-
         viewModel.markers.observe(viewLifecycleOwner) { markersList ->
-            try {
-                googleMap.clear()
+            if (!(currentMarkers == markersList)) {
+                try {
+                    currentMarkers = markersList
+                    googleMap.clear()
 
-                val socketIcon = fromResource(R.drawable.map_socket)
-                val groupIcon = fromResource(R.drawable.map_group)
+                    val socketIcon = fromResource(R.drawable.map_socket)
+                    val groupIcon = fromResource(R.drawable.map_group)
 
 
-                markersList.forEach { marker ->
-                    val coords = LatLng(marker.lat, marker.lng)
+                    markersList.forEach { marker ->
+                        val coords = LatLng(marker.lat, marker.lng)
 
-                    val mapMarker = when (marker.type) {
-                        MARKER_TYPE_SOCKET -> googleMap.addMarker(
-                            MarkerOptions().position(coords).icon(socketIcon)
-                        )
-                        MARKER_TYPE_GROUP -> googleMap.addMarker(
-                            MarkerOptions().position(coords).icon(groupIcon)
-                        )
-                        else -> null
-                    }
+                        val mapMarker = when (marker.type) {
+                            MARKER_TYPE_SOCKET -> googleMap.addMarker(
+                                MarkerOptions().position(coords).icon(socketIcon)
+                            )
+                            MARKER_TYPE_GROUP -> googleMap.addMarker(
+                                MarkerOptions().position(coords).icon(groupIcon)
+                            )
+                            else -> null
+                        }
 
-                    mapMarker?.let { it ->
-                        it.tag = marker
-                        marker.icon?.let { icon ->
-                            mapMarker.loadIcon(requireContext(), icon)
+                        mapMarker?.let { it ->
+                            it.tag = marker
+                            marker.icon?.let { icon ->
+                                mapMarker.loadIcon(requireContext(), icon)
+                            }
                         }
                     }
+                } catch (e: Exception) {
+                    println("Place markers exception: " + e.message)
                 }
-            } catch (e: Exception) {
-                println("Place markers exception: " + e.message)
             }
         }
 
