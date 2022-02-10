@@ -7,6 +7,18 @@ import com.google.gson.reflect.TypeToken
 
 class DBTypeConverters {
     @TypeConverter
+    fun fromStrings(primary: List<String>?): String? {
+        val type = object : TypeToken<List<String>>() {}.type
+        return Gson().toJson(primary, type)
+    }
+
+    @TypeConverter
+    fun toStrings(primaryString: String?): List<String>? {
+        val type = object : TypeToken<List<String>>() {}.type
+        return Gson().fromJson<List<String>>(primaryString, type)
+    }
+
+    @TypeConverter
     fun fromPrimaryTransport(primary: UserPrimaryTransport?): String? {
         val type = object : TypeToken<UserPrimaryTransport>() {}.type
         return Gson().toJson(primary, type)

@@ -37,8 +37,33 @@
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
         android:layout_marginTop="8dp"
+        android:visibility="gone"
         tools:src="@tools:sample/avatars"
-        />
+        >
+    </ImageView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/moreImagesDiv"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        app:layout_constraintBottom_toBottomOf="@id/socketImage"
+        app:layout_constraintStart_toStartOf="@id/socketImage"
+        app:layout_constraintEnd_toEndOf="@id/socketImage"
+        android:background="#bb333333"
+        android:visibility="gone"
+        >
+        <TextView
+            android:id="@+id/moreImagesText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:textColor="@color/white"
+            android:text="@string/zoom_more_images"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/statusTitle"
@@ -123,10 +148,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@id/authorAvatar"
+        app:layout_constraintBottom_toTopOf="@id/created"
         app:layout_constraintStart_toEndOf="@id/authorAvatar"
         android:layout_marginStart="16dp"
         android:textStyle="bold"
         tools:text="Author nickname"
+        />
+
+    <TextView
+        android:id="@+id/created"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/authorName"
+        app:layout_constraintBottom_toBottomOf="@id/authorAvatar"
+        app:layout_constraintStart_toEndOf="@id/authorAvatar"
+        android:layout_marginStart="16dp"
+        tools:text="2022.01.01"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

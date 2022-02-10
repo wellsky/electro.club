@@ -11,5 +11,7 @@ data class Socket (
     val modified: Long,
     @SerializedName("author_id") val authorId: Long,
     @SerializedName("author_name") val authorName: String,
-    @SerializedName("author_avatar") val authorAvatar: String
+    @SerializedName("author_avatar") val authorAvatar: String,
+
+    val images: List<String>?
 )

@@ -17,7 +17,8 @@ data class SocketEntity(
     val modified: Long,
     val authorId: Long,
     val authorName: String,
-    val authorAvatar: String
+    val authorAvatar: String,
+    val images: List<String>?
 ) {
     fun toDto() = Socket (
         id = id,
@@ -28,7 +29,8 @@ data class SocketEntity(
         modified = modified,
         authorId = authorId,
         authorName = authorName,
-        authorAvatar = authorAvatar
+        authorAvatar = authorAvatar,
+        images = images,
     )
 
     companion object {
@@ -42,7 +44,8 @@ data class SocketEntity(
                 modified = dto.modified,
                 authorId = dto.authorId,
                 authorName = dto.authorName,
-                authorAvatar = dto.authorAvatar
+                authorAvatar = dto.authorAvatar,
+                images = dto.images
             )
     }
 }

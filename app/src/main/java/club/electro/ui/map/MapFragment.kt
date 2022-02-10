@@ -51,12 +51,12 @@ class MapFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.setFilter(MARKER_TYPE_GROUP, true)
+        viewModel.setFilter(MARKER_TYPE_SOCKET, true)
         viewModel.getAllMarkers()
     }
 
     private val callback = OnMapReadyCallback { googleMap ->
         val cameraPosition = viewModel.loadCameraState()
-
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(cameraPosition.lat, cameraPosition.lng), cameraPosition.zoom))
 
         viewModel.markers.observe(viewLifecycleOwner) { markersList ->
