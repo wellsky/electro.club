@@ -2,6 +2,7 @@ package club.electro.ui.feed
 
 import android.os.Bundle
 import android.view.*
+import androidx.core.os.ConfigurationCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -43,6 +44,9 @@ class FeedFragment : Fragment() {
     ): View? {
         _binding = FragmentFeedBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
+        // TODO язык ленты постов
+        println(ConfigurationCompat.getLocales(getResources().getConfiguration()).get(0))
 
         val adapter = FeedPostAdapter(object : OnFeedPostInteractionListener {
             override fun onClick(feedPost: FeedPost) {

@@ -59,11 +59,20 @@
     <string name="you_are_viewing_this_thread">You are viewing this thread</string>
     <string name="subscribe_and_start_chatting">Subscribe and start chatting</string>
     <string name="menu_transport">Transport</string>
-    <string name="search">Search...</string>
+    <string name="filter">Filter...</string>
     <string name="discussion">Discussions</string>
     <string name="rating">"Rating: "</string>
     <string name="messages">"Messages: "</string>
     <string name="owners_count">"Owners: "</string>
     <string name="weight">Weight, kg</string>
     <string name="power">Power, W</string>
+    <string name="measure_weight">kg</string>
+    <string name="measure_power">W</string>
+    <string name="measure_battery_capacity">A⋅h</string>
+    <string name="sicket_status">"Status: "</string>
+    <string name="socket_status_on">ON</string>
+    <string name="socket_status_off">OFF</string>
+    <string name="socket_status_missing">MISSING</string>
+    <string name="socket_title">Socket</string>
+    <string name="socket_added_by">Added by</string>
 </resources>

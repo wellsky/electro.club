@@ -10,7 +10,7 @@ data class Transport(
     val fullImage: String?,
     val users: Int,
     val rating: Float,
-    val specs: TransportSpecs?,
+    val specs: TransportSpecs,
 )
 
 data class TransportPreview(
@@ -20,6 +20,7 @@ data class TransportPreview(
     val image: String?,
     val users: Int,
     val rating: Float,
+    val specs: TransportSpecs,
 )
 
 data class TransportSpecs(
@@ -28,5 +29,5 @@ data class TransportSpecs(
     @SerializedName("max_distance") val maxDistance: Int,
     @SerializedName("voltage") val voltage: Int,
     @SerializedName("power") val power: Int,
-    @SerializedName("") val batteryCapacityAh: Int,
+    @SerializedName("battery_capacity_ah") val batteryCapacityAh: Float,
 )

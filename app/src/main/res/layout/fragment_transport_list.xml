@@ -18,7 +18,7 @@
             android:id="@+id/search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/search"
+            android:hint="@string/filter"
             android:inputType="textMultiLine|textCapSentences"
             android:maxLines="1"
             android:padding="12dp"

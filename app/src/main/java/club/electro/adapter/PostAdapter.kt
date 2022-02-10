@@ -27,9 +27,7 @@ import com.bumptech.glide.Glide
 import android.text.SpannableStringBuilder
 import android.widget.TextView
 import android.text.style.ClickableSpan
-import androidx.core.text.HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_BLOCKQUOTE
 import androidx.lifecycle.LifecycleCoroutineScope
-import android.R.attr.button
 import android.graphics.Paint
 
 

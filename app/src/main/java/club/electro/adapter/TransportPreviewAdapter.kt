@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import club.electro.R
 import club.electro.databinding.ItemTransportListBinding
 import club.electro.dto.TransportPreview
 import club.electro.utils.load
@@ -40,6 +41,17 @@ class TransportPreviewViewHolder(
 
             usersValue.text = transport.users.toString()
             ratingValue.text = transport.rating.toString()
+
+            transportText.text = ""
+                .plus(transport.specs.weight)
+                .plus(this.root.context.getString(R.string.measure_weight))
+                .plus(", ")
+                .plus(transport.specs.power)
+                .plus(this.root.context.getString(R.string.measure_power))
+                .plus(", ")
+                .plus(transport.specs.batteryCapacityAh)
+                .plus(this.root.context.getString(R.string.measure_battery_capacity))
+
 
             transport.image?.let {
                 transportImage.load(it)

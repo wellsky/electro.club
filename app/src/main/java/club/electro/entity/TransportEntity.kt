@@ -17,7 +17,7 @@ data class TransportEntity(
     val fullImage: String? = null,
     val users: Int,
     val rating: Float,
-    val specs: TransportSpecs? = null
+    val specs: TransportSpecs
 ) {
     fun toDto() = Transport(
         id = id,
@@ -36,6 +36,7 @@ data class TransportEntity(
         image = image,
         users = users,
         rating = rating,
+        specs = specs,
     )
     companion object {
         fun fromDto(dto: Transport) =
@@ -56,7 +57,8 @@ data class TransportEntity(
                 name = dto.name,
                 image = dto.image,
                 users = dto.users,
-                rating = dto.rating
+                rating = dto.rating,
+                specs = dto.specs,
             )
     }
 }

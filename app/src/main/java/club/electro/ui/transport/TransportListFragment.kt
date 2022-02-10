@@ -16,6 +16,7 @@ import club.electro.adapter.TransportPreviewInteractionListener
 import club.electro.databinding.FragmentTransportListBinding
 import club.electro.dto.TransportPreview
 import club.electro.ui.transport.TransportFragment.Companion.transportId
+import club.electro.util.AndroidUtils
 //import club.electro.dto.Transport
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -49,6 +50,7 @@ class TransportListFragment : Fragment() {
 
         val adapter = TransportPreviewAdapter(object : TransportPreviewInteractionListener {
             override fun onClick(transport: TransportPreview) {
+                AndroidUtils.hideKeyboard(requireView())
                 findNavController().navigate(
                     R.id.action_nav_transport_list_to_transportFragment,
                     Bundle().apply {
