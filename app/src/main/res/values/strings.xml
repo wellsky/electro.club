@@ -76,4 +76,5 @@
     <string name="socket_title">Socket</string>
     <string name="socket_added_by">Added by</string>
     <string name="zoom_more_images">Zoom and show more images (%1$s)</string>
+    <string name="user_last_visit_time">"Last activity: "</string>
 </resources>

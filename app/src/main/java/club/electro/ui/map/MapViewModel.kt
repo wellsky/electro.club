@@ -4,7 +4,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.*
 import androidx.paging.cachedIn
+import club.electro.dto.MARKER_TYPE_GROUP
+import club.electro.dto.UserPrimaryTransport
 import club.electro.repository.map.MapRepository
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +29,15 @@ class MapViewModel @Inject constructor(
     private val latKey = "lat"
     private val lngKey = "lng"
     private val zoomKey = "zoom"
+    private val filterKey = "filter"
+
+    init {
+        val filterJson = prefs.getString(filterKey, "[" + MARKER_TYPE_GROUP + "]")
+        markersFilter.addAll(
+            Gson().fromJson<MutableList<Byte>>(filterJson, object : TypeToken<MutableList<Byte>>() {}.type)
+        )
+        repository.setMerkersFilter(markersFilter)
+    }
 
     fun getAllMarkers() = viewModelScope.launch {
         repository.getAll()
@@ -51,6 +64,13 @@ class MapViewModel @Inject constructor(
     fun setFilter(value: Byte, show: Boolean) {
         if (show) markersFilter.add(value) else markersFilter.remove(value)
         repository.setMerkersFilter(markersFilter)
+        with(prefs.edit()) {
+            putString(
+                filterKey,
+                Gson().toJson(markersFilter, object : TypeToken<MutableList<Byte>>() {}.type)
+            )
+            apply()
+        }
     }
 }
 
@@ -66,3 +86,4 @@ fun SharedPreferences.getDouble(key: String?, defaultValue: Double): Double {
         )
     )
 }
+

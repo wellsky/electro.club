@@ -14,6 +14,7 @@ import club.electro.R
 import club.electro.ToolBarConfig
 import club.electro.databinding.FragmentUserProfileBinding
 import club.electro.repository.thread.ThreadLoadTarget
+import club.electro.ui.map.socket.SocketFragment
 import club.electro.ui.thread.ThreadFragment.Companion.postId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
@@ -26,6 +27,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class UserProfileFragment : Fragment() {
     companion object {
         var Bundle.userId: Long by LongArg
+        private val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
     }
 
     private var _binding: FragmentUserProfileBinding? = null
@@ -96,7 +98,11 @@ class UserProfileFragment : Fragment() {
 
             requireActivity().run {
                 val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-                mainViewModel.updateActionBarConfig(ToolBarConfig(title = user.name))
+                val lastVisitTime = java.util.Date(user.lastVisit * 1000)
+                mainViewModel.updateActionBarConfig(ToolBarConfig(
+                    title = user.name,
+                    subtitle = getString(R.string.user_last_visit_time) + sdf.format(lastVisitTime).toString(),
+                ))
             }
         }
 

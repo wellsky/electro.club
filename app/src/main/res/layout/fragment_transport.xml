@@ -1,124 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <ImageView
-        android:id="@+id/transportImage"
+    >
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:adjustViewBounds="true"
-        android:scaleType="centerCrop"
-        android:layout_marginLeft="48dp"
-        android:layout_marginRight="48dp"
-        android:layout_marginTop="24dp"
-        tools:srcCompat="@tools:sample/avatars"
-        />
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:id="@+id/transportName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/transportImage"
-        android:layout_marginTop="16dp"
-        android:textAlignment="center"
-        android:textSize="18sp"
-        android:textColor="@color/grey_3"
-        tools:text="Xiaomi M365 Special Edition"
-        />
+        <ImageView
+            android:id="@+id/transportImage"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:layout_marginLeft="48dp"
+            android:layout_marginRight="48dp"
+            android:layout_marginTop="24dp"
+            tools:srcCompat="@tools:sample/avatars"
+            />
 
-    <TextView
-        android:id="@+id/transportRatingValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/transportRatingTitle"
-        app:layout_constraintStart_toEndOf="@id/transportRatingTitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:text="4.5"
-        />
+        <TextView
+            android:id="@+id/transportName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/transportImage"
+            android:layout_marginTop="16dp"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textColor="@color/grey_3"
+            tools:text="Xiaomi M365 Special Edition"
+            />
 
-    <TextView
-        android:id="@+id/transportRatingTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/transportRatingValue"
-        app:layout_constraintTop_toBottomOf="@id/transportName"
-        android:layout_marginTop="2dp"
-        android:textAlignment="center"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        android:text="@string/rating"
-        />
+        <TextView
+            android:id="@+id/transportRatingValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/transportRatingTitle"
+            app:layout_constraintStart_toEndOf="@id/transportRatingTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="4.5"
+            />
 
-    <TextView
-        android:id="@+id/weightValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/transportRatingTitle"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/powerValue"
-        android:textSize="24sp"
-        android:textColor="@color/grey_3"
-        tools:text="22"
-        />
+        <TextView
+            android:id="@+id/transportRatingTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/transportRatingValue"
+            app:layout_constraintTop_toBottomOf="@id/transportName"
+            android:layout_marginTop="2dp"
+            android:textAlignment="center"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            android:text="@string/rating"
+            />
 
-    <TextView
-        android:id="@+id/weightTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/weightValue"
-        app:layout_constraintStart_toStartOf="@id/weightValue"
-        app:layout_constraintEnd_toEndOf="@id/weightValue"
-        android:text="@string/weight"
-        />
+        <TextView
+            android:id="@+id/weightValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/transportRatingTitle"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/powerValue"
+            android:textSize="24sp"
+            android:textColor="@color/grey_3"
+            tools:text="22"
+            />
 
-    <TextView
-        android:id="@+id/powerValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/weightValue"
-        app:layout_constraintStart_toEndOf="@id/weightValue"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:textSize="24sp"
-        android:textColor="@color/grey_3"
-        tools:text="22"
-        />
+        <TextView
+            android:id="@+id/weightTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/weightValue"
+            app:layout_constraintStart_toStartOf="@id/weightValue"
+            app:layout_constraintEnd_toEndOf="@id/weightValue"
+            android:text="@string/weight"
+            />
 
-    <TextView
-        android:id="@+id/powerTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/powerValue"
-        app:layout_constraintStart_toStartOf="@id/powerValue"
-        app:layout_constraintEnd_toEndOf="@id/powerValue"
-        android:text="@string/power"
-        />
+        <TextView
+            android:id="@+id/powerValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/weightValue"
+            app:layout_constraintStart_toEndOf="@id/weightValue"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="24sp"
+            android:textColor="@color/grey_3"
+            tools:text="22"
+            />
+
+        <TextView
+            android:id="@+id/powerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/powerValue"
+            app:layout_constraintStart_toStartOf="@id/powerValue"
+            app:layout_constraintEnd_toEndOf="@id/powerValue"
+            android:text="@string/power"
+            />
 
 
 
-    <TextView
-        android:id="@+id/discussionTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/weightTitle"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="10dp"
-        android:text="@string/discussion"
-        android:textSize="18sp"
-        />
+        <TextView
+            android:id="@+id/discussionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/weightTitle"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="10dp"
+            android:text="@string/discussion"
+            android:textSize="18sp"
+            />
 
-    <include
-        android:id="@+id/discussion_item"
-        layout="@layout/item_transport_discussion"
-        app:layout_constraintTop_toBottomOf="@id/discussionTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <include
+            android:id="@+id/discussion_item"
+            layout="@layout/item_transport_discussion"
+            app:layout_constraintTop_toBottomOf="@id/discussionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

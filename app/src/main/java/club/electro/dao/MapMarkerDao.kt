@@ -19,6 +19,12 @@ interface MapMarkerDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(markers: List<MapMarkerEntity>)
 
+    @Transaction
+    suspend fun reset(markers: List<MapMarkerEntity>) {
+        clear()
+        insert(markers)
+    }
+
     @Query("DELETE FROM MapMarkerEntity")
     suspend fun clear()
 }

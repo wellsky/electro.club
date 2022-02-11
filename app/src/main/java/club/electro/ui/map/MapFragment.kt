@@ -31,6 +31,7 @@ import com.bumptech.glide.request.RequestListener
 import com.google.android.gms.maps.model.Marker
 import com.bumptech.glide.request.target.Target
 import com.google.android.gms.maps.model.BitmapDescriptorFactory.fromResource
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -51,8 +52,6 @@ class MapFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.setFilter(MARKER_TYPE_GROUP, true)
-        viewModel.setFilter(MARKER_TYPE_SOCKET, true)
         viewModel.getAllMarkers()
     }
 
@@ -61,36 +60,32 @@ class MapFragment : Fragment() {
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(cameraPosition.lat, cameraPosition.lng), cameraPosition.zoom))
         viewModel.markers.observe(viewLifecycleOwner) { markersList ->
             if (!(currentMarkers == markersList)) {
-                try {
-                    currentMarkers = markersList
-                    googleMap.clear()
+                currentMarkers = markersList
+                googleMap.clear()
 
-                    val socketIcon = fromResource(R.drawable.map_socket)
-                    val groupIcon = fromResource(R.drawable.map_group)
+                val socketIcon = fromResource(R.drawable.map_socket)
+                val groupIcon = fromResource(R.drawable.map_group)
 
 
-                    markersList.forEach { marker ->
-                        val coords = LatLng(marker.lat, marker.lng)
+                markersList.forEach { marker ->
+                    val coords = LatLng(marker.lat, marker.lng)
 
-                        val mapMarker = when (marker.type) {
-                            MARKER_TYPE_SOCKET -> googleMap.addMarker(
-                                MarkerOptions().position(coords).icon(socketIcon)
-                            )
-                            MARKER_TYPE_GROUP -> googleMap.addMarker(
-                                MarkerOptions().position(coords).icon(groupIcon)
-                            )
-                            else -> null
-                        }
+                    val mapMarker = when (marker.type) {
+                        MARKER_TYPE_SOCKET -> googleMap.addMarker(
+                            MarkerOptions().position(coords).icon(socketIcon)
+                        )
+                        MARKER_TYPE_GROUP -> googleMap.addMarker(
+                            MarkerOptions().position(coords).icon(groupIcon)
+                        )
+                        else -> null
+                    }
 
-                        mapMarker?.let { it ->
-                            it.tag = marker
-                            marker.icon?.let { icon ->
-                                mapMarker.loadIcon(requireContext(), icon)
-                            }
+                    mapMarker?.let { it ->
+                        it.tag = marker
+                        marker.icon?.let { icon ->
+                            mapMarker.loadIcon(requireContext(), icon)
                         }
                     }
-                } catch (e: Exception) {
-                    println("Place markers exception: " + e.message)
                 }
             }
         }
@@ -149,7 +144,13 @@ class MapFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        mapFragment?.getMapAsync(callback)
+
+        try {
+            mapFragment?.getMapAsync(callback)
+        } catch (e :Exception) {
+            Snackbar.make(view, e.message.toString(), Snackbar.LENGTH_LONG)
+                .show()
+        }
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -222,14 +223,11 @@ fun Marker.loadIcon(context: Context, url: String?) {
                     BitmapDescriptorFactory.fromBitmap(it)
                 }?.let {
                     try {
-                        try {
-                            setIcon(it)
-                        } catch (e: Exception) {
-                            // Маркер был удален с карты?
-                            println("Marker removed")
-                        }
+                        setIcon(it)
                         true
                     } catch (e: Exception) {
+                        // Маркер был удален с карты?
+                        println("Marker removed")
                         false
                     }
                 } ?: false

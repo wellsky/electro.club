@@ -1,9 +1,11 @@
 package club.electro.repository.map
 
 import android.content.Context
+import androidx.room.withTransaction
 import club.electro.api.ApiService
 import club.electro.dao.MapMarkerDao
 import club.electro.dao.SocketDao
+import club.electro.db.AppDb
 import club.electro.dto.MARKER_TYPE_GROUP
 import club.electro.dto.MARKER_TYPE_SOCKET
 import club.electro.dto.Socket
@@ -23,7 +25,7 @@ class MapRepositoryServerImpl @Inject constructor(
     @ApplicationContext context: Context,
     private val apiService: ApiService,
     private val markerDao: MapMarkerDao,
-    private val socketDao: SocketDao
+    private val socketDao: SocketDao,
 ): MapRepository {
 
     val resources = context.resources
@@ -49,8 +51,7 @@ class MapRepositoryServerImpl @Inject constructor(
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
 
-            markerDao.clear()
-            markerDao.insert(body.data.map_objects.toEntity())
+            markerDao.reset(body.data.map_objects.toEntity())
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
