@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="10dp"
+    android:paddingRight="@dimen/fab_margin"
+    android:paddingTop="8dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    >
+
+    <ImageView
+        android:id="@+id/attachmentImage"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/attachmentName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/attachmentImage"
+        app:layout_constraintStart_toEndOf="@id/attachmentImage"
+        app:layout_constraintLeft_toRightOf="@id/attachmentImage"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="@dimen/fab_margin"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/grey_26"
+        android:textSize="16sp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        tools:text="Status: uploaded"
+        >
+    </TextView>
+
+
+
+    <TextView
+        android:id="@+id/attachmentLastName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/attachmentImage"
+        app:layout_constraintStart_toEndOf="@id/attachmentImage"
+        app:layout_constraintLeft_toRightOf="@id/attachmentImage"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:layout_marginStart="@dimen/fab_margin"
+        android:layout_marginBottom="4dp"
+        tools:text="1024 Kb"
+        >
+    </TextView>
+
+    <View
+        android:id="@+id/panelLine"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:background="@color/grey_f6"
+        app:layout_constraintTop_toBottomOf="@id/attachmentImage"
+        app:layout_constraintStart_toEndOf="@id/attachmentImage"
+        android:layout_marginTop="8dp"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

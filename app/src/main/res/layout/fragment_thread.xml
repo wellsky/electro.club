@@ -222,8 +222,20 @@
                 android:background="@null"
                 android:textCursorDrawable="@null"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/editorPostSave"
+                app:layout_constraintEnd_toStartOf="@id/editorAttachments"
                 app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageButton
+                android:id="@+id/editorAttachments"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="@dimen/common_spacing"
+                android:background="@android:color/transparent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/editorPostSave"
+                app:layout_constraintStart_toEndOf="@id/editorPostContent"
+                app:layout_constraintTop_toTopOf="@+id/editorPostContent"
+                app:srcCompat="@drawable/ic_baseline_attach_file_24" />
 
             <ImageButton
                 android:id="@+id/editorPostSave"
@@ -235,9 +247,8 @@
                 android:contentDescription="@string/save_description"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/editorPostContent"
+                app:layout_constraintStart_toEndOf="@id/editorAttachments"
                 app:layout_constraintTop_toTopOf="@+id/editorPostContent"
-
                 app:srcCompat="@drawable/ic_baseline_send_24" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

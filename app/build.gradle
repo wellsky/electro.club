@@ -82,6 +82,7 @@ dependencies {
     implementation "androidx.hilt:hilt-work:$hilt_worker_version"
     implementation 'io.github.igreenwood.loupe:loupe:1.2.2'
     implementation 'com.github.stfalcon-studio:StfalconImageViewer:v1.0.1'
+    implementation "com.github.dhaval2404:imagepicker:2.1"
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

@@ -1,6 +1,7 @@
 package club.electro.repository.post
 
 import android.content.Context
+import android.net.Uri
 import androidx.work.*
 import club.electro.adapter.PostsEntitiesPreparator
 import club.electro.api.ApiService

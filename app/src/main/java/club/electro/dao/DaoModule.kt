@@ -29,4 +29,7 @@ object DaoModule {
     fun provideTransportDao(db: AppDb): TransportDao = db.transportDao()
     @Provides
     fun provideDiscussionDao(db: AppDb): DiscussionDao = db.discussionDao()
+    @Provides
+    fun providePostDraftAttachmentDao(db: AppDb): PostDraftAttachmentDao = db.postDraftAttachmentDao()
+
 }

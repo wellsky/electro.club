@@ -55,10 +55,6 @@ class ThreadFragment: Fragment() {
     private var _binding: FragmentThreadBinding? = null
     private val binding get() = _binding!!
 
-    //private var currentTargetPost: ThreadLoadTarget? = null // Задается при вызове загрузки постов и сбрасывается в null при первом поступлении новых данных
-    //private var currentIncomingRefresh: Boolean = false // Становится true, если тема обновляется из-за изменений на сервере
-    //private var incomingChangesStatus: IncomingChangesStatus? = null
-
     private var scrolledToTop: Boolean = true
     private var scrolledToBottom: Boolean = true
 
@@ -401,6 +397,12 @@ class ThreadFragment: Fragment() {
 
         binding.cancelAnswer.setOnClickListener {
             viewModel.cancelAnswerPost()
+        }
+
+        binding.editorAttachments.setOnClickListener {
+            findNavController().navigate (
+                R.id.action_threadFragment_to_postAttachmentsFragment
+            )
         }
 
         binding.bottomPanelSubscrube.setOnClickListener {
