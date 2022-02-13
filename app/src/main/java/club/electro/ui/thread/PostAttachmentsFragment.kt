@@ -1,35 +1,29 @@
 package club.electro.ui.thread
 
-import android.app.Activity
-import android.net.Uri
+import android.media.Image
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.net.toFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import club.electro.R
 import club.electro.databinding.FragmentPostAttachmentsBinding
-import club.electro.utils.ByteArg
-import club.electro.utils.LongArg
-import com.github.dhaval2404.imagepicker.ImagePicker
-import com.github.dhaval2404.imagepicker.constant.ImageProvider
-import com.google.android.material.snackbar.Snackbar
+import com.esafirm.imagepicker.features.ImagePickerConfig
+import com.esafirm.imagepicker.features.ImagePickerMode
+import com.esafirm.imagepicker.features.ReturnMode
+import com.esafirm.imagepicker.features.registerImagePicker
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
 
 @AndroidEntryPoint
-class PostAttachmentsFragment: Fragment() {
-    companion object {
-        var Bundle.threadType: Byte by ByteArg
-        var Bundle.threadId: Long by LongArg
-        var Bundle.postId: Long by LongArg // Может быть -1 (загрузить с последнего сообщения) и -2 (с первого непрочитанного)
-    }
-
+class PostAttachmentsFragment: Fragment(R.layout.fragment_post_attachments) {
     private val viewModel: PostAttachmentsViewModel by viewModels()
 
     private var _binding: FragmentPostAttachmentsBinding? = null
     private val binding get() = _binding!!
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,35 +32,25 @@ class PostAttachmentsFragment: Fragment() {
         _binding = FragmentPostAttachmentsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val pickPhotoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                when (it.resultCode) {
-                    ImagePicker.RESULT_ERROR -> {
-                        Snackbar.make(
-                            binding.root,
-                            ImagePicker.getError(it.data),
-                            Snackbar.LENGTH_LONG
-                        ).show()
-                    }
-                    Activity.RESULT_OK -> {
-                        val uri: Uri? = it.data?.data
-                        uri?.let {
-                            viewModel.addAttachment(it)
-                        }
-                    }
-                }
+        val imagePickerLauncher = registerImagePicker {
+            val firstImage = it.firstOrNull() ?: return@registerImagePicker
+            it.forEach { image ->
+                println(image.path)
+                val file = File(image.path)
             }
+        }
 
         binding.fabAdd.setOnClickListener {
-            ImagePicker.with(this)
-                .compress(1920)
-                .provider(ImageProvider.GALLERY)
-                .galleryMimeTypes(
-                    arrayOf(
-                        "image/png",
-                        "image/jpeg",
-                    )
-                )
-                .createIntent(pickPhotoLauncher::launch)
+            imagePickerLauncher.launch(
+                ImagePickerConfig {
+                    mode = ImagePickerMode.SINGLE
+                    returnMode = ReturnMode.ALL // set whether pick action or camera action should return immediate result or not. Only works in single mode for image picker
+                    isFolderMode = true // set folder mode (false by default)
+                    folderTitle = "Folder" // folder selection title
+                    imageTitle = "Tap to select" // image selection title
+                    doneButtonText = "DONE" // done button text
+                }
+            )
         }
 
         return root

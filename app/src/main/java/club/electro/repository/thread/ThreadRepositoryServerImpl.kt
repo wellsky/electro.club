@@ -119,6 +119,7 @@ class ThreadRepositoryServerImpl @Inject constructor(
     }
 
     override suspend fun checkForUpdates()  {
+        return
         while (true) {
             delay(2_000L)
             try {

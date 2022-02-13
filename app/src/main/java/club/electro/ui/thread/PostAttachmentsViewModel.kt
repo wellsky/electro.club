@@ -1,6 +1,7 @@
 package club.electro.ui.thread
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import club.electro.repository.attachments.AttachmentsRepository
@@ -11,11 +12,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PostAttachmentsViewModel @Inject constructor(
+    val state : SavedStateHandle,
     private val repository:AttachmentsRepository
 ) : ViewModel() {
+    val threadType: Byte = state.get("threadType") ?: 0
+    val threadId: Long = state.get("threadId") ?: 0
 
     fun addAttachment(uri: Uri) = viewModelScope.launch{
-        println("viewModel addAttachment")
-        repository.addPostAttachment(uri)
+        repository.queuePostDraftAttachment(uri, threadType, threadId)
     }
 }

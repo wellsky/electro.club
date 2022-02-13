@@ -7,16 +7,18 @@ import club.electro.dto.PostDraftAttachment
 @Entity
 data class PostDraftAttachmentEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long,
+    val id: Long = 0,
+    val type: Byte,
     val threadType: Byte,
-    val threadId: Byte,
+    val threadId: Long,
     val localFile: String,
-    val previewUrl: String,
-    val fullUrl: String,
-    val status: Byte,
+    val previewUrl: String? = null,
+    val fullUrl: String? = null,
+    val status: Byte = 0,
 ) {
     fun toDto() = PostDraftAttachment(
         id = id,
+        type = type,
         threadType = threadType,
         threadId = threadId,
         localFile = localFile,
@@ -29,6 +31,7 @@ data class PostDraftAttachmentEntity(
         fun fromDto(dto: PostDraftAttachment) =
             PostDraftAttachmentEntity(
                 id = dto.id,
+                type = dto.type,
                 threadType = dto.threadType,
                 threadId = dto.threadId,
                 localFile = dto.localFile,

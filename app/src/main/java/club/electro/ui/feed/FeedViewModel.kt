@@ -17,6 +17,6 @@ class FeedViewModel @Inject constructor(
     val data = repository.data.asLiveData(Dispatchers.Default)
 
     fun getFeedPosts() = viewModelScope.launch {
-        repository.getFeedPosts()
+        //repository.getFeedPosts()
     }
 }

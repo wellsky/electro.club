@@ -19,10 +19,10 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ThreadInfoFragment : Fragment() {
-    companion object {
-        var Bundle.threadInfoType: Byte by ByteArg
-        var Bundle.threadInfoId: Long by LongArg
-    }
+//    companion object {
+//        var Bundle.threadInfoType: Byte by ByteArg
+//        var Bundle.threadInfoId: Long by LongArg
+//    }
 
     private val viewModel: ThreadViewModel by viewModels()
 

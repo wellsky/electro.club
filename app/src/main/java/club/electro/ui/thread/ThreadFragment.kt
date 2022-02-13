@@ -27,8 +27,10 @@ import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST
 import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST_UNREAD
 import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_LAST
-import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
-import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
+//import club.electro.ui.thread.PostAttachmentsFragment.Companion.attachmentsThreadId
+//import club.electro.ui.thread.PostAttachmentsFragment.Companion.attachmentsThreadType
+//import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
+//import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
 import club.electro.utils.*
 import com.squareup.picasso.Picasso
 import com.stfalcon.imageviewer.StfalconImageViewer
@@ -106,16 +108,16 @@ class ThreadFragment: Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.getItemId()) {
-            R.id.thread_settings -> {
-                findNavController().navigate(
-                    R.id.action_threadFragment_to_threadInfoFragment,
-                    Bundle().apply {
-                        threadInfoType = this@ThreadFragment.threadType
-                        threadInfoId = this@ThreadFragment.threadId
-                    }
-                )
-                return true
-            }
+//            R.id.thread_settings -> {
+//                findNavController().navigate(
+//                    R.id.action_threadFragment_to_threadInfoFragment,
+//                    Bundle().apply {
+//                        threadInfoType = this@ThreadFragment.threadType
+//                        threadInfoId = this@ThreadFragment.threadId
+//                    }
+//                )
+//                return true
+//            }
             R.id.thread_subscribe -> {
                 viewModel.changeSubscription(SUBSCRIPTION_STATUS_SUBSCRIBED)
                 return true
@@ -401,7 +403,11 @@ class ThreadFragment: Fragment() {
 
         binding.editorAttachments.setOnClickListener {
             findNavController().navigate (
-                R.id.action_threadFragment_to_postAttachmentsFragment
+                R.id.action_threadFragment_to_postAttachmentsFragment,
+                Bundle().apply {
+                    threadType = this@ThreadFragment.threadType
+                    threadId = this@ThreadFragment.threadId
+                }
             )
         }
 

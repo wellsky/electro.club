@@ -5,14 +5,20 @@ import club.electro.utils.UrlDataResultDto
 import club.electro.utils.UrlType
 import club.electro.utils.urlTypeSerializer
 import com.google.gson.GsonBuilder
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 
-const val BASE_SERVER_URL = "https://electro.club/api/v1/"
+
+/**
+ * Кроме изменения основого адреса, надо убрать из манифеста поддержку http, а также в токен-интерцепторе подстановку хоста
+ */
+//const val BASE_SERVER_URL = "https://electro.club/api/v1/"
+const val BASE_SERVER_URL = "http://10.0.2.2:80/api/v1/"
 const val UPDATES_SERVER_URL = "https://srv1.electro.club/api/"
 
 
@@ -118,6 +124,14 @@ interface ApiService {
         @Field("post_content") postContent: String,
         @Field("answer_to") answerTo: Long?,
     ): Response<ApiResponse<ApiSavedPost>>
+
+    @Multipart
+    @POST(BASE_SERVER_URL)
+    suspend fun uploadPostDraftAttachment(
+        @Part("method") method: RequestBody = "uploadPostDraftAttachment".toRequestBody(),
+        @Part file: MultipartBody.Part
+    ): Response<ApiResponse<String>>
+
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
