@@ -18,7 +18,13 @@ class PostAttachmentsViewModel @Inject constructor(
     val threadType: Byte = state.get("threadType") ?: 0
     val threadId: Long = state.get("threadId") ?: 0
 
-    fun addAttachment(uri: Uri) = viewModelScope.launch{
-        repository.queuePostDraftAttachment(uri, threadType, threadId)
+    init {
+        viewModelScope.launch {
+            repository.uploadJob()
+        }
+    }
+
+    fun queueAttachment(path: String) = viewModelScope.launch {
+        repository.queuePostDraftAttachment(path, threadType, threadId)
     }
 }

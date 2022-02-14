@@ -39,27 +39,27 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            //val sourceFile = File("/storage/emulated/0/DCIM/Camera/IMG_20220213_130617.jpg")
-            val sourceFile = File("/storage/emulated/0/Download/86262-gorodskoj_rajon-gorodskoj_pejzazh-otrazhenie-gorizont-boston-3840x2160.jpg")
-
-            println("Source file name " + sourceFile.name)
-
-            val outputDir = context.cacheDir // context being the Activity pointer
-            val destinationFile = File.createTempFile("temp_compressed", ".jpg", outputDir)
-            destinationFile.deleteOnExit()
-
-            val compressedImageFile = Compressor.compress(context, sourceFile) {
-                destination(destinationFile )
-                default(width = 1920, format = Bitmap.CompressFormat.JPEG, quality = 80)
-            }
-
-            apiService.uploadPostDraftAttachment(
-                file = MultipartBody.Part.createFormData(
-                        "file",
-                        compressedImageFile.name,
-                        compressedImageFile.asRequestBody("image/*".toMediaType())
-                )
-            )
+//            //val sourceFile = File("/storage/emulated/0/DCIM/Camera/IMG_20220213_130617.jpg")
+//            val sourceFile = File("/storage/emulated/0/Download/86262-gorodskoj_rajon-gorodskoj_pejzazh-otrazhenie-gorizont-boston-3840x2160.jpg")
+//
+//            println("Uploading... " + sourceFile.name)
+//
+//            val outputDir = context.cacheDir // context being the Activity pointer
+//            val destinationFile = File.createTempFile("temp_compressed", ".jpg", outputDir)
+//            destinationFile.deleteOnExit()
+//
+//            val compressedImageFile = Compressor.compress(context, sourceFile) {
+//                destination(destinationFile )
+//                default(width = 1920, format = Bitmap.CompressFormat.JPEG, quality = 80)
+//            }
+//
+//            apiService.uploadPostDraftAttachment(
+//                file = MultipartBody.Part.createFormData(
+//                        "file",
+//                        compressedImageFile.name,
+//                        compressedImageFile.asRequestBody("image/*".toMediaType())
+//                )
+//            )
         }
     }
 }

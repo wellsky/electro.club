@@ -35,16 +35,19 @@ class PostAttachmentsFragment: Fragment(R.layout.fragment_post_attachments) {
         val imagePickerLauncher = registerImagePicker {
             val firstImage = it.firstOrNull() ?: return@registerImagePicker
             it.forEach { image ->
-                println(image.path)
-                val file = File(image.path)
+                //println(image.path)
+                //val file = File(image.path)
+                viewModel.queueAttachment(image.path)
             }
+
+            //viewModel.startAll()
         }
 
         binding.fabAdd.setOnClickListener {
             imagePickerLauncher.launch(
                 ImagePickerConfig {
-                    mode = ImagePickerMode.SINGLE
-                    returnMode = ReturnMode.ALL // set whether pick action or camera action should return immediate result or not. Only works in single mode for image picker
+                    mode = ImagePickerMode.MULTIPLE
+                    //returnMode = ReturnMode.ALL // set whether pick action or camera action should return immediate result or not. Only works in single mode for image picker
                     isFolderMode = true // set folder mode (false by default)
                     folderTitle = "Folder" // folder selection title
                     imageTitle = "Tap to select" // image selection title
