@@ -55,15 +55,15 @@ class DBTypeConverters {
     }
 
     @TypeConverter
-    fun fromPostAttachments(primary: List<PostAttachment>?): String? {
-        val type = object : TypeToken<List<PostAttachment>>() {}.type
+    fun fromPostAttachments(primary: List<PostBufferedAttachment>?): String? {
+        val type = object : TypeToken<List<PostBufferedAttachment>>() {}.type
         return Gson().toJson(primary, type)
     }
 
     @TypeConverter
-    fun toPostAttachments(primaryString: String?): List<PostAttachment>? {
-        val type = object : TypeToken<List<PostAttachment>>() {}.type
-        return Gson().fromJson<List<PostAttachment>>(primaryString, type)
+    fun toPostAttachments(primaryString: String?): List<PostBufferedAttachment>? {
+        val type = object : TypeToken<List<PostBufferedAttachment>>() {}.type
+        return Gson().fromJson<List<PostBufferedAttachment>>(primaryString, type)
     }
 
     @TypeConverter

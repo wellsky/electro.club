@@ -30,6 +30,6 @@ object DaoModule {
     @Provides
     fun provideDiscussionDao(db: AppDb): DiscussionDao = db.discussionDao()
     @Provides
-    fun providePostDraftAttachmentDao(db: AppDb): PostDraftAttachmentDao = db.postDraftAttachmentDao()
+    fun providePostDraftAttachmentDao(db: AppDb): PostAttachmentDao = db.postDraftAttachmentDao()
 
 }

@@ -1,6 +1,6 @@
 package club.electro.dto
 
-data class PostDraftAttachment (
+data class PostAttachment (
     val id: Long,
     val type: Byte,
     val threadType: Byte,
@@ -15,7 +15,6 @@ data class PostDraftAttachment (
         const val STATUS_READY_TO_UPLOAD: Byte = 1
         const val STATUS_UPLOADING: Byte = 2
         const val STATUS_UPLOADED: Byte = 3
-
         const val STATUS_ERROR: Byte = -1
     }
 }

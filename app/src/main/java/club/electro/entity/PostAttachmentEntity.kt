@@ -2,10 +2,10 @@ package club.electro.entity;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey
-import club.electro.dto.PostDraftAttachment
+import club.electro.dto.PostAttachment
 
 @Entity
-data class PostDraftAttachmentEntity(
+data class PostAttachmentEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val type: Byte,
@@ -16,7 +16,7 @@ data class PostDraftAttachmentEntity(
     val fullUrl: String? = null,
     val status: Byte = 0,
 ) {
-    fun toDto() = PostDraftAttachment(
+    fun toDto() = PostAttachment(
         id = id,
         type = type,
         threadType = threadType,
@@ -28,8 +28,8 @@ data class PostDraftAttachmentEntity(
     )
 
     companion object {
-        fun fromDto(dto: PostDraftAttachment) =
-            PostDraftAttachmentEntity(
+        fun fromDto(dto: PostAttachment) =
+            PostAttachmentEntity(
                 id = dto.id,
                 type = dto.type,
                 threadType = dto.threadType,
@@ -42,6 +42,6 @@ data class PostDraftAttachmentEntity(
     }
 }
 
-fun List<PostDraftAttachmentEntity>.toDto(): List<PostDraftAttachment> = map(PostDraftAttachmentEntity::toDto)
-fun List<PostDraftAttachment>.toEntity(): List<PostDraftAttachmentEntity> = map(PostDraftAttachmentEntity::fromDto)
-fun PostDraftAttachment.toEntity(): PostDraftAttachmentEntity = PostDraftAttachmentEntity.fromDto(this)
+fun List<PostAttachmentEntity>.toDto(): List<PostAttachment> = map(PostAttachmentEntity::toDto)
+fun List<PostAttachment>.toEntity(): List<PostAttachmentEntity> = map(PostAttachmentEntity::fromDto)
+fun PostAttachment.toEntity(): PostAttachmentEntity = PostAttachmentEntity.fromDto(this)

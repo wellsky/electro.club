@@ -7,8 +7,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import club.electro.R
+import club.electro.adapter.PostAttachmentAdapter
+import club.electro.adapter.PostAttachmentInteractionListener
+import club.electro.adapter.TransportPreviewAdapter
+import club.electro.adapter.TransportPreviewInteractionListener
 import club.electro.databinding.FragmentPostAttachmentsBinding
+import club.electro.dto.PostAttachment
+import club.electro.dto.TransportPreview
+import club.electro.ui.transport.TransportFragment.Companion.transportId
+import club.electro.util.AndroidUtils
 import com.esafirm.imagepicker.features.ImagePickerConfig
 import com.esafirm.imagepicker.features.ImagePickerMode
 import com.esafirm.imagepicker.features.ReturnMode
@@ -32,15 +41,24 @@ class PostAttachmentsFragment: Fragment(R.layout.fragment_post_attachments) {
         _binding = FragmentPostAttachmentsBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        val adapter = PostAttachmentAdapter(object : PostAttachmentInteractionListener {
+            override fun onClick(attachment: PostAttachment) {
+                AndroidUtils.hideKeyboard(requireView())
+            }
+        })
+
+        binding.attachmentsList.adapter = adapter
+
+        viewModel.attachments.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
+
+        // TODO не создавать объекты внутри onCreateView?
         val imagePickerLauncher = registerImagePicker {
             val firstImage = it.firstOrNull() ?: return@registerImagePicker
             it.forEach { image ->
-                //println(image.path)
-                //val file = File(image.path)
                 viewModel.queueAttachment(image.path)
             }
-
-            //viewModel.startAll()
         }
 
         binding.fabAdd.setOnClickListener {

@@ -120,7 +120,7 @@ class AppAuth @Inject constructor(
                     params["method"] = "destroyPushToken"
                 }
 
-                //apiService.setPushToken(params)
+                apiService.setPushToken(params)
             } catch (e: Exception) {
                 e.printStackTrace()
             }

@@ -114,11 +114,11 @@ class PostViewHolder(
                 }
             }
 
-            post.attachments?.let {
+            post.bufferedAttachments?.let {
                 attachments.isVisible = true
                 attachments.text = attachments.context.getString(
                     R.string.attachments,
-                    post.attachments.size.toString()
+                    post.bufferedAttachments.size.toString()
                 )
                 attachments.setPaintFlags(attachments.getPaintFlags() or Paint.UNDERLINE_TEXT_FLAG)
             }
