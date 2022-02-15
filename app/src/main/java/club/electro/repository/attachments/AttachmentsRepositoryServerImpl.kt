@@ -7,6 +7,7 @@ import club.electro.dao.PostAttachmentDao
 import club.electro.dto.PostAttachment
 import club.electro.entity.PostAttachmentEntity
 import club.electro.entity.toDto
+import club.electro.error.ApiError
 import dagger.hilt.android.qualifiers.ApplicationContext
 import id.zelory.compressor.Compressor
 import id.zelory.compressor.constraint.default
@@ -19,6 +20,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import okhttp3.RequestBody.Companion.toRequestBody
 
 class AttachmentsRepositoryServerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -63,16 +65,31 @@ class AttachmentsRepositoryServerImpl @Inject constructor(
                              )
                          }
 
-                         apiService.uploadPostDraftAttachment(
+                         val response = apiService.uploadPostDraftAttachment(
+                             threadType = attachment.threadType.toString().toRequestBody(), // TODO надо узнать, скорее всего не так надо форматировать
+                             threadId = attachment.threadId.toString().toRequestBody(),
                              file = MultipartBody.Part.createFormData(
                                  "file",
                                  compressedImageFile.name,
                                  compressedImageFile.asRequestBody("image/*".toMediaType())
                              )
                          )
-                         println("Done: " + sourceFile.name)
-                         postAttachmentDao.setStatus(attachment.localId, PostAttachment.STATUS_UPLOADED)
 
+                         if (!response.isSuccessful) {
+                             throw ApiError(response.code(), response.message())
+                         }
+                         val body = response.body() ?: throw ApiError(response.code(), response.message())
+
+                         postAttachmentDao.updateLocal(
+                             localId = attachment.localId,
+                             id = body.data.id,
+                             previewUrl = body.data.previewUrl,
+                             fullUrl = body.data.fullUrl,
+                             status = PostAttachment.STATUS_UPLOADED
+                         )
+
+                         println("Done: " + sourceFile.name)
+                         //postAttachmentDao.setStatus(attachment.localId, PostAttachment.STATUS_UPLOADED)
                      } catch (e: Exception) {
                          // TODO отметить как ошибку при компрессии или отправке
                          postAttachmentDao.setStatus(attachment.localId, PostAttachment.STATUS_ERROR)

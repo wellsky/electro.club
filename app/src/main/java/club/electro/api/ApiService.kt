@@ -130,8 +130,10 @@ interface ApiService {
     @POST(BASE_SERVER_URL)
     suspend fun uploadPostDraftAttachment(
         @Part("method") method: RequestBody = "uploadPostDraftAttachment".toRequestBody(),
+        @Part("thread_type") threadType: RequestBody,
+        @Part("thread_id") threadId: RequestBody,
         @Part file: MultipartBody.Part
-    ): Response<ApiResponse<String>>
+    ): Response<ApiResponse<PostAttachment>>
 
 
     @FormUrlEncoded

@@ -13,7 +13,7 @@ interface PostAttachmentDao {
     @Query("SELECT * FROM PostAttachmentEntity WHERE status = ${PostAttachment.STATUS_READY_TO_UPLOAD}")
     fun getFirstReady(): Flow<PostAttachmentEntity?>
 
-    @Query("SELECT * FROM PostAttachmentEntity WHERE threadType = :threadType AND threadId = :threadId")
+    @Query("SELECT * FROM PostAttachmentEntity WHERE threadType = :threadType AND threadId = :threadId ORDER BY localId")
     fun getForThread(threadType: Byte, threadId: Long): Flow<List<PostAttachmentEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -21,6 +21,9 @@ interface PostAttachmentDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(attachments: List<PostAttachmentEntity>)
+
+    @Query("UPDATE PostAttachmentEntity SET id = :id, previewUrl = :previewUrl, fullUrl = :fullUrl, status = :status WHERE localId = :localId")
+    suspend fun updateLocal(localId: Long, id: Long?, previewUrl: String?, fullUrl: String?, status: Byte)
 
     @Query("UPDATE PostAttachmentEntity SET status = :status WHERE localId = :localId")
     suspend fun setStatus(localId: Long, status: Byte)
