@@ -195,7 +195,7 @@ class ThreadFragment: Fragment() {
             }
 
             override fun onAttachmentsClicked(post: Post) {
-                post.bufferedAttachments?.let {
+                post.attachmentLinks?.let {
                     val images = it
 
                     StfalconImageViewer.Builder(context, images) { view, image ->

@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import club.electro.databinding.ItemAttachmentBinding
 import club.electro.dto.PostAttachment
+import club.electro.utils.load
 
 interface PostAttachmentInteractionListener {
     fun onClick(attachment: PostAttachment) {}
@@ -33,7 +34,19 @@ class PostAttachmentViewHolder(
 
     fun bind(attachment: PostAttachment) {
         binding.apply {
-            attachmentPath.text = attachment.localFile
+            attachmentName.text = attachment.name
+
+            val statusText = when(attachment.status) {
+                PostAttachment.STATUS_CREATED -> "New"
+                PostAttachment.STATUS_READY_TO_UPLOAD -> "Ready to upload"
+                PostAttachment.STATUS_UPLOADING -> "Uploading"
+                PostAttachment.STATUS_UPLOADED -> "Uploaded"
+                else -> {"Unknown" }
+            }
+
+            attachmentStatus.text = "Status: " + statusText
+
+            attachmentImage.load(attachment.localPath)
 
             root.setOnClickListener {
                 onInteractionListener.onClick(attachment)

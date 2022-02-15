@@ -7,8 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import club.electro.MainViewModel
 import club.electro.R
+import club.electro.ToolBarConfig
 import club.electro.adapter.PostAttachmentAdapter
 import club.electro.adapter.PostAttachmentInteractionListener
 import club.electro.adapter.TransportPreviewAdapter
@@ -32,7 +35,16 @@ class PostAttachmentsFragment: Fragment(R.layout.fragment_post_attachments) {
     private var _binding: FragmentPostAttachmentsBinding? = null
     private val binding get() = _binding!!
 
-
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        requireActivity().run {
+            val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+            mainViewModel.updateActionBarConfig(ToolBarConfig(
+                subtitle = "",
+                onClick = {}
+            ))
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,9 +67,8 @@ class PostAttachmentsFragment: Fragment(R.layout.fragment_post_attachments) {
 
         // TODO не создавать объекты внутри onCreateView?
         val imagePickerLauncher = registerImagePicker {
-            val firstImage = it.firstOrNull() ?: return@registerImagePicker
             it.forEach { image ->
-                viewModel.queueAttachment(image.path)
+                viewModel.queueAttachment(image.name, image.path)
             }
         }
 

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface AttachmentsRepository {
     fun getThreadAttachments(threadType: Byte, threadId: Long): Flow<List<PostAttachment>>
-    suspend fun queuePostDraftAttachment(path: String, threadType: Byte, threadId: Long)
+    suspend fun queuePostDraftAttachment(threadType: Byte, threadId: Long, name: String, path: String)
 
     suspend fun uploadJob()
 }

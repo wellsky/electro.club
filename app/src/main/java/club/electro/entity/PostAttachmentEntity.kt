@@ -1,27 +1,32 @@
 package club.electro.entity;
 
 import androidx.room.Entity;
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import club.electro.dto.PostAttachment
 
-@Entity
+@Entity(indices = [Index(value = ["threadType", "threadId", "id"], unique = true)])
 data class PostAttachmentEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
-    val type: Byte,
+    val localId: Long = 0,
+    val id: Long? = null,
     val threadType: Byte,
     val threadId: Long,
-    val localFile: String,
+    val type: Byte,
+    val name: String? = null,
+    val localPath: String? = null,
     val previewUrl: String? = null,
     val fullUrl: String? = null,
     val status: Byte = 0,
 ) {
     fun toDto() = PostAttachment(
+        localId = localId,
         id = id,
         type = type,
         threadType = threadType,
         threadId = threadId,
-        localFile = localFile,
+        name = name,
+        localPath = localPath,
         previewUrl = previewUrl,
         fullUrl = fullUrl,
         status = status
@@ -30,11 +35,13 @@ data class PostAttachmentEntity(
     companion object {
         fun fromDto(dto: PostAttachment) =
             PostAttachmentEntity(
+                localId = dto.localId,
                 id = dto.id,
                 type = dto.type,
                 threadType = dto.threadType,
                 threadId = dto.threadId,
-                localFile = dto.localFile,
+                name = dto.name,
+                localPath = dto.localPath,
                 previewUrl = dto.previewUrl,
                 fullUrl = dto.fullUrl,
                 status = dto.status

@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.paging.*
 import club.electro.api.ApiService
 import club.electro.auth.AppAuth
+import club.electro.dao.PostAttachmentDao
 import club.electro.dao.PostDao
 import club.electro.dao.ThreadDao
 import club.electro.dto.Post
@@ -29,6 +30,7 @@ class ThreadRepositoryServerImpl @Inject constructor(
     private val apiService: ApiService,
     private val threadDao: ThreadDao,
     private val postDao: PostDao,
+    private val postAttachmentDao: PostAttachmentDao,
     private val appAuth: AppAuth,
     private val postRepository: PostRepository,
     private val networkStatus: NetworkStatus
@@ -74,6 +76,11 @@ class ThreadRepositoryServerImpl @Inject constructor(
                 val body = response.body() ?: throw ApiError(response.code(), response.message())
 
                 threadDao.insert(body.data.thread.toEntity())
+
+                body.data.draftAttachments?.let {
+                    postAttachmentDao.insert(it.toEntity())
+                }
+
                 networkStatus.setStatus(NetworkStatus.Status.ONLINE)
             } catch (e: IOException) {
                 networkStatus.setStatus(NetworkStatus.Status.ERROR)

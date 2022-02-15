@@ -96,5 +96,5 @@
     <fragment
         android:id="@+id/postAttachmentsFragment"
         android:name="club.electro.ui.thread.PostAttachmentsFragment"
-        android:label="PostAttachmentsFragment" />
+        android:label="Attachments" />
 </navigation>

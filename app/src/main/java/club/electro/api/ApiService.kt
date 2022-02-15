@@ -5,6 +5,7 @@ import club.electro.utils.UrlDataResultDto
 import club.electro.utils.UrlType
 import club.electro.utils.urlTypeSerializer
 import com.google.gson.GsonBuilder
+import com.google.gson.annotations.SerializedName
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -191,7 +192,9 @@ data class ApiSubscriptionsData (
 )
 
 data class ApiThreadData (
-    val thread: PostsThread
+    val thread: PostsThread,
+    @SerializedName("draft_text") val draftText: String?,
+    @SerializedName("draft_attachments") val draftAttachments: List<PostAttachment>?
 )
 
 data class ApiPostsData (

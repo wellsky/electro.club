@@ -1,13 +1,17 @@
 package club.electro.dto
 
+import com.google.gson.annotations.SerializedName
+
 data class PostAttachment (
-    val id: Long,
+    val localId: Long,
+    val id: Long?,
+    @SerializedName("thread_type")  val threadType: Byte,
+    @SerializedName("thread_id")  val threadId: Long,
     val type: Byte,
-    val threadType: Byte,
-    val threadId: Long,
-    val localFile: String,
-    val previewUrl: String?,
-    val fullUrl: String?,
+    val name: String?,
+    val localPath: String?,
+    @SerializedName("preview_url")  val previewUrl: String?,
+    @SerializedName("full_url")  val fullUrl: String?,
     val status: Byte,
 ) {
     companion object {

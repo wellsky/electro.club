@@ -19,8 +19,11 @@ interface PostAttachmentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(attachment: PostAttachmentEntity): Long
 
-    @Query("UPDATE PostAttachmentEntity SET status = :status WHERE id = :id")
-    suspend fun setStatus(id: Long, status: Byte)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(attachments: List<PostAttachmentEntity>)
+
+    @Query("UPDATE PostAttachmentEntity SET status = :status WHERE localId = :localId")
+    suspend fun setStatus(localId: Long, status: Byte)
 
     @Query("DELETE FROM PostAttachmentEntity WHERE status = ${PostAttachment.STATUS_UPLOADED}")
     suspend fun removeUploaded()

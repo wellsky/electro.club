@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import club.electro.dto.Post
-import club.electro.dto.PostBufferedAttachment
+import club.electro.dto.PostAttachmentLink
 
 @Entity(indices = [Index(value = ["threadType", "threadId", "id"], unique = true)])
 data class PostEntity(
@@ -27,7 +27,7 @@ data class PostEntity(
     val canEdit: Boolean = false,
     val canRemove: Boolean = false,
 
-    val bufferedAttachments: List<PostBufferedAttachment>? = null,
+    val attachmentLinks: List<PostAttachmentLink>? = null,
 
     val fresh: Boolean = false,
 ) {
@@ -48,7 +48,7 @@ data class PostEntity(
         views = views,
         canEdit = canEdit,
         canRemove = canRemove,
-        bufferedAttachments = bufferedAttachments
+        attachmentLinks = attachmentLinks
     )
 
     companion object {
@@ -70,7 +70,7 @@ data class PostEntity(
                 views = dto.views,
                 canEdit = dto.canEdit,
                 canRemove = dto.canRemove,
-                bufferedAttachments = dto.bufferedAttachments
+                attachmentLinks = dto.attachmentLinks
             )
     }
 }

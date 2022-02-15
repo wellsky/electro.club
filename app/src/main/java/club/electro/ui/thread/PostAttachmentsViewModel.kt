@@ -29,7 +29,7 @@ class PostAttachmentsViewModel @Inject constructor(
         }
     }
 
-    fun queueAttachment(path: String) = viewModelScope.launch {
-        repository.queuePostDraftAttachment(path, threadType, threadId)
+    fun queueAttachment(name:String, path: String) = viewModelScope.launch {
+        repository.queuePostDraftAttachment(threadType, threadId, name, path)
     }
 }
