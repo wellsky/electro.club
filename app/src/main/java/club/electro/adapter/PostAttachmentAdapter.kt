@@ -10,7 +10,7 @@ import club.electro.dto.PostAttachment
 import club.electro.utils.load
 
 interface PostAttachmentInteractionListener {
-    fun onClick(attachment: PostAttachment) {}
+    fun onRemoveClick(attachment: PostAttachment) {}
 }
 
 class PostAttachmentAdapter (
@@ -39,17 +39,18 @@ class PostAttachmentViewHolder(
             val statusText = when(attachment.status) {
                 PostAttachment.STATUS_CREATED -> "New"
                 PostAttachment.STATUS_READY_TO_UPLOAD -> "Ready to upload"
+                PostAttachment.STATUS_COMPRESSING -> "Compressing"
                 PostAttachment.STATUS_UPLOADING -> "Uploading"
                 PostAttachment.STATUS_UPLOADED -> "Uploaded"
-                else -> {"Unknown" }
+                else -> { "Unknown" }
             }
 
             attachmentStatus.text = "Status: " + statusText
 
             attachmentImage.load(attachment.localPath)
 
-            root.setOnClickListener {
-                onInteractionListener.onClick(attachment)
+            attachmentRemove.setOnClickListener {
+                onInteractionListener.onRemoveClick(attachment)
             }
         }
     }

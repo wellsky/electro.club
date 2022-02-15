@@ -12,13 +12,15 @@ data class PostAttachment (
     val localPath: String?,
     @SerializedName("preview_url")  val previewUrl: String?,
     @SerializedName("full_url")  val fullUrl: String?,
-    val status: Byte,
+    val status: Byte = STATUS_UNKNOWN,
 ) {
     companion object {
-        const val STATUS_CREATED: Byte = 0
-        const val STATUS_READY_TO_UPLOAD: Byte = 1
-        const val STATUS_UPLOADING: Byte = 2
-        const val STATUS_UPLOADED: Byte = 3
+        const val STATUS_UNKNOWN: Byte = 0
+        const val STATUS_CREATED: Byte = 1
+        const val STATUS_READY_TO_UPLOAD: Byte = 2
+        const val STATUS_COMPRESSING: Byte = 3
+        const val STATUS_UPLOADING: Byte = 4
+        const val STATUS_UPLOADED: Byte = 5
         const val STATUS_ERROR: Byte = -1
     }
 }

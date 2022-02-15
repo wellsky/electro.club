@@ -319,6 +319,15 @@ class ThreadFragment: Fragment() {
             invalidateBottomPanel()
         }
 
+        viewModel.draftAttachments.observe(viewLifecycleOwner) {
+            if (it.size > 0) {
+                binding.attachmentsCount.isVisible = true
+                binding.attachmentsCount.text = it.size.toString()
+            } else {
+                binding.attachmentsCount.isVisible = false
+            }
+        }
+
         binding.postsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)

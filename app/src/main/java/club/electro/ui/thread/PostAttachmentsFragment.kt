@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -54,8 +55,18 @@ class PostAttachmentsFragment: Fragment(R.layout.fragment_post_attachments) {
         val root: View = binding.root
 
         val adapter = PostAttachmentAdapter(object : PostAttachmentInteractionListener {
-            override fun onClick(attachment: PostAttachment) {
-                AndroidUtils.hideKeyboard(requireView())
+            override fun onRemoveClick(attachment: PostAttachment) {
+                val builder = AlertDialog.Builder(requireContext())
+                builder.setMessage(getString(R.string.delete_post_attachment_confirm_text))
+                    .setCancelable(false)
+                    .setPositiveButton(getString(R.string.delete_post_confirm_yes)) { dialog, id ->
+                        viewModel.removeAttachment(attachment)
+                    }
+                    .setNegativeButton(getString(R.string.delete_post_confirm_no)) { dialog, id ->
+                        dialog.dismiss()
+                    }
+                val alert = builder.create()
+                alert.show()
             }
         })
 

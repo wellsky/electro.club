@@ -28,7 +28,7 @@ class AttachmentsRepositoryServerImpl @Inject constructor(
     private val apiService: ApiService
 ): AttachmentsRepository {
 
-    override fun getThreadAttachments(threadType: Byte, threadId: Long) = postAttachmentDao.getForThread(threadType, threadId).map{it.toDto()}
+    override fun getThreadDraftAttachments(threadType: Byte, threadId: Long) = postAttachmentDao.getForThread(threadType, threadId).map{it.toDto()}
 
     override suspend fun queuePostDraftAttachment(threadType: Byte, threadId: Long, name: String, path: String) {
         println("Queue attachment: " + threadType + ":" + threadId + " URI: " + path.toString())
@@ -50,6 +50,7 @@ class AttachmentsRepositoryServerImpl @Inject constructor(
                  if (sourceFile.exists()) {
                      try {
                          println("Uploading... " + sourceFile.name)
+                         postAttachmentDao.setStatus(attachment.localId, PostAttachment.STATUS_COMPRESSING)
 
                          val outputDir = context.cacheDir // context being the Activity pointer
                          val destinationFile =
@@ -65,6 +66,8 @@ class AttachmentsRepositoryServerImpl @Inject constructor(
                              )
                          }
 
+
+                         postAttachmentDao.setStatus(attachment.localId, PostAttachment.STATUS_UPLOADING)
                          val response = apiService.uploadPostDraftAttachment(
                              threadType = attachment.threadType.toString().toRequestBody(), // TODO надо узнать, скорее всего не так надо форматировать
                              threadId = attachment.threadId.toString().toRequestBody(),
@@ -101,6 +104,28 @@ class AttachmentsRepositoryServerImpl @Inject constructor(
              }
         } ?: run {
             println("All files uploaded")
+        }
+    }
+
+    override suspend fun removePostAttachment(threadType: Byte, threadId: Long, id: Long) {
+        val response = apiService.removePostAttachment(
+            threadType = threadType,
+            threadId = threadId,
+            attachmentId = id,
+        )
+
+        if (!response.isSuccessful) {
+            throw ApiError(response.code(), response.message())
+        }
+
+        val body = response.body() ?: throw ApiError(response.code(), response.message())
+
+        if (body.status.equals("ok")) { // TODO
+            postAttachmentDao.removeById(
+                threadType = threadType,
+                threadId = threadId,
+                id = id
+            )
         }
     }
 }

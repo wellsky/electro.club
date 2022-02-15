@@ -45,7 +45,7 @@
     <string name="action_mute">Mute</string>
     <string name="success_auth">Successful authorization</string>
     <string name="short_days">d.</string>
-    <string name="delete_post_confirm_text">Are you sure you want to Delete?</string>
+    <string name="delete_post_confirm_text">Delete this post?</string>
     <string name="delete_post_confirm_yes">Yes</string>
     <string name="delete_post_confirm_no">No</string>
     <string name="map_filter_groups">Groups</string>
@@ -77,4 +77,5 @@
     <string name="socket_added_by">Added by</string>
     <string name="zoom_more_images">Zoom and show more images (%1$s)</string>
     <string name="user_last_visit_time">"Last activity: "</string>
+    <string name="delete_post_attachment_confirm_text">Delete this attachment?</string>
 </resources>

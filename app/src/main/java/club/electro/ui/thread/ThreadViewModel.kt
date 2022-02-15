@@ -4,13 +4,16 @@ import androidx.lifecycle.*
 import androidx.paging.cachedIn
 import club.electro.auth.AppAuth
 import club.electro.dto.Post
+import club.electro.repository.attachments.AttachmentsRepository
 import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.repository.thread.ThreadRepository
 import club.electro.repository.thread.ThreadStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,9 +21,14 @@ import javax.inject.Inject
 class ThreadViewModel @Inject constructor(
     state : SavedStateHandle,
     val repository: ThreadRepository,
+    val attachmentsRepository: AttachmentsRepository,
     val appAuth: AppAuth
 ) : ViewModel() {
+    val threadType: Byte = state.get("threadType") ?: 0
+    val threadId: Long = state.get("threadId") ?: 0
+
     val thread = repository.thread.asLiveData()
+    val draftAttachments = attachmentsRepository.getThreadDraftAttachments(threadType, threadId).flowOn(Dispatchers.Default).asLiveData()
 
     val mutablePosts = MutableStateFlow(value = ThreadLoadTarget((state.get("postId") ?: 0L)))
     val posts = mutablePosts.flatMapLatest { refreshTarget ->

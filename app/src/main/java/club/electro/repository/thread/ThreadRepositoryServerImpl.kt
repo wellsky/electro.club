@@ -2,12 +2,15 @@ package club.electro.repository.thread
 
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.*
+import androidx.room.withTransaction
 import club.electro.api.ApiService
 import club.electro.auth.AppAuth
 import club.electro.dao.PostAttachmentDao
 import club.electro.dao.PostDao
 import club.electro.dao.ThreadDao
+import club.electro.db.AppDb
 import club.electro.dto.Post
+import club.electro.dto.PostAttachment
 import club.electro.dto.PostsThread
 import club.electro.entity.toEntity
 import club.electro.error.*
@@ -28,6 +31,7 @@ class ThreadRepositoryServerImpl @Inject constructor(
             private val threadId: Long,
 
     private val apiService: ApiService,
+    private val db: AppDb,
     private val threadDao: ThreadDao,
     private val postDao: PostDao,
     private val postAttachmentDao: PostAttachmentDao,
@@ -78,7 +82,14 @@ class ThreadRepositoryServerImpl @Inject constructor(
                 threadDao.insert(body.data.thread.toEntity())
 
                 body.data.draftAttachments?.let {
-                    postAttachmentDao.insert(it.toEntity())
+                    db.withTransaction {
+                        postAttachmentDao.removeUploaded(threadType, threadId)
+                        postAttachmentDao.insert(
+                            it.toEntity().map {
+                                it.copy(status = PostAttachment.STATUS_UPLOADED)
+                            }
+                        )
+                    }
                 }
 
                 networkStatus.setStatus(NetworkStatus.Status.ONLINE)

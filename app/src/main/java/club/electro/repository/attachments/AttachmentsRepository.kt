@@ -7,8 +7,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
 interface AttachmentsRepository {
-    fun getThreadAttachments(threadType: Byte, threadId: Long): Flow<List<PostAttachment>>
+    fun getThreadDraftAttachments(threadType: Byte, threadId: Long): Flow<List<PostAttachment>>
+
     suspend fun queuePostDraftAttachment(threadType: Byte, threadId: Long, name: String, path: String)
+    suspend fun removePostAttachment(threadType: Byte, threadId: Long, id: Long)
 
     suspend fun uploadJob()
 }

@@ -24,8 +24,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@id/attachmentImage"
         app:layout_constraintStart_toEndOf="@id/attachmentImage"
-        app:layout_constraintLeft_toRightOf="@id/attachmentImage"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/attachmentRemove"
         android:layout_marginStart="@dimen/fab_margin"
         android:layout_marginTop="4dp"
         android:textColor="@color/grey_26"
@@ -40,11 +39,11 @@
 
     <TextView
         android:id="@+id/attachmentStatus"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@id/attachmentImage"
         app:layout_constraintStart_toEndOf="@id/attachmentImage"
-        app:layout_constraintLeft_toRightOf="@id/attachmentImage"
+        app:layout_constraintEnd_toStartOf="@id/attachmentRemove"
         android:ellipsize="end"
         android:singleLine="true"
         android:layout_marginStart="@dimen/fab_margin"
@@ -52,6 +51,15 @@
         tools:text="1024 Kb"
         >
     </TextView>
+
+    <ImageView
+        android:id="@+id/attachmentRemove"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/ic_baseline_delete_24" />
 
     <View
         android:id="@+id/panelLine"

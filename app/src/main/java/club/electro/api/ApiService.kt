@@ -135,6 +135,15 @@ interface ApiService {
         @Part file: MultipartBody.Part
     ): Response<ApiResponse<PostAttachment>>
 
+    @FormUrlEncoded
+    @POST(BASE_SERVER_URL)
+    suspend fun removePostAttachment(
+        @Field("method") method: String = "removePostAttachment",
+        @Field("thread_type") threadType: Byte,
+        @Field("thread_id") threadId: Long,
+        @Field("attachment_id") attachmentId: Long?,
+    ): Response<ApiResponse<Unit>>
+
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)

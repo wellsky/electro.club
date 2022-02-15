@@ -223,19 +223,39 @@
                 android:textCursorDrawable="@null"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/editorAttachments"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                />
 
             <ImageButton
                 android:id="@+id/editorAttachments"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginStart="@dimen/common_spacing"
+                android:layout_marginEnd="8dp"
                 android:background="@android:color/transparent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/editorPostSave"
                 app:layout_constraintStart_toEndOf="@id/editorPostContent"
                 app:layout_constraintTop_toTopOf="@+id/editorPostContent"
                 app:srcCompat="@drawable/ic_baseline_attach_file_24" />
+
+            <TextView
+                android:id="@+id/attachmentsCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                app:layout_constraintStart_toStartOf="@id/editorAttachments"
+                app:layout_constraintTop_toTopOf="@id/editorAttachments"
+                app:layout_constraintBottom_toBottomOf="@id/editorAttachments"
+                android:textColor="@color/white"
+                android:background="@drawable/editor_attachments_count_bg"
+                android:minWidth="24dp"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                tools:text="12"
+                android:visibility="gone"
+                >
+            </TextView>
 
             <ImageButton
                 android:id="@+id/editorPostSave"
