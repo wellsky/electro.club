@@ -327,8 +327,15 @@ class ThreadFragment: Fragment() {
 
         viewModel.draftAttachments.observe(viewLifecycleOwner) {
             if (it.size > 0) {
+                val uploaded = it.count { it.status == PostAttachment.STATUS_UPLOADED }
+                if (uploaded == it.size) {
+                    binding.attachmentsCount.text = it.size.toString()
+                    binding.attachmentsCount.setBackgroundResource(R.drawable.editor_attachments_count_bg_uploaded)
+                } else {
+                    binding.attachmentsCount.text = uploaded.toString() + "/" + it.size.toString()
+                    binding.attachmentsCount.setBackgroundResource(R.drawable.editor_attachments_count_bg)
+                }
                 binding.attachmentsCount.isVisible = true
-                binding.attachmentsCount.text = it.size.toString()
             } else {
                 binding.attachmentsCount.isVisible = false
             }

@@ -56,10 +56,6 @@ class ThreadViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            attachmentsRepository.uploadJob()
-        }
-
-        viewModelScope.launch {
             repository.threadStatus.asFlow().collectLatest { newStatus->
                 println("Repository thread status changed")
                 if (newStatus.lastUpdateTime > 0) { // Не инициализация переменной в репозитории

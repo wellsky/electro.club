@@ -120,14 +120,19 @@ class MainActivity: AppCompatActivity() {
         CoroutineScope(Dispatchers.Default).launch {
             viewModel.networkStatus.status.collectLatest {
                 val statusString = when (it) {
-                   NetworkStatus.Status.ONLINE -> getString(R.string.network_status_online)
-                   NetworkStatus.Status.OFFLINE -> getString(R.string.network_status_offline)
-                   NetworkStatus.Status.ERROR -> getString(R.string.network_status_error)
+                    NetworkStatus.Status.ONLINE -> getString(R.string.network_status_online)
+                    NetworkStatus.Status.OFFLINE -> getString(R.string.network_status_offline)
+                    NetworkStatus.Status.ERROR -> getString(R.string.network_status_error)
                 }
 
                 Snackbar.make(binding.root, statusString, Snackbar.LENGTH_LONG)
                     .show()
             }
+        }
+
+        CoroutineScope(Dispatchers.Default).launch {
+            // TODO как лучше запускать такие корутины, которые должны работать во время работы всего приложеия?
+            viewModel.uploaderJob()
         }
     }
 

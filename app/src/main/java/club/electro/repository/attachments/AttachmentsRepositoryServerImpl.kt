@@ -41,7 +41,7 @@ class AttachmentsRepositoryServerImpl @Inject constructor(
         postAttachmentDao.setStatus(newUploadId,PostAttachment.STATUS_READY_TO_UPLOAD)
     }
 
-    override suspend fun uploadJob() = postAttachmentDao.getFirstReady().distinctUntilChanged().collect { entity ->
+    override suspend fun uploaderJob() = postAttachmentDao.getFirstReady().distinctUntilChanged().collect { entity ->
          entity?.toDto()?.let { attachment->
              attachment.localPath?.let { localPath ->
                  val sourceFile = File(localPath)

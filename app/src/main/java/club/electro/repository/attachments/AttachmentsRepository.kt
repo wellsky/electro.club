@@ -12,5 +12,5 @@ interface AttachmentsRepository {
     suspend fun queuePostDraftAttachment(threadType: Byte, threadId: Long, name: String, path: String)
     suspend fun removePostAttachment(attachment: PostAttachment)
 
-    suspend fun uploadJob()
+    suspend fun uploaderJob()
 }

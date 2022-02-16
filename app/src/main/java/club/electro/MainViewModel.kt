@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import club.electro.api.ApiService
 import club.electro.auth.AppAuth
 import club.electro.model.NetworkStatus
+import club.electro.repository.attachments.AttachmentsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import id.zelory.compressor.Compressor
@@ -29,11 +30,17 @@ import java.io.File
 class MainViewModel @Inject constructor(
     val appAuth: AppAuth,
     val networkStatus : NetworkStatus,
+    val attachmentsRepository: AttachmentsRepository,
 ): ViewModel() {
     private val _config = MutableLiveData<ToolBarConfig>()
     val config: LiveData<ToolBarConfig>
         get() = _config
+
     fun updateActionBarConfig(config: ToolBarConfig) = _config.postValue(config)
+
+    suspend fun uploaderJob() {
+        attachmentsRepository.uploaderJob()
+    }
 
 }
 
