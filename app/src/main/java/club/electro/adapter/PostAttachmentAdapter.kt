@@ -38,10 +38,15 @@ class PostAttachmentViewHolder(
 
             val statusText = when(attachment.status) {
                 PostAttachment.STATUS_CREATED -> "New"
-                PostAttachment.STATUS_READY_TO_UPLOAD -> "Ready to upload"
-                PostAttachment.STATUS_COMPRESSING -> "Compressing"
-                PostAttachment.STATUS_UPLOADING -> "Uploading"
-                PostAttachment.STATUS_UPLOADED -> "Uploaded"
+                PostAttachment.STATUS_READY_TO_UPLOAD -> "ready to upload"
+                PostAttachment.STATUS_COMPRESSING -> "compressing"
+                PostAttachment.STATUS_UPLOADING -> "uploading"
+                PostAttachment.STATUS_UPLOADED -> "uploaded"
+
+                PostAttachment.STATUS_ERROR_NOT_FOUND -> "error: file not found"
+                PostAttachment.STATUS_ERROR_COMPRESSING -> "error: compression failed"
+                PostAttachment.STATUS_ERROR_UPLOADING -> "error: uploading failed"
+
                 else -> { "Unknown" }
             }
 

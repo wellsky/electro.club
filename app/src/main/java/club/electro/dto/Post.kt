@@ -21,7 +21,7 @@ data class Post (
     @SerializedName("can_edit") val canEdit: Boolean = false,
     @SerializedName("can_remove") val canRemove: Boolean = false,
 
-    val attachmentLinks: List<PostAttachmentLink>? = null,
+    @SerializedName("attachments") val attachmentLinks: List<PostAttachmentLink>? = null,
 ) {
     companion object {
         const val STATUS_PUBLISHED: Byte = 0

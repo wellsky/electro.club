@@ -28,8 +28,11 @@ interface PostAttachmentDao {
     @Query("UPDATE PostAttachmentEntity SET status = :status WHERE localId = :localId")
     suspend fun setStatus(localId: Long, status: Byte)
 
-    @Query("DELETE FROM PostAttachmentEntity WHERE threadType = :threadType AND threadId = :threadId AND id = :id")
-    suspend fun removeById(threadType: Byte, threadId: Long, id: Long)
+    @Query("DELETE FROM PostAttachmentEntity WHERE localId = :localId")
+    suspend fun removeByLocalId(localId: Long)
+
+//    @Query("DELETE FROM PostAttachmentEntity WHERE threadType = :threadType AND threadId = :threadId AND id = :id")
+//    suspend fun removeById(threadType: Byte, threadId: Long, id: Long)
 
     @Query("DELETE FROM PostAttachmentEntity WHERE status = ${PostAttachment.STATUS_UPLOADED} AND threadType = :threadType AND threadId = :threadId")
     suspend fun removeUploaded(threadType: Byte, threadId: Long)

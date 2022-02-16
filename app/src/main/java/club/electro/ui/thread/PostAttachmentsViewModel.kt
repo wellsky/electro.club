@@ -34,12 +34,6 @@ class PostAttachmentsViewModel @Inject constructor(
     }
 
     fun removeAttachment(attachment: PostAttachment) = viewModelScope.launch {
-        attachment.id?.let {
-            repository.removePostAttachment(
-                threadType = attachment.threadType,
-                threadId = attachment.threadId,
-                id = it
-            )
-        }
+        repository.removePostAttachment(attachment)
     }
 }

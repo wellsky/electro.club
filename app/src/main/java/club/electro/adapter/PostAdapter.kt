@@ -70,12 +70,6 @@ class PostViewHolder(
     }
 
     fun bind(post: Post) {
-        if (post.id == 30455L) {
-            println("Binding 30455")
-        }
-        if (post.id == 265523L) {
-            println("Binding 265523")
-        }
         binding.apply {
             val date = java.util.Date(post.published * 1000)
 

@@ -21,7 +21,11 @@ data class PostAttachment (
         const val STATUS_COMPRESSING: Byte = 3
         const val STATUS_UPLOADING: Byte = 4
         const val STATUS_UPLOADED: Byte = 5
-        const val STATUS_ERROR: Byte = -1
+
+        const val STATUS_ERROR_UNKNOWN: Byte = -1
+        const val STATUS_ERROR_NOT_FOUND: Byte = -2
+        const val STATUS_ERROR_COMPRESSING: Byte = -3
+        const val STATUS_ERROR_UPLOADING: Byte = -4
     }
 }
 

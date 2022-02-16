@@ -10,7 +10,7 @@ interface AttachmentsRepository {
     fun getThreadDraftAttachments(threadType: Byte, threadId: Long): Flow<List<PostAttachment>>
 
     suspend fun queuePostDraftAttachment(threadType: Byte, threadId: Long, name: String, path: String)
-    suspend fun removePostAttachment(threadType: Byte, threadId: Long, id: Long)
+    suspend fun removePostAttachment(attachment: PostAttachment)
 
     suspend fun uploadJob()
 }

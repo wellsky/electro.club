@@ -31,7 +31,6 @@ class AttachmentsRepositoryServerImpl @Inject constructor(
     override fun getThreadDraftAttachments(threadType: Byte, threadId: Long) = postAttachmentDao.getForThread(threadType, threadId).map{it.toDto()}
 
     override suspend fun queuePostDraftAttachment(threadType: Byte, threadId: Long, name: String, path: String) {
-        println("Queue attachment: " + threadType + ":" + threadId + " URI: " + path.toString())
         val newUploadId = postAttachmentDao.insert(PostAttachmentEntity(
             type = 1,
             name = name,
@@ -43,21 +42,19 @@ class AttachmentsRepositoryServerImpl @Inject constructor(
     }
 
     override suspend fun uploadJob() = postAttachmentDao.getFirstReady().distinctUntilChanged().collect { entity ->
-        //val sourceFile = File("/storage/emulated/0/DCIM/Camera/IMG_20220213_130617.jpg")
          entity?.toDto()?.let { attachment->
              attachment.localPath?.let { localPath ->
                  val sourceFile = File(localPath)
                  if (sourceFile.exists()) {
-                     try {
-                         println("Uploading... " + sourceFile.name)
-                         postAttachmentDao.setStatus(attachment.localId, PostAttachment.STATUS_COMPRESSING)
+                     postAttachmentDao.setStatus(attachment.localId, PostAttachment.STATUS_COMPRESSING)
 
+                     val compressedImageFile: File? = try {
                          val outputDir = context.cacheDir // context being the Activity pointer
                          val destinationFile =
                              File.createTempFile(sourceFile.name, ".jpg", outputDir)
                          destinationFile.deleteOnExit()
 
-                         val compressedImageFile = Compressor.compress(context, sourceFile) {
+                         Compressor.compress(context, sourceFile) {
                              destination(destinationFile)
                              default(
                                  width = 1920,
@@ -65,41 +62,47 @@ class AttachmentsRepositoryServerImpl @Inject constructor(
                                  quality = 80
                              )
                          }
-
-
-                         postAttachmentDao.setStatus(attachment.localId, PostAttachment.STATUS_UPLOADING)
-                         val response = apiService.uploadPostDraftAttachment(
-                             threadType = attachment.threadType.toString().toRequestBody(), // TODO надо узнать, скорее всего не так надо форматировать
-                             threadId = attachment.threadId.toString().toRequestBody(),
-                             file = MultipartBody.Part.createFormData(
-                                 "file",
-                                 compressedImageFile.name,
-                                 compressedImageFile.asRequestBody("image/*".toMediaType())
-                             )
-                         )
-
-                         if (!response.isSuccessful) {
-                             throw ApiError(response.code(), response.message())
-                         }
-                         val body = response.body() ?: throw ApiError(response.code(), response.message())
-
-                         postAttachmentDao.updateLocal(
-                             localId = attachment.localId,
-                             id = body.data.id,
-                             previewUrl = body.data.previewUrl,
-                             fullUrl = body.data.fullUrl,
-                             status = PostAttachment.STATUS_UPLOADED
-                         )
-
-                         println("Done: " + sourceFile.name)
-                         //postAttachmentDao.setStatus(attachment.localId, PostAttachment.STATUS_UPLOADED)
                      } catch (e: Exception) {
-                         // TODO отметить как ошибку при компрессии или отправке
-                         postAttachmentDao.setStatus(attachment.localId, PostAttachment.STATUS_ERROR)
+                         postAttachmentDao.setStatus(attachment.localId, PostAttachment.STATUS_ERROR_COMPRESSING)
+                         null
+                     }
+
+                     compressedImageFile?.let {
+                         postAttachmentDao.setStatus(attachment.localId, PostAttachment.STATUS_UPLOADING)
+                         try {
+                             val response = apiService.uploadPostDraftAttachment(
+                                 threadType = attachment.threadType.toString().toRequestBody(), // TODO надо узнать, скорее всего не так надо форматировать
+                                 threadId = attachment.threadId.toString().toRequestBody(),
+                                 attachmentName = attachment.name?.toRequestBody() ?: "".toRequestBody(),
+                                 file = MultipartBody.Part.createFormData(
+                                     "file",
+                                     compressedImageFile.name,
+                                     compressedImageFile.asRequestBody("image/*".toMediaType())
+                                 )
+                             )
+
+                             if (!response.isSuccessful) {
+                                 throw ApiError(response.code(), response.message())
+                             }
+
+                             val body = response.body() ?: throw ApiError(
+                                 response.code(),
+                                 response.message()
+                             )
+
+                             postAttachmentDao.updateLocal(
+                                 localId = attachment.localId,
+                                 id = body.data.id,
+                                 previewUrl = body.data.previewUrl,
+                                 fullUrl = body.data.fullUrl,
+                                 status = PostAttachment.STATUS_UPLOADED
+                             )
+                         } catch (e: Exception) {
+                             postAttachmentDao.setStatus(attachment.localId, PostAttachment.STATUS_ERROR_UPLOADING)
+                         }
                      }
                  } else {
-                     // TODO отметить как не найденный файл
-                     postAttachmentDao.setStatus(attachment.localId, PostAttachment.STATUS_ERROR)
+                     postAttachmentDao.setStatus(attachment.localId, PostAttachment.STATUS_ERROR_NOT_FOUND)
                  }
              }
         } ?: run {
@@ -107,24 +110,28 @@ class AttachmentsRepositoryServerImpl @Inject constructor(
         }
     }
 
-    override suspend fun removePostAttachment(threadType: Byte, threadId: Long, id: Long) {
-        val response = apiService.removePostAttachment(
-            threadType = threadType,
-            threadId = threadId,
-            attachmentId = id,
-        )
+    override suspend fun removePostAttachment(attachment: PostAttachment) {
+        attachment.id?.let {
+            val response = apiService.removePostAttachment(
+                threadType = attachment.threadType,
+                threadId = attachment.threadId,
+                attachmentId = attachment.id,
+            )
 
-        if (!response.isSuccessful) {
-            throw ApiError(response.code(), response.message())
-        }
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
 
-        val body = response.body() ?: throw ApiError(response.code(), response.message())
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
 
-        if (body.status.equals("ok")) { // TODO
-            postAttachmentDao.removeById(
-                threadType = threadType,
-                threadId = threadId,
-                id = id
+            if (body.status.equals("ok")) { // TODO
+                postAttachmentDao.removeByLocalId(
+                    localId = attachment.localId
+                )
+            }
+        } ?: run {
+            postAttachmentDao.removeByLocalId(
+                localId = attachment.localId
             )
         }
     }

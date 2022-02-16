@@ -90,6 +90,8 @@ class ThreadRepositoryServerImpl @Inject constructor(
                             }
                         )
                     }
+                } ?: run {
+                    postAttachmentDao.removeUploaded(threadType, threadId)
                 }
 
                 networkStatus.setStatus(NetworkStatus.Status.ONLINE)
