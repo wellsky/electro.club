@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import androidx.paging.cachedIn
 import club.electro.auth.AppAuth
 import club.electro.dto.Post
+import club.electro.dto.PostAttachment
 import club.electro.repository.attachments.AttachmentsRepository
 import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.repository.thread.ThreadRepository
@@ -54,6 +55,10 @@ class ThreadViewModel @Inject constructor(
     //val lastUpdateTime = MutableLiveData(0L)
 
     init {
+        viewModelScope.launch {
+            attachmentsRepository.uploadJob()
+        }
+
         viewModelScope.launch {
             repository.threadStatus.asFlow().collectLatest { newStatus->
                 println("Repository thread status changed")
@@ -151,13 +156,31 @@ class ThreadViewModel @Inject constructor(
         editorPost.value = editorPost.value?.copy(answerTo = null)
     }
 
-    fun startCheckUpdates() {
-        repository.startCheckUpdates()
+    fun queueAttachment(name:String, path: String) = viewModelScope.launch {
+        attachmentsRepository.queuePostDraftAttachment(threadType, threadId, name, path)
     }
 
-    fun stopCheckUpdates() {
-        repository.stopCheckUpdates()
+    fun removeAttachment(attachment: PostAttachment) = viewModelScope.launch {
+        attachmentsRepository.removePostAttachment(attachment)
     }
+
+//    init {
+//        viewModelScope.launch {
+//            attachmentsRepository.uploadJob()
+//        }
+//    }
+
+    suspend fun checkThreadUpdates() {
+        repository.checkThreadUpdates()
+    }
+
+//    fun startCheckUpdates() {
+//        repository.startCheckUpdates()
+//    }
+//
+//    fun stopCheckUpdates() {
+//        repository.stopCheckUpdates()
+//    }
 }
 
 private val emptyPost = Post(

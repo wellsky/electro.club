@@ -69,7 +69,7 @@
     </fragment>
     <fragment
         android:id="@+id/threadInfoFragment"
-        android:name="club.electro.ui.user.ThreadInfoFragment"
+        android:name="club.electro.ui.thread.ThreadInfoFragment"
         android:label="Thread details" />
     <action
         android:id="@+id/action_global_userProfileFragment"
@@ -95,6 +95,6 @@
         android:label="TransportFragment" />
     <fragment
         android:id="@+id/postAttachmentsFragment"
-        android:name="club.electro.ui.thread.PostAttachmentsFragment"
+        android:name="club.electro.ui.thread.ThreadAttachmentsFragment"
         android:label="Attachments" />
 </navigation>

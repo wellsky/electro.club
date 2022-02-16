@@ -1,4 +1,4 @@
-package club.electro.ui.user
+package club.electro.ui.thread
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,9 +10,6 @@ import androidx.lifecycle.ViewModelProvider
 import club.electro.MainViewModel
 import club.electro.ToolBarConfig
 import club.electro.databinding.FragmentThreadInfoBinding
-import club.electro.ui.thread.ThreadViewModel
-import club.electro.utils.ByteArg
-import club.electro.utils.LongArg
 import club.electro.utils.loadCircleCrop
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -94,14 +91,14 @@ class ThreadInfoFragment : Fragment() {
             }
         }
 
-        viewModel.startCheckUpdates()
+        //viewModel.startCheckUpdates()
 
         return root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        viewModel.stopCheckUpdates()
+        //viewModel.stopCheckUpdates()
         _binding = null
     }
 }

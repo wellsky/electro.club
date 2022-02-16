@@ -29,12 +29,13 @@ import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION
 import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_LAST
 //import club.electro.ui.thread.PostAttachmentsFragment.Companion.attachmentsThreadId
 //import club.electro.ui.thread.PostAttachmentsFragment.Companion.attachmentsThreadType
-//import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoId
-//import club.electro.ui.user.ThreadInfoFragment.Companion.threadInfoType
+//import club.electro.ui.thread.ThreadInfoFragment.Companion.threadInfoId
+//import club.electro.ui.thread.ThreadInfoFragment.Companion.threadInfoType
 import club.electro.utils.*
 import com.squareup.picasso.Picasso
 import com.stfalcon.imageviewer.StfalconImageViewer
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -240,11 +241,16 @@ class ThreadFragment: Fragment() {
             }
         }
 
-        lifecycleScope.launchWhenCreated {
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             adapter.loadStateFlow.collectLatest { state ->
                 binding.swiperefresh.isRefreshing = state.refresh is LoadState.Loading
             }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.checkThreadUpdates()
+        }
+
 
         adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
             // https://stackoverflow.com/questions/51889154/recycler-view-not-scrolling-to-the-top-after-adding-new-item-at-the-top-as-chan
@@ -428,7 +434,7 @@ class ThreadFragment: Fragment() {
             adapter.refresh()
         }
 
-        viewModel.startCheckUpdates()
+        //viewModel.startCheckUpdates()
 
         setHasOptionsMenu(true)
 
@@ -455,7 +461,7 @@ class ThreadFragment: Fragment() {
      */
     override fun onDestroyView() {
         super.onDestroyView()
-        viewModel.stopCheckUpdates()
+        //viewModel.stopCheckUpdates()
         _binding = null
     }
 
@@ -538,8 +544,3 @@ class ThreadFragment: Fragment() {
         }
     }
 }
-
-data class Poster(
-    val url: String,
-    val title: String
-)

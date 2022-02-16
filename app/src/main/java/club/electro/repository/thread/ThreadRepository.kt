@@ -19,10 +19,10 @@ interface ThreadRepository {
     suspend fun savePostToServer(post: Post)
 
     suspend fun removePost(post: Post)
-    suspend fun checkForUpdates()
+    suspend fun checkThreadUpdates()
 
-    fun startCheckUpdates()
-    fun stopCheckUpdates()
+//    fun startCheckUpdates()
+//    fun stopCheckUpdates()
 }
 
 data class ThreadStatus (

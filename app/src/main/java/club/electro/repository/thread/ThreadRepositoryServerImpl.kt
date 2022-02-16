@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.*
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Named
+import kotlin.random.Random
 
 class ThreadRepositoryServerImpl @Inject constructor(
     @Named("threadType")
@@ -43,7 +44,7 @@ class ThreadRepositoryServerImpl @Inject constructor(
 
     override val threadStatus: MutableLiveData<ThreadStatus> = MutableLiveData(ThreadStatus())
 
-    private lateinit var updaterJob: Job
+    //private lateinit var updaterJob: Job
 
     @Inject
     lateinit var mediatorFactory: PostRemoteMediatorFactory
@@ -138,12 +139,11 @@ class ThreadRepositoryServerImpl @Inject constructor(
         postRepository.removePostFromServer(post)
     }
 
-    override suspend fun checkForUpdates()  {
-
-
-        return
+    override suspend fun checkThreadUpdates()  {
         while (true) {
             delay(2_000L)
+            println("CheckThreadUpdates for thread " + threadId + " : " + Random.nextInt(0, 100))
+            continue
             try {
                 val response = apiService.getAreaModifiedTime(
                     type = threadType,
@@ -173,15 +173,15 @@ class ThreadRepositoryServerImpl @Inject constructor(
         }
     }
 
-    override fun startCheckUpdates() {
-        updaterJob = CoroutineScope(Dispatchers.Default).launch {
-            checkForUpdates()
-        }
-    }
-
-    override fun stopCheckUpdates() {
-        updaterJob.cancel()
-    }
+//    override fun startCheckUpdates() {
+//        updaterJob = CoroutineScope(Dispatchers.Default).launch {
+//            checkForUpdates()
+//        }
+//    }
+//
+//    override fun stopCheckUpdates() {
+//        updaterJob.cancel()
+//    }
 }
 
 
