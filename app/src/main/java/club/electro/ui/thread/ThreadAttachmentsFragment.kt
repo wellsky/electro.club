@@ -64,7 +64,8 @@ class ThreadAttachmentsFragment: Fragment(R.layout.fragment_thread_attachments) 
 
         binding.attachmentsList.adapter = adapter
 
-        viewModel.draftAttachments.observe(viewLifecycleOwner) {
+
+        viewModel.editorAttachments.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
 

@@ -20,6 +20,7 @@ import club.electro.util.AndroidUtils
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import club.electro.ToolBarConfig
 import club.electro.dto.*
@@ -325,7 +326,7 @@ class ThreadFragment: Fragment() {
             invalidateBottomPanel()
         }
 
-        viewModel.draftAttachments.observe(viewLifecycleOwner) {
+        viewModel.editorAttachments.observe(viewLifecycleOwner) {
             if (it.size > 0) {
                 val uploaded = it.count { it.status == PostAttachment.STATUS_UPLOADED }
                 if (uploaded == it.size) {

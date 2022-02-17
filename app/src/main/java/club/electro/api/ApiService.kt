@@ -126,6 +126,15 @@ interface ApiService {
         @Field("answer_to") answerTo: Long?,
     ): Response<ApiResponse<ApiSavedPost>>
 
+    @FormUrlEncoded
+    @POST(BASE_SERVER_URL)
+    suspend fun getPostAttachments(
+        @Field("method") method: String = "getPostAttachments",
+        @Field("thread_type") threadType: Byte,
+        @Field("thread_id") threadId: Long,
+        @Field("post_id") postId: Long?,
+    ): Response<ApiResponse<List<PostAttachment>>>
+
     @Multipart
     @POST(BASE_SERVER_URL)
     suspend fun uploadPostAttachment(

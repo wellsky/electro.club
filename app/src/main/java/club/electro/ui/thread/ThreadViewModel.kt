@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
-    state : SavedStateHandle,
+    val state : SavedStateHandle,
     val repository: ThreadRepository,
     val attachmentsRepository: AttachmentsRepository,
     val appAuth: AppAuth
@@ -29,7 +29,14 @@ class ThreadViewModel @Inject constructor(
     val threadId: Long = state.get("threadId") ?: 0
 
     val thread = repository.thread.asLiveData()
-    val draftAttachments = attachmentsRepository.getThreadDraftAttachments(threadType, threadId).flowOn(Dispatchers.Default).asLiveData()
+
+    val mutableAttachments = MutableStateFlow(value = 0L)
+    val editorAttachments = mutableAttachments.flatMapLatest { postId ->
+        when (postId) {
+            0L -> attachmentsRepository.flowForThreadDraft(threadType, threadId)
+            else -> attachmentsRepository.flowForPost(threadType, threadId, postId)
+        }
+    }.flowOn(Dispatchers.Default).asLiveData()
 
     val mutablePosts = MutableStateFlow(value = ThreadLoadTarget((state.get("postId") ?: 0L)))
     val posts = mutablePosts.flatMapLatest { refreshTarget ->
@@ -55,6 +62,7 @@ class ThreadViewModel @Inject constructor(
     //val lastUpdateTime = MutableLiveData(0L)
 
     init {
+        println("Init thread viewmodel")
         viewModelScope.launch {
             repository.threadStatus.asFlow().collectLatest { newStatus->
                 println("Repository thread status changed")
@@ -135,11 +143,19 @@ class ThreadViewModel @Inject constructor(
     fun startEditPost(post: Post) {
         editedPost.value = post
         editorPost.value = post
+        mutableAttachments.value = post.id
+
+        viewModelScope.launch {
+            attachmentsRepository.getPostAttachments(post.threadType, post.threadId, post.id)
+        }
+
+        state.set("editorPostId", post.id)
     }
 
     fun cancelEditPost() {
         editedPost.value = emptyPost
         editorPost.value = emptyPost
+        mutableAttachments.value = 0L
     }
 
     fun startAnswerPost(post: Post) {
