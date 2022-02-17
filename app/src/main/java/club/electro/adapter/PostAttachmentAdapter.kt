@@ -50,6 +50,7 @@ class PostAttachmentViewHolder(
                 else -> { "Unknown" }
             }
 
+            val date = java.util.Date(attachment.created * 1000)
             attachmentStatus.text = "Status: " + statusText
 
             attachmentImage.load(attachment.localPath)

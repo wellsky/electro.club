@@ -7,11 +7,13 @@ data class PostAttachment (
     val id: Long?,
     @SerializedName("thread_type")  val threadType: Byte,
     @SerializedName("thread_id")  val threadId: Long,
+    @SerializedName("post_id")  val postId: Long = 0,
     val type: Byte,
     val name: String?,
     val localPath: String?,
     @SerializedName("preview_url")  val previewUrl: String?,
     @SerializedName("full_url")  val fullUrl: String?,
+    val created: Long,
     val status: Byte = STATUS_UNKNOWN,
 ) {
     companion object {

@@ -22,13 +22,14 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import okhttp3.RequestBody.Companion.toRequestBody
 
+
 class AttachmentsRepositoryServerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val postAttachmentDao: PostAttachmentDao,
     private val apiService: ApiService
 ): AttachmentsRepository {
 
-    override fun getThreadDraftAttachments(threadType: Byte, threadId: Long) = postAttachmentDao.getForThread(threadType, threadId).map{it.toDto()}
+    override fun getThreadDraftAttachments(threadType: Byte, threadId: Long) = postAttachmentDao.getThreadDraft(threadType, threadId).map{it.toDto()}
 
     override suspend fun queuePostDraftAttachment(threadType: Byte, threadId: Long, name: String, path: String) {
         val newUploadId = postAttachmentDao.insert(PostAttachmentEntity(
@@ -37,6 +38,7 @@ class AttachmentsRepositoryServerImpl @Inject constructor(
             localPath = path,
             threadType = threadType,
             threadId = threadId,
+            created = System.currentTimeMillis() / 1000
         ))
         postAttachmentDao.setStatus(newUploadId,PostAttachment.STATUS_READY_TO_UPLOAD)
     }
@@ -70,7 +72,7 @@ class AttachmentsRepositoryServerImpl @Inject constructor(
                      compressedImageFile?.let {
                          postAttachmentDao.setStatus(attachment.localId, PostAttachment.STATUS_UPLOADING)
                          try {
-                             val response = apiService.uploadPostDraftAttachment(
+                             val response = apiService.uploadPostAttachment(
                                  threadType = attachment.threadType.toString().toRequestBody(), // TODO надо узнать, скорее всего не так надо форматировать
                                  threadId = attachment.threadId.toString().toRequestBody(),
                                  attachmentName = attachment.name?.toRequestBody() ?: "".toRequestBody(),

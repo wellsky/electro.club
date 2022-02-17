@@ -12,11 +12,13 @@ data class PostAttachmentEntity(
     val id: Long? = null,
     val threadType: Byte,
     val threadId: Long,
+    val postId: Long = 0,
     val type: Byte,
     val name: String? = null,
     val localPath: String? = null,
     val previewUrl: String? = null,
     val fullUrl: String? = null,
+    val created: Long,
     val status: Byte = 0,
 ) {
     fun toDto() = PostAttachment(
@@ -25,10 +27,12 @@ data class PostAttachmentEntity(
         type = type,
         threadType = threadType,
         threadId = threadId,
+        postId = postId,
         name = name,
         localPath = localPath,
         previewUrl = previewUrl,
         fullUrl = fullUrl,
+        created = created,
         status = status
     )
 
@@ -40,10 +44,12 @@ data class PostAttachmentEntity(
                 type = dto.type,
                 threadType = dto.threadType,
                 threadId = dto.threadId,
+                postId = dto.postId,
                 name = dto.name,
                 localPath = dto.localPath,
                 previewUrl = dto.previewUrl,
                 fullUrl = dto.fullUrl,
+                created = dto.created,
                 status = dto.status
             )
     }

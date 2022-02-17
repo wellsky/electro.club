@@ -13,8 +13,8 @@ interface PostAttachmentDao {
     @Query("SELECT * FROM PostAttachmentEntity WHERE status = ${PostAttachment.STATUS_READY_TO_UPLOAD}")
     fun getFirstReady(): Flow<PostAttachmentEntity?>
 
-    @Query("SELECT * FROM PostAttachmentEntity WHERE threadType = :threadType AND threadId = :threadId ORDER BY localId")
-    fun getForThread(threadType: Byte, threadId: Long): Flow<List<PostAttachmentEntity>>
+    @Query("SELECT * FROM PostAttachmentEntity WHERE threadType = :threadType AND threadId = :threadId AND postId = 0 ORDER BY localId, created")
+    fun getThreadDraft(threadType: Byte, threadId: Long): Flow<List<PostAttachmentEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(attachment: PostAttachmentEntity): Long
