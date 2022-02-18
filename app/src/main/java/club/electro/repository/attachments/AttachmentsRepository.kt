@@ -12,7 +12,7 @@ interface AttachmentsRepository {
 
     suspend fun getPostAttachments(threadType: Byte, threadId: Long, postId: Long = 0)
 
-    suspend fun queuePostDraftAttachment(threadType: Byte, threadId: Long, name: String, path: String)
+    suspend fun queuePostDraftAttachment(threadType: Byte, threadId: Long, postId: Long, name: String, path: String)
     suspend fun removePostAttachment(attachment: PostAttachment)
 
     suspend fun uploaderJob()

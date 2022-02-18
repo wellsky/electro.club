@@ -13,7 +13,7 @@ import club.electro.ToolBarConfig
 import club.electro.adapter.*
 import club.electro.databinding.FragmentFeedBinding
 import club.electro.dto.*
-import club.electro.ui.thread.ThreadFragment.Companion.postId
+import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import dagger.hilt.android.AndroidEntryPoint
@@ -55,7 +55,7 @@ class FeedFragment : Fragment() {
                     Bundle().apply {
                         threadType = ThreadType.THREAD_TYPE_POST_WITH_COMMENTS.value
                         threadId = feedPost.id
-                        postId = -1L
+                        targetPostId = -1L
                     }
                 )
             }

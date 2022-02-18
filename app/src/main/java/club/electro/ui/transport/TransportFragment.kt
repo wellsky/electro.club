@@ -14,11 +14,10 @@ import club.electro.R
 import club.electro.ToolBarConfig
 import club.electro.databinding.FragmentTransportBinding
 import club.electro.repository.thread.ThreadLoadTarget
-import club.electro.ui.thread.ThreadFragment.Companion.postId
+import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.utils.LongArg
-import club.electro.utils.areaLastActivityTime
 import club.electro.utils.load
 import club.electro.utils.loadCircleCrop
 import dagger.hilt.android.AndroidEntryPoint
@@ -95,7 +94,7 @@ class TransportFragment : Fragment() {
                         Bundle().apply {
                             threadType = discussion.threadType
                             threadId = discussion.threadId
-                            postId = ThreadLoadTarget.TARGET_POSITION_FIRST
+                            targetPostId = ThreadLoadTarget.TARGET_POSITION_FIRST
                         }
                     )
                 }

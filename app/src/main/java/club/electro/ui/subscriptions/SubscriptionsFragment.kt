@@ -15,7 +15,7 @@ import club.electro.adapter.SubscriptionAreaInteractionListener
 import club.electro.databinding.FragmentSubscriptionsBinding
 import club.electro.dto.SubscriptionArea
 import club.electro.repository.thread.ThreadLoadTarget
-import club.electro.ui.thread.ThreadFragment.Companion.postId
+import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import dagger.hilt.android.AndroidEntryPoint
@@ -55,7 +55,7 @@ class SubscriptionsFragment : Fragment() {
                     Bundle().apply {
                         threadType = area.type
                         threadId = area.objectId
-                        postId = if (area.count > 0) ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD else ThreadLoadTarget.TARGET_POSITION_LAST // Если есть непрочитанные, то грузить с первого непрочитанного, иначе с последнего сообщения в теме
+                        targetPostId = if (area.count > 0) ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD else ThreadLoadTarget.TARGET_POSITION_LAST // Если есть непрочитанные, то грузить с первого непрочитанного, иначе с последнего сообщения в теме
                     }
                 )
             }

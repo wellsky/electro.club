@@ -15,7 +15,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import club.electro.auth.AppAuth
-import club.electro.ui.thread.ThreadFragment.Companion.postId
+import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.utils.GetCircleBitmap
@@ -103,7 +103,7 @@ class FCMService : FirebaseMessagingService() {
                     .setArguments(Bundle().apply {
                         threadType = data.threadType
                         threadId = data.threadId
-                        postId = data.postId
+                        targetPostId = data.postId
                     })
                     .createPendingIntent()
 

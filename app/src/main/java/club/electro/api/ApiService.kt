@@ -139,10 +139,10 @@ interface ApiService {
     @POST(BASE_SERVER_URL)
     suspend fun uploadPostAttachment(
         @Part("method") method: RequestBody = "uploadPostAttachment".toRequestBody(),
-        @Part("attachment_name") attachmentName: RequestBody,
         @Part("thread_type") threadType: RequestBody,
         @Part("thread_id") threadId: RequestBody,
-        @Part("post_id") postId: RequestBody = "0".toRequestBody(), // TODO
+        @Part("post_id") postId: RequestBody,
+        @Part("attachment_name") attachmentName: RequestBody,
         @Part file: MultipartBody.Part
     ): Response<ApiResponse<PostAttachment>>
 

@@ -20,7 +20,6 @@ import club.electro.util.AndroidUtils
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import club.electro.ToolBarConfig
 import club.electro.dto.*
@@ -45,7 +44,8 @@ class ThreadFragment: Fragment() {
     companion object {
         var Bundle.threadType: Byte by ByteArg
         var Bundle.threadId: Long by LongArg
-        var Bundle.postId: Long by LongArg // Может быть -1 (загрузить с последнего сообщения) и -2 (с первого непрочитанного)
+        var Bundle.targetPostId: Long by LongArg // Может быть -1 (загрузить с последнего сообщения) и -2 (с первого непрочитанного)
+        var Bundle.editedPostId: Long by LongArg
     }
 
     private val viewModel: ThreadViewModel by viewModels()
@@ -142,7 +142,7 @@ class ThreadFragment: Fragment() {
         threadType = requireArguments().threadType
         threadId =  requireArguments().threadId
 
-        val postId = requireArguments().postId
+        val postId = requireArguments().targetPostId
 
         viewModel.setIncomingChangesStatus(
             IncomingChangesStatus(
@@ -430,6 +430,7 @@ class ThreadFragment: Fragment() {
                 Bundle().apply {
                     threadType = this@ThreadFragment.threadType
                     threadId = this@ThreadFragment.threadId
+                    editedPostId = viewModel.editedPostId()
                 }
             )
         }

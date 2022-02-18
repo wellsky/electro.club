@@ -19,7 +19,7 @@ import androidx.core.view.GravityCompat
 import club.electro.databinding.ActivityMainBinding
 import club.electro.model.NetworkStatus
 import club.electro.repository.thread.ThreadLoadTarget
-import club.electro.ui.thread.ThreadFragment.Companion.postId
+import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.utils.loadCircleCrop
@@ -76,7 +76,7 @@ class MainActivity: AppCompatActivity() {
                 Bundle().apply {
                     threadType = 2
                     threadId = 8510
-                    postId = ThreadLoadTarget.TARGET_POSITION_FIRST
+                    targetPostId = ThreadLoadTarget.TARGET_POSITION_FIRST
                 }
             )
 

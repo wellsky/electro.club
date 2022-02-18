@@ -14,8 +14,7 @@ import club.electro.R
 import club.electro.ToolBarConfig
 import club.electro.databinding.FragmentUserProfileBinding
 import club.electro.repository.thread.ThreadLoadTarget
-import club.electro.ui.map.socket.SocketFragment
-import club.electro.ui.thread.ThreadFragment.Companion.postId
+import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.utils.LongArg
@@ -89,7 +88,7 @@ class UserProfileFragment : Fragment() {
                             Bundle().apply {
                                 threadType = link.threadType
                                 threadId = link.threadId
-                                postId = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD
+                                targetPostId = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD
                             }
                         )
                     }

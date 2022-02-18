@@ -21,7 +21,7 @@ import club.electro.MainViewModel
 import club.electro.ToolBarConfig
 import club.electro.dto.*
 import club.electro.repository.thread.ThreadLoadTarget
-import club.electro.ui.thread.ThreadFragment.Companion.postId
+import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import com.bumptech.glide.Glide
@@ -122,7 +122,7 @@ class MapFragment : Fragment() {
                         Bundle().apply {
                             threadType = marker.data!!.threadType!!
                             threadId = marker.data!!.threadId!!
-                            postId = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD
+                            targetPostId = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD
                         }
                     )
                 }

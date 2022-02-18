@@ -16,6 +16,8 @@ import club.electro.adapter.PostAttachmentAdapter
 import club.electro.adapter.PostAttachmentInteractionListener
 import club.electro.databinding.FragmentThreadAttachmentsBinding
 import club.electro.dto.PostAttachment
+import club.electro.utils.ByteArg
+import club.electro.utils.LongArg
 import com.esafirm.imagepicker.features.ImagePickerConfig
 import com.esafirm.imagepicker.features.ImagePickerMode
 import com.esafirm.imagepicker.features.registerImagePicker

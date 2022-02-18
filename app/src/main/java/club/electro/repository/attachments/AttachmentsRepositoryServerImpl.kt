@@ -68,13 +68,14 @@ class AttachmentsRepositoryServerImpl @Inject constructor(
         }
     }
 
-    override suspend fun queuePostDraftAttachment(threadType: Byte, threadId: Long, name: String, path: String) {
+    override suspend fun queuePostDraftAttachment(threadType: Byte, threadId: Long, postId: Long, name: String, path: String) {
         val newUploadId = postAttachmentDao.insert(PostAttachmentEntity(
             type = 1,
             name = name,
             localPath = path,
             threadType = threadType,
             threadId = threadId,
+            postId = postId,
             created = System.currentTimeMillis() / 1000
         ))
         postAttachmentDao.setStatus(newUploadId,PostAttachment.STATUS_READY_TO_UPLOAD)
@@ -112,6 +113,7 @@ class AttachmentsRepositoryServerImpl @Inject constructor(
                              val response = apiService.uploadPostAttachment(
                                  threadType = attachment.threadType.toString().toRequestBody(), // TODO надо узнать, скорее всего не так надо форматировать
                                  threadId = attachment.threadId.toString().toRequestBody(),
+                                 postId = attachment.postId.toString().toRequestBody(),
                                  attachmentName = attachment.name?.toRequestBody() ?: "".toRequestBody(),
                                  file = MultipartBody.Part.createFormData(
                                      "file",

@@ -10,7 +10,7 @@ import club.electro.api.ApiService
 import club.electro.dto.ThreadType
 import club.electro.error.ApiError
 import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST
-import club.electro.ui.thread.ThreadFragment.Companion.postId
+import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.ui.user.UserProfileFragment.Companion.userId
@@ -21,7 +21,6 @@ import com.google.gson.stream.JsonWriter
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -127,7 +126,7 @@ open class UrlHandlerAction(
             Bundle().apply {
                 threadType = data.threadType.value
                 threadId = data.threadId
-                postId = if (data.threadType == ThreadType.THREAD_TYPE_POST_WITH_COMMENTS) TARGET_POSITION_FIRST else TARGET_POSITION_FIRST
+                targetPostId = if (data.threadType == ThreadType.THREAD_TYPE_POST_WITH_COMMENTS) TARGET_POSITION_FIRST else TARGET_POSITION_FIRST
             }
         )
     }
@@ -138,7 +137,7 @@ open class UrlHandlerAction(
             Bundle().apply {
                 threadType = data.threadType.value
                 threadId = data.threadId
-                postId = data.postId
+                targetPostId = data.postId
             }
         )
     }

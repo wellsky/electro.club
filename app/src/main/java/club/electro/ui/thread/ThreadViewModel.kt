@@ -27,10 +27,14 @@ class ThreadViewModel @Inject constructor(
 ) : ViewModel() {
     val threadType: Byte = state.get("threadType") ?: 0
     val threadId: Long = state.get("threadId") ?: 0
+    val targetPostId: Long = state.get("targetPostId") ?: 0L
+    val editedPostId: Long = state.get("editedPostId") ?: 0L
 
     val thread = repository.thread.asLiveData()
 
-    val mutableAttachments = MutableStateFlow(value = 0L)
+
+    val mutableAttachments = MutableStateFlow(value = editedPostId)
+
     val editorAttachments = mutableAttachments.flatMapLatest { postId ->
         when (postId) {
             0L -> attachmentsRepository.flowForThreadDraft(threadType, threadId)
@@ -38,7 +42,7 @@ class ThreadViewModel @Inject constructor(
         }
     }.flowOn(Dispatchers.Default).asLiveData()
 
-    val mutablePosts = MutableStateFlow(value = ThreadLoadTarget((state.get("postId") ?: 0L)))
+    val mutablePosts = MutableStateFlow(value = ThreadLoadTarget(targetPostId))
     val posts = mutablePosts.flatMapLatest { refreshTarget ->
         repository.posts(refreshTarget)
     }.cachedIn(viewModelScope)
@@ -62,7 +66,6 @@ class ThreadViewModel @Inject constructor(
     //val lastUpdateTime = MutableLiveData(0L)
 
     init {
-        println("Init thread viewmodel")
         viewModelScope.launch {
             repository.threadStatus.asFlow().collectLatest { newStatus->
                 println("Repository thread status changed")
@@ -149,7 +152,7 @@ class ThreadViewModel @Inject constructor(
             attachmentsRepository.getPostAttachments(post.threadType, post.threadId, post.id)
         }
 
-        state.set("editorPostId", post.id)
+        state["editorPostId"] = post.id
     }
 
     fun cancelEditPost() {
@@ -157,6 +160,8 @@ class ThreadViewModel @Inject constructor(
         editorPost.value = emptyPost
         mutableAttachments.value = 0L
     }
+
+    fun editedPostId():Long = editedPost.value?.id ?: 0L
 
     fun startAnswerPost(post: Post) {
         answerToPost.value = post
@@ -169,7 +174,7 @@ class ThreadViewModel @Inject constructor(
     }
 
     fun queueAttachment(name:String, path: String) = viewModelScope.launch {
-        attachmentsRepository.queuePostDraftAttachment(threadType, threadId, name, path)
+        attachmentsRepository.queuePostDraftAttachment(threadType, threadId, editedPostId, name, path)
     }
 
     fun removeAttachment(attachment: PostAttachment) = viewModelScope.launch {
