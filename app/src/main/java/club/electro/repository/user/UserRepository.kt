@@ -6,6 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
     suspend fun getLocalById(id: Long, onLoadedCallback:  (suspend () -> Unit)? = null): User?
-    suspend fun getRemoteById(id: Long): User
+    suspend fun getRemoteById(id: Long): User?
     fun getUserProfile(id: Long): Flow<User>
 }

@@ -35,29 +35,18 @@ class NetworkModule {
     ) = Interceptor {
             // https://stackoverflow.com/questions/34791244/retrofit2-modifying-request-body-in-okhttp-interceptor
             val request = it.request()
-            //val body = request.body
 
             val accessToken =
                 context.resources.getString(R.string.electro_club_access_token)
 
-            //val accessTokenString = "&access_token=" + accessToken
-            //val userTokenString = if (appAuth.myToken() != null) "&user_token=" + appAuth.myToken() else ""
-
             val requestBuilder = request.newBuilder()
-                .header("Host", "electro.local")
-                .header("access_token", accessToken)
-                //.header("user_token", accessToken)
+                //.header("Host", "electro.local")
+                .header("ACCESS-TOKEN", accessToken)
+
 
             appAuth.myToken()?.let {
-                requestBuilder.header("user_token", it)
+                requestBuilder.header("USER-TOKEN", it)
             }
-
-//                .post(
-//                    RequestBody.create(
-//                        body?.contentType(),
-//                        body.bodyToString() + accessTokenString + userTokenString
-//                    )
-//                )
             val newRequest = requestBuilder.build()
             it.proceed(newRequest)
         }

@@ -7,6 +7,7 @@ import club.electro.entity.toEntity
 import club.electro.error.ApiError
 import club.electro.error.NetworkError
 import club.electro.error.UnknownError
+import club.electro.model.NetworkStatus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.IOException
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 class UserRepositoryServerImpl @Inject constructor(
     private val apiService: ApiService,
-    private val dao: UserDao
+    private val dao: UserDao,
+    private val networkStatus: NetworkStatus,
 ) : UserRepository {
 
     override suspend fun getLocalById(id: Long, onLoadedCallback:  (suspend () -> Unit)?): User? {
@@ -33,8 +35,9 @@ class UserRepositoryServerImpl @Inject constructor(
             ).toEntity())
 
             CoroutineScope(Dispatchers.Default).launch {
-                val user = getRemoteById(id)
-                dao.insert(user.toEntity())
+                getRemoteById(id)?.let {
+                    dao.insert(it.toEntity())
+                }
                 onLoadedCallback()
             }
             null
@@ -47,13 +50,14 @@ class UserRepositoryServerImpl @Inject constructor(
         dao.getById(id)?.let {
             emit(it.toDto())
         }
-        val user = getRemoteById(id)
-        dao.insert(user.toEntity())
-        emit(user)
+        getRemoteById(id)?.let {
+            dao.insert(it.toEntity())
+            emit(it)
+        }
     }.flowOn(Dispatchers.Default)
 
 
-    override suspend fun getRemoteById(id: Long): User {
+    override suspend fun getRemoteById(id: Long): User? {
         try {
             val response = apiService.getUserProfile(
                 userId = id
@@ -63,11 +67,16 @@ class UserRepositoryServerImpl @Inject constructor(
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
+
+            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
             return body.data.user
         } catch (e: IOException) {
-            throw NetworkError
+            networkStatus.setStatus(NetworkStatus.Status.ERROR)
+            return null
+            //throw UnknownError
         } catch (e: Exception) {
-            throw UnknownError
+            return null
+            //throw UnknownError
         }
     }
 }

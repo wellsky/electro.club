@@ -1,7 +1,6 @@
 package club.electro.repository.thread
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.paging.*
 import androidx.room.withTransaction
 import club.electro.api.ApiService
@@ -23,7 +22,6 @@ import kotlinx.coroutines.flow.*
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Named
-import kotlin.random.Random
 
 class ThreadRepositoryServerImpl @Inject constructor(
     @Named("threadType")
@@ -85,7 +83,7 @@ class ThreadRepositoryServerImpl @Inject constructor(
 
                 body.data.draftAttachments?.let {
                     db.withTransaction {
-                        postAttachmentDao.removeUploaded(threadType, threadId)
+                        postAttachmentDao.removeUploadedDrafts(threadType, threadId)
                         postAttachmentDao.insert(
                             it.toEntity().map {
                                 it.copy(status = PostAttachment.STATUS_UPLOADED)
@@ -93,7 +91,7 @@ class ThreadRepositoryServerImpl @Inject constructor(
                         )
                     }
                 } ?: run {
-                    postAttachmentDao.removeUploaded(threadType, threadId)
+                    postAttachmentDao.removeUploadedDrafts(threadType, threadId)
                 }
 
                 networkStatus.setStatus(NetworkStatus.Status.ONLINE)
@@ -129,11 +127,13 @@ class ThreadRepositoryServerImpl @Inject constructor(
     }
 
     override suspend fun savePostToServer(post: Post) {
-        val newPost = post.copy(
+        if (post.id == 0L) {
+            postAttachmentDao.removeUploadedDrafts(threadType, threadId)
+        }
+        postRepository.savePostToServer(post.copy(
             threadId = threadId,
             threadType = threadType,
-        )
-        postRepository.savePostToServer(newPost)
+        ))
     }
 
     override suspend fun removePost(post: Post) {
@@ -143,8 +143,6 @@ class ThreadRepositoryServerImpl @Inject constructor(
     override suspend fun checkThreadUpdates()  {
         while (true) {
             delay(2_000L)
-            //println("CheckThreadUpdates for thread " + threadId + " : " + Random.nextInt(0, 100))
-            continue
             try {
                 val response = apiService.getAreaModifiedTime(
                     type = threadType,

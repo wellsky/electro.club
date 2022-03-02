@@ -29,7 +29,6 @@ class SubscriptionsRepositoryServerImpl @Inject constructor(
     private lateinit var updaterJob: Job
 
     override suspend fun getAll() {
-        return
         appAuth.myToken()?.let { myToken ->
             try {
                 val response = apiService.getSubscriptions()
@@ -53,7 +52,6 @@ class SubscriptionsRepositoryServerImpl @Inject constructor(
     }
 
     override suspend fun checkForUpdates()  {
-        return
         while (true) {
             delay(2_000L)
             try {

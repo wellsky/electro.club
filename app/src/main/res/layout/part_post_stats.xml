@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/views"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginLeft="@dimen/common_spacing"
+        android:layout_marginStart="@dimen/common_spacing"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/share"
+        tools:text="@sample/posts.json/data/viewsCount"
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/ViewsIcon"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/comments"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/common_spacing"
+        android:layout_marginRight="@dimen/common_spacing"
+        android:layout_marginEnd="@dimen/common_spacing"
+        tools:text="@sample/posts.json/data/viewsCount"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/views"
+        android:contentDescription="@string/views"
+        style="@style/CommentsIcon"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

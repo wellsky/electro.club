@@ -17,10 +17,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp"
+
         >
             <ImageView
                 android:id="@+id/authorAvatar"
@@ -30,6 +27,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/barrier"
+                android:layout_marginTop="@dimen/common_spacing"
+                android:layout_marginStart="@dimen/common_spacing"
                 tools:srcCompat="@tools:sample/avatars" />
 
             <TextView
@@ -44,7 +43,7 @@
                 app:layout_constraintBottom_toTopOf="@id/published"
                 app:layout_constraintEnd_toStartOf="@id/menu"
                 app:layout_constraintStart_toEndOf="@id/authorAvatar"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toTopOf="@id/authorAvatar"
                 app:layout_constraintVertical_chainStyle="packed"
                 tools:text="@sample/posts.json/data/author" />
 
@@ -57,7 +56,7 @@
                 android:ellipsize="end"
                 android:singleLine="true"
                 app:layout_constraintTop_toBottomOf="@id/authorName"
-                app:layout_constraintBottom_toTopOf="@id/barrier"
+                app:layout_constraintBottom_toBottomOf="@id/authorAvatar"
                 app:layout_constraintEnd_toStartOf="@id/menu"
                 app:layout_constraintStart_toStartOf="@id/authorName"
                 tools:text="@sample/posts.json/data/published"
@@ -70,7 +69,8 @@
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/more_menu"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toTopOf="@id/authorAvatar"
+                android:layout_marginEnd="@dimen/common_spacing"
                 style="@style/OptionsButton"
                 />
 
@@ -99,7 +99,10 @@
                 android:textSize="15sp"
                 app:layout_constraintTop_toBottomOf="@id/barrier"
                 app:lineHeight="19dp"
-                android:paddingTop="16dp"
+                android:paddingTop="@dimen/common_spacing"
+                android:paddingBottom="@dimen/common_spacing"
+                android:layout_marginStart="@dimen/common_spacing"
+                android:layout_marginEnd="@dimen/common_spacing"
                 tools:text="@sample/posts.json/data/text" />
 
             <com.google.android.material.button.MaterialButton
@@ -110,11 +113,21 @@
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/share"
                 app:layout_constraintTop_toBottomOf="@id/content"
+                android:layout_marginStart="@dimen/common_spacing"
                 style="@style/AttachmentsIcon"
                 android:text="@string/attachments"
                 android:visibility="gone"
                 />
 
-
+            <include
+                android:id="@+id/partPostStats"
+                layout="@layout/part_post_stats"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintTop_toBottomOf="@id/attachments"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone"
+                />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

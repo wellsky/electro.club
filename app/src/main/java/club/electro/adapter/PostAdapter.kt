@@ -29,6 +29,7 @@ import android.widget.TextView
 import android.text.style.ClickableSpan
 import androidx.lifecycle.LifecycleCoroutineScope
 import android.graphics.Paint
+import club.electro.databinding.PartPostStatsBinding
 
 
 interface PostInteractionListener {
@@ -38,6 +39,7 @@ interface PostInteractionListener {
     fun onAvatarClicked(post: Post) {}
     fun onUrlClicked(url: String?) {}
     fun onAttachmentsClicked(post: Post) {}
+    fun onOpenClicked(post: Post) {}
 }
 
 class PostAdapter(
@@ -125,6 +127,26 @@ class PostViewHolder(
                     .placeholder(R.drawable.ic_loading_100dp)
                     .error(R.drawable.ic_error_100dp)
                     .into(authorAvatar)
+            }
+
+            if ((post.comments != null) || (post.views != null)) {
+                partPostStats.apply {
+                    root.isVisible = true
+
+                    post.comments?.let {
+                        comments.text = it.toString()
+
+                        comments.setOnClickListener {
+                            onInteractionListener.onOpenClicked(post)
+                        }
+                    }
+
+                    post.views?.let {
+                        views.text = it.toString()
+                    }
+                }
+            } else {
+                partPostStats.root.isVisible = false
             }
 
 

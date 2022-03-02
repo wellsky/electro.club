@@ -47,8 +47,8 @@ class FeedPostViewHolder(
             content.text = feedPost.content
             published.text = sdf.format(date).toString()
 
-            views.text = feedPost.views.toString()
-            comments.text = feedPost.comments.toString()
+            partPostStats.views.text = feedPost.views.toString()
+            partPostStats.comments.text = feedPost.comments.toString()
 
             if (!feedPost.channelAvatar.isEmpty()) {
                 channelAvatar.isVisible = true

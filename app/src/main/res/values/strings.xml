@@ -78,4 +78,5 @@
     <string name="zoom_more_images">Zoom and show more images (%1$s)</string>
     <string name="user_last_visit_time">"Last activity: "</string>
     <string name="delete_post_attachment_confirm_text">Delete this attachment?</string>
+    <string name="subscribe_to_channel">Subscribe</string>
 </resources>

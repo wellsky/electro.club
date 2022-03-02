@@ -12,7 +12,6 @@ data class FeedPost (
     val content: String,
     val published: Long,
     val sorting: Long,
-    val likes: Int,
     val views: Int,
     val comments: Int
 )

@@ -5,6 +5,7 @@ import androidx.room.PrimaryKey
 import club.electro.dto.PostsThread
 import club.electro.dto.ThreadType
 import club.electro.dto.User
+import com.google.gson.annotations.SerializedName
 
 @Entity
 data class ThreadEntity(
@@ -16,6 +17,7 @@ data class ThreadEntity(
     val messages: Long,
     val subscribersCount: Long,
     val subscriptionStatus: Byte,
+    val canPost: Boolean = false,
 ) {
     fun toDto() = PostsThread(
         id = id,
@@ -24,7 +26,8 @@ data class ThreadEntity(
         image = image,
         messages = messages,
         subscribersCount = subscribersCount,
-        subscriptionStatus = subscriptionStatus
+        subscriptionStatus = subscriptionStatus,
+        canPost = canPost,
     )
 
     companion object {
@@ -36,7 +39,8 @@ data class ThreadEntity(
                 image = dto.image,
                 messages = dto.messages,
                 subscribersCount = dto.subscribersCount,
-                subscriptionStatus = dto.subscriptionStatus
+                subscriptionStatus = dto.subscriptionStatus,
+                canPost = dto.canPost
             )
     }
 }

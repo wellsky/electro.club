@@ -18,7 +18,6 @@ data class FeedPostEntity(
     val image: String,
     val published: Long,
     val sorting: Long,
-    val likes: Int,
     val views: Int,
     val comments: Int,
 ) {
@@ -32,7 +31,6 @@ data class FeedPostEntity(
         image = image,
         published = published,
         sorting = sorting,
-        likes = likes,
         views = views,
         comments = comments
     )
@@ -49,7 +47,6 @@ data class FeedPostEntity(
                 image = dto.image,
                 published = dto.published,
                 sorting = dto.sorting,
-                likes = dto.likes,
                 views = dto.views,
                 comments = dto.comments,
             )

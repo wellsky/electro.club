@@ -16,6 +16,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.lifecycle.lifecycleScope
 import club.electro.databinding.ActivityMainBinding
 import club.electro.model.NetworkStatus
 import club.electro.repository.thread.ThreadLoadTarget
@@ -130,7 +131,7 @@ class MainActivity: AppCompatActivity() {
             }
         }
 
-        CoroutineScope(Dispatchers.Default).launch {
+        lifecycleScope.launch {
             // TODO как лучше запускать такие корутины, которые должны работать во время работы всего приложеия?
             viewModel.uploaderJob()
         }

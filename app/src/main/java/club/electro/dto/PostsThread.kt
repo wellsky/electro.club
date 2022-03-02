@@ -12,7 +12,8 @@ data class PostsThread (
     val image: String,
     val messages: Long,
     @SerializedName("subscribers_count")  val subscribersCount: Long,
-    @SerializedName("subscription_status")  val subscriptionStatus: Byte
+    @SerializedName("subscription_status")  val subscriptionStatus: Byte,
+    @SerializedName("can_post")  val canPost: Boolean = false,
 )
 
 enum class ThreadType(val value: Byte) {

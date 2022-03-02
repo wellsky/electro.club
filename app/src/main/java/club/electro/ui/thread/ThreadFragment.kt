@@ -27,6 +27,7 @@ import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST
 import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST_UNREAD
 import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_LAST
+import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 //import club.electro.ui.thread.PostAttachmentsFragment.Companion.attachmentsThreadId
 //import club.electro.ui.thread.PostAttachmentsFragment.Companion.attachmentsThreadType
 //import club.electro.ui.thread.ThreadInfoFragment.Companion.threadInfoId
@@ -194,6 +195,17 @@ class ThreadFragment: Fragment() {
                         }
                     )
                 }
+            }
+
+            override fun onOpenClicked(post: Post) {
+                findNavController().navigate(
+                    R.id.action_global_threadFragment,
+                    Bundle().apply {
+                        threadType = ThreadType.THREAD_TYPE_POST_WITH_COMMENTS.value
+                        threadId = post.id
+                        targetPostId = TARGET_POSITION_FIRST
+                    }
+                )
             }
 
             override fun onAttachmentsClicked(post: Post) {
@@ -451,13 +463,22 @@ class ThreadFragment: Fragment() {
     }
 
     fun invalidateBottomPanel() {
+        binding.bottomPanel.isVisible = false
         viewModel.thread.value?.let {
             if (viewModel.appAuth.authorized()) {
-                binding.bottomPanel.isVisible = true
                 if (it.subscriptionStatus.equals(SUBSCRIPTION_STATUS_SUBSCRIBED)) {
-                    binding.bottomPanelEditor.isVisible = true
-                    binding.bottomPanelSubscrube.isVisible = false
+                    if (it.canPost) {
+                        binding.bottomPanel.isVisible = true
+                        binding.bottomPanelEditor.isVisible = true
+                        binding.bottomPanelSubscrube.isVisible = false
+                    }
                 } else {
+                    if (threadType == ThreadType.THREAD_TYPE_CHANNEL.value) {
+                        binding.bottomPanelSubscrube.text = getString(R.string.subscribe_to_channel)
+                    } else {
+                        binding.bottomPanelSubscrube.text = getString(R.string.subscribe_and_start_chatting)
+                    }
+                    binding.bottomPanel.isVisible = true
                     binding.bottomPanelEditor.isVisible = false
                     binding.bottomPanelSubscrube.isVisible = true
                 }

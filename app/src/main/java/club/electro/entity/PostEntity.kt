@@ -21,8 +21,8 @@ data class PostEntity(
     val preparedContent: String? = content,
     val published: Long,
     val answerTo: Long?,
-    val likes: Int = 0,
-    val views: Int = 0,
+    val views: Int? = null,
+    val comments: Int? = null,
 
     val canEdit: Boolean = false,
     val canRemove: Boolean = false,
@@ -44,8 +44,8 @@ data class PostEntity(
         preparedContent = preparedContent,
         published = published,
         answerTo = answerTo,
-        likes = likes,
         views = views,
+        comments = comments,
         canEdit = canEdit,
         canRemove = canRemove,
         attachmentLinks = attachmentLinks
@@ -66,8 +66,8 @@ data class PostEntity(
                 preparedContent = dto.preparedContent,
                 published = dto.published,
                 answerTo = dto.answerTo,
-                likes = dto.likes,
                 views = dto.views,
+                comments = dto.comments,
                 canEdit = dto.canEdit,
                 canRemove = dto.canRemove,
                 attachmentLinks = dto.attachmentLinks

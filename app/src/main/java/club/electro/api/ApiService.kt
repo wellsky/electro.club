@@ -17,9 +17,10 @@ import retrofit2.http.*
 
 /**
  * Кроме изменения основого адреса, надо убрать из манифеста поддержку http, а также в токен-интерцепторе подстановку хоста
+ * Отменить запросы к srv1 в SubscriptionsRepository и ThreadRepository
  */
-//const val BASE_SERVER_URL = "https://electro.club/api/v1/"
-const val BASE_SERVER_URL = "http://10.0.2.2:80/api/v1/"
+const val BASE_SERVER_URL = "https://electro.club/api/v1/"
+//const val BASE_SERVER_URL = "http://10.0.2.2:80/api/v1/"
 const val UPDATES_SERVER_URL = "https://srv1.electro.club/api/"
 
 
