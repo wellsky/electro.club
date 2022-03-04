@@ -19,6 +19,7 @@
             app:popupTheme="@style/Theme.Electroclub.AppBarPopup"
             app:titleTextAppearance="@style/ToolbarTitleAppearance"
             app:subtitleTextAppearance="@style/ToolbarSubtitleAppearance"
+            app:layout_scrollFlags="scroll|enterAlways"
             >
 
             <LinearLayout

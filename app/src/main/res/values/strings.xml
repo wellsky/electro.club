@@ -92,4 +92,8 @@
     <string name="notification_quoted">"%1$s quotes you"</string>
     <string name="notification_mention">%1$s mentions you</string>
     <string name="notification_answer">%1$s answered you</string>
+    <string name="feed_tab_all">All channels</string>
+    <string name="feed_tab_my">My subscriptions</string>
+    <string name="subscriptions_tab_all">All groups</string>
+    <string name="subscriptions_tab_my">My groups</string>
 </resources>
