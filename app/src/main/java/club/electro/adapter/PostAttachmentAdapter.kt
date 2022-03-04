@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import club.electro.R
 import club.electro.databinding.ItemAttachmentBinding
 import club.electro.dto.PostAttachment
 import club.electro.utils.load
@@ -34,26 +35,30 @@ class PostAttachmentViewHolder(
 
     fun bind(attachment: PostAttachment) {
         binding.apply {
+            val context = binding.root.context
             attachmentName.text = attachment.name
 
             val statusText = when(attachment.status) {
-                PostAttachment.STATUS_CREATED -> "New"
-                PostAttachment.STATUS_READY_TO_UPLOAD -> "ready to upload"
-                PostAttachment.STATUS_COMPRESSING -> "compressing"
-                PostAttachment.STATUS_UPLOADING -> "uploading"
-                PostAttachment.STATUS_UPLOADED -> "uploaded"
+                PostAttachment.STATUS_CREATED -> context.getString(R.string.upload_status_new)
+                PostAttachment.STATUS_READY_TO_UPLOAD -> context.getString(R.string.upload_status_ready)
+                PostAttachment.STATUS_COMPRESSING -> context.getString(R.string.upload_status_compressing)
+                PostAttachment.STATUS_UPLOADING -> context.getString(R.string.upload_status_uploading)
+                PostAttachment.STATUS_UPLOADED -> context.getString(R.string.upload_status_uploaded)
 
-                PostAttachment.STATUS_ERROR_NOT_FOUND -> "error: file not found"
-                PostAttachment.STATUS_ERROR_COMPRESSING -> "error: compression failed"
-                PostAttachment.STATUS_ERROR_UPLOADING -> "error: uploading failed"
+                PostAttachment.STATUS_ERROR_NOT_FOUND -> context.getString(R.string.upload_status_not_found)
+                PostAttachment.STATUS_ERROR_COMPRESSING -> context.getString(R.string.upload_status_compressiion_failed)
+                PostAttachment.STATUS_ERROR_UPLOADING -> context.getString(R.string.upload_status_failed)
 
-                else -> { "Unknown" }
+                else -> { context.getString(R.string.upload_status_unknown) }
             }
 
-            val date = java.util.Date(attachment.created * 1000)
-            attachmentStatus.text = "Status: " + statusText
+            attachmentStatus.text = context.getString(R.string.upload_status) + statusText
 
-            attachmentImage.load(attachment.localPath)
+            attachment.localPath?.let {
+                attachmentImage.load(it)
+            } ?: attachment.previewUrl?.let {
+                attachmentImage.load(it)
+            }
 
             attachmentRemove.setOnClickListener {
                 onInteractionListener.onRemoveClick(attachment)

@@ -79,4 +79,14 @@
     <string name="user_last_visit_time">"Last activity: "</string>
     <string name="delete_post_attachment_confirm_text">Delete this attachment?</string>
     <string name="subscribe_to_channel">Subscribe</string>
+    <string name="upload_status_new">New</string>
+    <string name="upload_status_ready">ready to upload</string>
+    <string name="upload_status_compressing">compressing</string>
+    <string name="upload_status_uploading">uploading</string>
+    <string name="upload_status_uploaded">uploaded</string>
+    <string name="upload_status_not_found">error: file not found</string>
+    <string name="upload_status_compressiion_failed">error: compression failed</string>
+    <string name="upload_status_failed">error: uploading failed</string>
+    <string name="upload_status_unknown">Unknown</string>
+    <string name="upload_status">\"Status: \"</string>
 </resources>
