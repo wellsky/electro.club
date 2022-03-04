@@ -89,6 +89,7 @@ class FCMService : FirebaseMessagingService() {
     private fun handleNewMessage(message: RemoteMessage) {
         val action = message.data.get(action)
 
+
         when (action) {
             ACTION_PERSONAL_MESSAGE, ACTION_THREAD_POST, ACTION_ANSWER, ACTION_MENTION, ACTION_QUOTE -> {
                 val data = gson.fromJson(message.data[content], PostNotification::class.java)
@@ -121,18 +122,52 @@ class FCMService : FirebaseMessagingService() {
                         )
                         .setContentText(htmlToText(data.postContent))
                         .setStyle(NotificationCompat.BigTextStyle()
-                        .bigText(data.postContent))
-                    //groupTitle = data.authorName
+                            .bigText(htmlToText(data.postContent))
+                        )
                 }
 
                 if (action.equals(ACTION_THREAD_POST)) {
+                    val text = data.authorName + ": " + htmlToText(data.postContent)
                     notificationBuilder
                         .setContentTitle(htmlToText(data.threadName))
-                        .setContentText(data.authorName + ": " + htmlToText(data.postContent))
+                        .setContentText(text)
                         .setStyle(NotificationCompat.BigTextStyle()
-                        .bigText(data.authorName + ": " + data.postContent))
-                    //groupTitle = data.threadName
+                            .bigText(text)
+                        )
                 }
+
+                if (action.equals(ACTION_ANSWER)) {
+                    val text = getString(R.string.notification_answer, data.authorName) + ": " + htmlToText(data.postContent)
+                    notificationBuilder
+                        .setContentTitle(htmlToText(data.threadName))
+                        .setContentText(text)
+                        .setStyle(NotificationCompat.BigTextStyle()
+                            .bigText(text)
+                        )
+                }
+
+                if (action.equals(ACTION_QUOTE)) {
+                    val text = getString(R.string.notification_quoted, data.authorName) + ": " + htmlToText(data.postContent)
+                    notificationBuilder
+                        .setContentTitle(htmlToText(data.threadName))
+                        .setContentText(text)
+                        .setStyle(NotificationCompat.BigTextStyle()
+                            .bigText(text)
+                        )
+                }
+
+                if (action.equals(ACTION_MENTION)) {
+                    val text = getString(R.string.notification_mention, data.authorName) + ": " + htmlToText(data.postContent)
+                    notificationBuilder
+                        .setContentTitle(htmlToText(data.threadName))
+                        .setContentText(text)
+                        .setStyle(NotificationCompat.BigTextStyle()
+                            .bigText(text)
+                        )
+                }
+
+
+
 
                 applyImageUrl(notificationBuilder, data.threadImage)
                 val notification = notificationBuilder.build()

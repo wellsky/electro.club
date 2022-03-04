@@ -77,7 +77,7 @@
             app:layout_constraintTop_toBottomOf="@id/socketImage"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="24dp"
-            android:text="@string/sicket_status"
+            android:text="@string/socket_status"
             />
 
         <TextView

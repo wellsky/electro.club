@@ -69,7 +69,7 @@
     <string name="measure_weight">kg</string>
     <string name="measure_power">W</string>
     <string name="measure_battery_capacity">A⋅h</string>
-    <string name="sicket_status">"Status: "</string>
+    <string name="socket_status">"Status: "</string>
     <string name="socket_status_on">ON</string>
     <string name="socket_status_off">OFF</string>
     <string name="socket_status_missing">MISSING</string>
@@ -88,5 +88,8 @@
     <string name="upload_status_compressiion_failed">error: compression failed</string>
     <string name="upload_status_failed">error: uploading failed</string>
     <string name="upload_status_unknown">Unknown</string>
-    <string name="upload_status">\"Status: \"</string>
+    <string name="upload_status">"Status: "</string>
+    <string name="notification_quoted">"%1$s quotes you"</string>
+    <string name="notification_mention">%1$s mentions you</string>
+    <string name="notification_answer">%1$s answered you</string>
 </resources>
