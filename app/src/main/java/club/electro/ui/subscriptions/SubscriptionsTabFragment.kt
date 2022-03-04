@@ -22,12 +22,12 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class SubscriptionsTabFragment : Fragment() {
-    private val viewModel: SubscriptionsViewModel by viewModels (
-        ownerProducer = ::requireParentFragment
-    )
+    private val viewModel: SubscriptionsViewModel by viewModels ()
 
     private var _binding: FragmentSubscriptionsTabBinding? = null
     private val binding get() = _binding!!
+
+    private var globalList: Boolean = true
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -38,6 +38,13 @@ class SubscriptionsTabFragment : Fragment() {
                 onClick = {}
             ))
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        globalList = (requireArguments().get("global") == 1)
+        println("Global : " + globalList )
     }
 
     override fun onCreateView(
@@ -75,20 +82,26 @@ class SubscriptionsTabFragment : Fragment() {
         })
 
         binding.swiperefresh.setOnRefreshListener {
-            viewModel.loadSubscriptions()
+            viewModel.loadSubscriptions(globalList)
         }
-
-        viewModel.loadSubscriptions()
-
-        viewModel.startCheckUpdates()
 
         setHasOptionsMenu(true)
 
         return root
     }
 
-    override fun onDestroyView() {
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadSubscriptions(globalList)
+        viewModel.startCheckUpdates(globalList)
+    }
+
+    override fun onPause() {
+        super.onPause()
         viewModel.stopCheckUpdates()
+    }
+
+    override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }

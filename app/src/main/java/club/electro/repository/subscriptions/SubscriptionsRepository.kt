@@ -6,9 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface SubscriptionsRepository {
     val data: Flow<List<SubscriptionArea>>
-    suspend fun getAll()
-    suspend fun checkForUpdates()
-
-    fun startCheckUpdates()
+    suspend fun getAll(global: Boolean = true)
+    fun startCheckUpdates(global: Boolean = true)
     fun stopCheckUpdates()
 }

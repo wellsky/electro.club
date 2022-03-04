@@ -7,6 +7,11 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import club.electro.R
 import club.electro.databinding.FragmentSubscriptionsBinding
+import club.electro.repository.thread.ThreadLoadTarget
+import club.electro.ui.thread.IncomingChangesStatus
+import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
+import club.electro.ui.thread.ThreadFragment.Companion.threadId
+import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import com.google.android.material.tabs.TabLayout
@@ -58,17 +63,19 @@ class SubscriptionsFragment : Fragment() {
     }
 }
 
-private const val ARG_OBJECT = "object"
+private const val ARG_OBJECT = "global"
 
 class SubscriptionsTabAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment {
         // Return a NEW fragment instance in createFragment(int)
+        val global = if (position == 0) 1 else 0
+
         val fragment = SubscriptionsTabFragment()
         fragment.arguments = Bundle().apply {
             // Our object is just an integer :-P
-            putInt(ARG_OBJECT, position + 1)
+            putInt(ARG_OBJECT, global)
         }
         return fragment
     }

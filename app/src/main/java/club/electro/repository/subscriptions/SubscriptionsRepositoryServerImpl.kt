@@ -28,34 +28,35 @@ class SubscriptionsRepositoryServerImpl @Inject constructor(
     private var lastEventTime = 0L
     private lateinit var updaterJob: Job
 
-    override suspend fun getAll() {
-        appAuth.myToken()?.let { myToken ->
-            try {
-                val response = apiService.getSubscriptions()
+    override suspend fun getAll(global: Boolean) {
+        try {
+            val response = apiService.getSubscriptions(
+                global = if (global) 1 else 0
+            )
 
-                if (!response.isSuccessful) {
-                    throw ApiError(response.code(), response.message())
-                }
-                val body = response.body() ?: throw ApiError(response.code(), response.message())
-
-                dao.removeAll()
-                dao.insert(body.data.items.toEntity())
-                lastEventTime = body.data.lastEventTime
-
-                networkStatus.setStatus(NetworkStatus.Status.ONLINE)
-            } catch (e: IOException) {
-                networkStatus.setStatus(NetworkStatus.Status.ERROR)
-            } catch (e: Exception) {
-                throw UnknownError
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
             }
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+
+            dao.removeAll()
+            dao.insert(body.data.items.toEntity())
+
+            lastEventTime = body.data.lastEventTime
+            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
+        } catch (e: IOException) {
+            networkStatus.setStatus(NetworkStatus.Status.ERROR)
+        } catch (e: Exception) {
+            throw UnknownError
         }
     }
 
-    override suspend fun checkForUpdates()  {
+    private suspend fun checkForUpdates(global: Boolean)  {
         while (true) {
             delay(2_000L)
             try {
                 val response = apiService.getSubscriptions(
+                    global = if (global) 1 else 0,
                     lastEventTime = lastEventTime
                 )
 
@@ -68,6 +69,8 @@ class SubscriptionsRepositoryServerImpl @Inject constructor(
                     if (it.data.items.isNotEmpty()) {
                         dao.removeAll()
                         dao.insert(body.data.items.toEntity())
+                        
+
                         lastEventTime = body.data.lastEventTime
                     }
                     networkStatus.setStatus(NetworkStatus.Status.ONLINE)
@@ -80,9 +83,9 @@ class SubscriptionsRepositoryServerImpl @Inject constructor(
         }
     }
 
-    override fun startCheckUpdates() {
+    override fun startCheckUpdates(global: Boolean) {
         updaterJob = CoroutineScope(Dispatchers.Default).launch {
-            checkForUpdates()
+            checkForUpdates(global)
         }
     }
 

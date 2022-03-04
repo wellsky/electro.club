@@ -17,19 +17,18 @@ class SubscriptionsViewModel @Inject constructor(
 ) : ViewModel() {
     val data = repository.data.asLiveData(Dispatchers.Default)
 
-    init {
-        loadSubscriptions()
+    fun loadSubscriptions(global: Boolean) = viewModelScope.launch {
+        println("Load subscr, global = " + global)
+        repository.getAll(global)
     }
 
-    fun loadSubscriptions() = viewModelScope.launch {
-        repository.getAll()
-    }
-
-    fun startCheckUpdates() {
-        repository.startCheckUpdates()
+    fun startCheckUpdates(global: Boolean) {
+        println("Start subscr, global =  " + global)
+        repository.startCheckUpdates(global)
     }
 
     fun stopCheckUpdates() {
+        println("Stop subscr")
         repository.stopCheckUpdates()
     }
 }
