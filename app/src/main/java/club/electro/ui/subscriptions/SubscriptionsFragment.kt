@@ -63,19 +63,19 @@ class SubscriptionsFragment : Fragment() {
     }
 }
 
-private const val ARG_OBJECT = "global"
+private const val ARG_OBJECT = "group"
 
 class SubscriptionsTabAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment {
         // Return a NEW fragment instance in createFragment(int)
-        val global = if (position == 0) 1 else 0
+        val group = position
 
         val fragment = SubscriptionsTabFragment()
         fragment.arguments = Bundle().apply {
             // Our object is just an integer :-P
-            putInt(ARG_OBJECT, global)
+            putInt(ARG_OBJECT, group)
         }
         return fragment
     }

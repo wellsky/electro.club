@@ -48,7 +48,7 @@ class SubscriptionAreaViewHolder(
 
             areaLastMessageTime.text = areaLastActivityTime(area.lastTime, this.root.context)
 
-            areaUnreadMessagesCount.isVisible = (area.count > 0)
+            areaUnreadMessagesCount.isVisible = ((area.group.toInt() != 0) && (area.count > 0))
             areaUnreadMessagesCount.text = area.count.toString()
 
             if (!area.image.isEmpty()) {

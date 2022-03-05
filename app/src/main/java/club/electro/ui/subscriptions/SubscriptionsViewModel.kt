@@ -15,20 +15,18 @@ class SubscriptionsViewModel @Inject constructor(
     val repository: SubscriptionsRepository,
     val appAuth: AppAuth
 ) : ViewModel() {
-    val data = repository.data.asLiveData(Dispatchers.Default)
+    
+    fun items(group: Byte) = repository.items(group).asLiveData(Dispatchers.Default)
 
-    fun loadSubscriptions(global: Boolean) = viewModelScope.launch {
-        println("Load subscr, global = " + global)
-        repository.getAll(global)
+    fun loadSubscriptions(group: Byte) = viewModelScope.launch {
+        repository.getAll(group)
     }
 
-    fun startCheckUpdates(global: Boolean) {
-        println("Start subscr, global =  " + global)
-        repository.startCheckUpdates(global)
+    fun startCheckUpdates(group: Byte) {
+        repository.startCheckUpdates(group)
     }
 
     fun stopCheckUpdates() {
-        println("Stop subscr")
         repository.stopCheckUpdates()
     }
 }

@@ -27,7 +27,7 @@ class SubscriptionsTabFragment : Fragment() {
     private var _binding: FragmentSubscriptionsTabBinding? = null
     private val binding get() = _binding!!
 
-    private var globalList: Boolean = true
+    private var currentGroup: Byte = 0
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -43,8 +43,8 @@ class SubscriptionsTabFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        globalList = (requireArguments().get("global") == 1)
-        println("Global : " + globalList )
+        currentGroup = requireArguments().get("group").toString().toByte() // TODO
+        println("Subscriptions group : " + currentGroup )
     }
 
     override fun onCreateView(
@@ -70,7 +70,7 @@ class SubscriptionsTabFragment : Fragment() {
 
         binding.subscriptionsList.adapter = adapter
 
-        viewModel.data.observe(viewLifecycleOwner, { items ->
+        viewModel.items(currentGroup).observe(viewLifecycleOwner, { items ->
             adapter.submitList(items)
             binding.swiperefresh.setRefreshing(false)
         })
@@ -82,7 +82,7 @@ class SubscriptionsTabFragment : Fragment() {
         })
 
         binding.swiperefresh.setOnRefreshListener {
-            viewModel.loadSubscriptions(globalList)
+            viewModel.loadSubscriptions(currentGroup)
         }
 
         setHasOptionsMenu(true)
@@ -92,8 +92,8 @@ class SubscriptionsTabFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.loadSubscriptions(globalList)
-        viewModel.startCheckUpdates(globalList)
+        viewModel.loadSubscriptions(currentGroup)
+        viewModel.startCheckUpdates(currentGroup)
     }
 
     override fun onPause() {

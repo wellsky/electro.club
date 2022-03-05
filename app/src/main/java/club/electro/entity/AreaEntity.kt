@@ -7,6 +7,8 @@ import club.electro.dto.SubscriptionArea
 @Entity
 data class AreaEntity(
     @PrimaryKey(autoGenerate = true)
+    val localId: Long = 0,
+    val group: Byte = 0,
     val id: Long,
     val type: Byte,
     val objectId: Long,
@@ -20,6 +22,7 @@ data class AreaEntity(
 ) {
     fun toDto() = SubscriptionArea(
         id = id,
+        group = group,
         type = type,
         objectId = objectId,
         image = image,
@@ -34,6 +37,7 @@ data class AreaEntity(
         fun fromDto(dto: SubscriptionArea) =
             AreaEntity(
                 id = dto.id,
+                group = dto.group,
                 type = dto.type,
                 objectId = dto.objectId,
                 image = dto.image,

@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class SubscriptionArea (
     val id: Long,
+    val group: Byte = 0,
     val type: Byte,
     @SerializedName("object_id")  val objectId: Long,
     val name: String,

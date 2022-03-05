@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AreaDao {
-    @Query("SELECT * FROM AreaEntity ORDER BY lastTime DESC")
-    fun getAll(): Flow<List<AreaEntity>>
+    @Query("SELECT * FROM AreaEntity WHERE `group` = :group ORDER BY lastTime DESC")
+    fun getAll(group: Byte): Flow<List<AreaEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(area: AreaEntity)
@@ -17,4 +17,7 @@ interface AreaDao {
 
     @Query("DELETE FROM AreaEntity")
     suspend fun removeAll()
+
+    @Query("DELETE FROM AreaEntity WHERE `group` = :group")
+    suspend fun removeAll(group: Byte)
 }

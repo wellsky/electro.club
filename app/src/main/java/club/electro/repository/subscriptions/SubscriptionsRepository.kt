@@ -5,8 +5,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
 interface SubscriptionsRepository {
-    val data: Flow<List<SubscriptionArea>>
-    suspend fun getAll(global: Boolean = true)
-    fun startCheckUpdates(global: Boolean = true)
+    fun items(group: Byte = 0): Flow<List<SubscriptionArea>>
+
+    suspend fun getAll(group: Byte = 0)
+
+    fun startCheckUpdates(group: Byte = 0)
     fun stopCheckUpdates()
 }

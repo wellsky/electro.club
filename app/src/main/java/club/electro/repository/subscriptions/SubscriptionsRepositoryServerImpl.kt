@@ -1,8 +1,10 @@
 package club.electro.repository.subscriptions
 
+import androidx.room.withTransaction
 import club.electro.api.ApiService
 import club.electro.auth.AppAuth
 import club.electro.dao.AreaDao
+import club.electro.db.AppDb
 import club.electro.dto.SubscriptionArea
 import club.electro.entity.AreaEntity
 import club.electro.entity.toDto
@@ -18,20 +20,23 @@ import javax.inject.Inject
 
 class SubscriptionsRepositoryServerImpl @Inject constructor(
     private val apiService: ApiService,
-    private val appAuth : AppAuth,
+    private val db: AppDb,
     private val dao: AreaDao,
     private val networkStatus: NetworkStatus
 ) : SubscriptionsRepository {
 
-    override val data: Flow<List<SubscriptionArea>> = dao.getAll().map(List<AreaEntity>::toDto).flowOn(Dispatchers.Default)
+    //override val data: Flow<List<SubscriptionArea>> = dao.getAll().map(List<AreaEntity>::toDto).flowOn(Dispatchers.Default)
 
     private var lastEventTime = 0L
     private lateinit var updaterJob: Job
 
-    override suspend fun getAll(global: Boolean) {
+    override fun items(group: Byte): Flow<List<SubscriptionArea>> =
+        dao.getAll(group).map(List<AreaEntity>::toDto).flowOn(Dispatchers.Default)
+
+    override suspend fun getAll(group: Byte) {
         try {
             val response = apiService.getSubscriptions(
-                global = if (global) 1 else 0
+                group = group
             )
 
             if (!response.isSuccessful) {
@@ -39,7 +44,7 @@ class SubscriptionsRepositoryServerImpl @Inject constructor(
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
 
-            insertItems(body.data.items, global)
+            insertItems(body.data.items, group)
 
             lastEventTime = body.data.lastEventTime
             networkStatus.setStatus(NetworkStatus.Status.ONLINE)
@@ -50,12 +55,12 @@ class SubscriptionsRepositoryServerImpl @Inject constructor(
         }
     }
 
-    private suspend fun checkForUpdates(global: Boolean)  {
+    private suspend fun checkForUpdates(group: Byte) {
         while (true) {
             delay(2_000L)
             try {
                 val response = apiService.getSubscriptions(
-                    global = if (global) 1 else 0,
+                    group = group,
                     lastEventTime = lastEventTime
                 )
 
@@ -66,12 +71,12 @@ class SubscriptionsRepositoryServerImpl @Inject constructor(
 
                 body.let {
                     if (it.data.items.isNotEmpty()) {
-                        insertItems(body.data.items, global)
+                        insertItems(body.data.items, group)
                         lastEventTime = body.data.lastEventTime
                     }
                     networkStatus.setStatus(NetworkStatus.Status.ONLINE)
                 }
-            }  catch (e: IOException) {
+            } catch (e: IOException) {
                 networkStatus.setStatus(NetworkStatus.Status.ERROR)
             } catch (e: Exception) {
                 // throw UnknownError
@@ -79,19 +84,20 @@ class SubscriptionsRepositoryServerImpl @Inject constructor(
         }
     }
 
-    private suspend fun insertItems(items: List<SubscriptionArea>, global: Boolean) {
-        if (global) {
-            dao.removeAll()
-            dao.insert(items.toEntity())
-        } else {
-            dao.removeAll()
-            dao.insert(items.toEntity())
+    private suspend fun insertItems(items: List<SubscriptionArea>, group: Byte) {
+        db.withTransaction {
+            dao.removeAll(group)
+            dao.insert(items.toEntity().map {
+                it.copy(
+                    group = group
+                )
+            })
         }
     }
 
-    override fun startCheckUpdates(global: Boolean) {
+    override fun startCheckUpdates(group: Byte) {
         updaterJob = CoroutineScope(Dispatchers.Default).launch {
-            checkForUpdates(global)
+            checkForUpdates(group)
         }
     }
 

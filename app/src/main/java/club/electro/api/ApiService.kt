@@ -63,7 +63,7 @@ interface ApiService {
     @POST(UPDATES_SERVER_URL)
     suspend fun getSubscriptions(
         @Field("method") method: String = "whatsUp",
-        @Field("global") global: Byte = 1,
+        @Field("group") group: Byte = 0,
         @Field("lastEventTime") lastEventTime: Long = 0
     ): Response<ApiResponse<ApiSubscriptionsData>>
 
