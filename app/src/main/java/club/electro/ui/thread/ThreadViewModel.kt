@@ -48,6 +48,7 @@ class ThreadViewModel @Inject constructor(
     }.cachedIn(viewModelScope)
 
     val editorPost = MutableLiveData(emptyPost) // Пост, который в данный момент в текстовом редакторе
+    val draftPost = MutableLiveData(emptyPost) // Пост-черновик текущей группы
     val editedPost = MutableLiveData(emptyPost) // Опубликованный пост, который в данный момент редактируется в текстовом редакторе
     val answerToPost = MutableLiveData(emptyPost) // Пост, на который в данный момент пишется ответ
 
@@ -105,7 +106,13 @@ class ThreadViewModel @Inject constructor(
         mutablePosts.value = target
     }
 
-    fun changeEditorPostContent(content: String) {
+    fun getEditorPostContent(): String {
+        return editorPost.value?.let {
+            it.content.trim()
+        } ?: ""
+    }
+
+    fun setEditorPostContent(content: String) {
         editorPost.value?.let {
             val text = content.trim()
             if (it.content != text) {
@@ -181,23 +188,9 @@ class ThreadViewModel @Inject constructor(
         attachmentsRepository.removePostAttachment(attachment)
     }
 
-//    init {
-//        viewModelScope.launch {
-//            attachmentsRepository.uploadJob()
-//        }
-//    }
-
     suspend fun checkThreadUpdates() {
         repository.checkThreadUpdates()
     }
-
-//    fun startCheckUpdates() {
-//        repository.startCheckUpdates()
-//    }
-//
-//    fun stopCheckUpdates() {
-//        repository.stopCheckUpdates()
-//    }
 }
 
 private val emptyPost = Post(

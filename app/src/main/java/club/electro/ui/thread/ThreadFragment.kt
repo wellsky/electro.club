@@ -27,7 +27,6 @@ import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST
 import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST_UNREAD
 import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_LAST
-import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 //import club.electro.ui.thread.PostAttachmentsFragment.Companion.attachmentsThreadId
 //import club.electro.ui.thread.PostAttachmentsFragment.Companion.attachmentsThreadType
 //import club.electro.ui.thread.ThreadInfoFragment.Companion.threadInfoId
@@ -111,16 +110,6 @@ class ThreadFragment: Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.getItemId()) {
-//            R.id.thread_settings -> {
-//                findNavController().navigate(
-//                    R.id.action_threadFragment_to_threadInfoFragment,
-//                    Bundle().apply {
-//                        threadInfoType = this@ThreadFragment.threadType
-//                        threadInfoId = this@ThreadFragment.threadId
-//                    }
-//                )
-//                return true
-//            }
             R.id.thread_subscribe -> {
                 viewModel.changeSubscription(SUBSCRIPTION_STATUS_SUBSCRIBED)
                 return true
@@ -291,6 +280,8 @@ class ThreadFragment: Fragment() {
             }
         })
 
+        println("Set content: " + viewModel.getEditorPostContent())
+        binding.editorPostContent.setText(viewModel.getEditorPostContent())
 
         // Обновляет видимые посты, если увеличилось время последнего изменения на сервере подписок
         viewModel.threadStatus.observe(viewLifecycleOwner) {
@@ -315,7 +306,6 @@ class ThreadFragment: Fragment() {
                 }
             } else {
                 binding.editedPostGroup.visibility = View.GONE
-                binding.editorPostContent.setText("")
             }
         }
 
@@ -414,7 +404,7 @@ class ThreadFragment: Fragment() {
                     return@setOnClickListener
                 }
 
-                viewModel.changeEditorPostContent(text.toString())
+                viewModel.setEditorPostContent(text.toString())
                 viewModel.saveEditorPost()
 
                 setText("")
@@ -484,15 +474,16 @@ class ThreadFragment: Fragment() {
         }
     }
 
-    /**
-     * Необходимо остановить корутину в репозитории, которая опрашивает сервер об обновлениях в текущем thread
-     */
-    override fun onDestroyView() {
-        super.onDestroyView()
-        //viewModel.stopCheckUpdates()
-        _binding = null
+    override fun onPause() {
+        super.onPause()
+        println("Set viewModel content: " + binding.editorPostContent.text.toString())
+        viewModel.setEditorPostContent(binding.editorPostContent.text.toString())
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
     /**
      * Прижимает все сообщения к верху

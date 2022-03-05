@@ -51,7 +51,7 @@ class SubscriptionsRepositoryServerImpl @Inject constructor(
         } catch (e: IOException) {
             networkStatus.setStatus(NetworkStatus.Status.ERROR)
         } catch (e: Exception) {
-            throw UnknownError
+            //throw UnknownError
         }
     }
 

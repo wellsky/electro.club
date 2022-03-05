@@ -99,4 +99,5 @@
     <string name="image_picker_folder">Folder</string>
     <string name="image_picker_tap_to_select">Tap to select</string>
     <string name="image_picker_done">DONE</string>
+    <string name="subscriptions_empty_list">A list of your subscriptions will be displayed here. You don\'t have subscriptions at the moment.</string>
 </resources>

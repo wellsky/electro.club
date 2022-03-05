@@ -71,14 +71,22 @@ class SubscriptionsTabFragment : Fragment() {
         binding.subscriptionsList.adapter = adapter
 
         viewModel.items(currentGroup).observe(viewLifecycleOwner, { items ->
+            //binding.swiperefresh.isActivated = it.authorized
+            if (items.isEmpty()) {
+                binding.swiperefresh.isVisible = false
+                if (viewModel.appAuth.authorized()) {
+                    binding.emptyListHint.isVisible = true
+                } else {
+                    binding.notLoggedHint.isVisible = true
+                }
+            } else {
+                binding.swiperefresh.isVisible = true
+                binding.emptyListHint.isVisible = false
+                binding.notLoggedHint.isVisible = false
+            }
+
             adapter.submitList(items)
             binding.swiperefresh.setRefreshing(false)
-        })
-
-        viewModel.appAuth.authState.observe(viewLifecycleOwner, {
-            binding.subscriptionsList.isVisible = it.authorized
-            binding.swiperefresh.isActivated = it.authorized
-            binding.notLoggedHint.isVisible = !it.authorized
         })
 
         binding.swiperefresh.setOnRefreshListener {
