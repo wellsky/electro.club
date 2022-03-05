@@ -3,6 +3,7 @@ package club.electro.ui.feed
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import club.electro.R
@@ -12,6 +13,8 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class FeedFragment : Fragment() {
+    private val viewModel: FeedViewModel by viewModels ()
+
     private var _binding: FragmentFeedBinding? = null
     private val binding get() = _binding!!
 
@@ -51,7 +54,7 @@ class FeedFragment : Fragment() {
 private const val ARG_OBJECT = "object"
 
 class FeedTabAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-    override fun getItemCount(): Int = 2
+    override fun getItemCount(): Int = 1
 
     override fun createFragment(position: Int): Fragment {
         // Return a NEW fragment instance in createFragment(int)

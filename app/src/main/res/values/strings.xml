@@ -96,4 +96,7 @@
     <string name="feed_tab_my">My subscriptions</string>
     <string name="subscriptions_tab_all">All groups</string>
     <string name="subscriptions_tab_my">My groups</string>
+    <string name="image_picker_folder">Folder</string>
+    <string name="image_picker_tap_to_select">Tap to select</string>
+    <string name="image_picker_done">DONE</string>
 </resources>

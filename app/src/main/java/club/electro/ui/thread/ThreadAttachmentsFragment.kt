@@ -105,9 +105,9 @@ class ThreadAttachmentsFragment: Fragment(R.layout.fragment_thread_attachments) 
                 mode = ImagePickerMode.MULTIPLE
                 //returnMode = ReturnMode.ALL // set whether pick action or camera action should return immediate result or not. Only works in single mode for image picker
                 isFolderMode = true // set folder mode (false by default)
-                folderTitle = "Folder" // folder selection title
-                imageTitle = "Tap to select" // image selection title
-                doneButtonText = "DONE" // done button text
+                folderTitle = getString(R.string.image_picker_folder) // folder selection title
+                imageTitle = getString(R.string.image_picker_tap_to_select) // image selection title
+                doneButtonText = getString(R.string.image_picker_done) // done button text
             }
         )
     }

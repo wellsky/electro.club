@@ -3,6 +3,7 @@ package club.electro.ui.subscriptions
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import club.electro.R
@@ -15,12 +16,13 @@ import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import com.google.android.material.tabs.TabLayout
-
-
+import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 
 
 @AndroidEntryPoint
 class SubscriptionsFragment : Fragment() {
+    private val viewModel: SubscriptionsTabsViewModel by viewModels()
+
     private var _binding: FragmentSubscriptionsBinding? = null
     private val binding get() = _binding!!
 
@@ -41,10 +43,20 @@ class SubscriptionsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         subscriptionsTabAdapter = SubscriptionsTabAdapter(this)
         viewPager = binding.viewPager
-        tabLayout = binding.tabLayout
         viewPager.adapter = subscriptionsTabAdapter
 
-        viewPager.setCurrentItem(1, false)
+        tabLayout = binding.tabLayout
+        tabLayout.addOnTabSelectedListener(object : OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                viewModel.setCurrentTabPosition(tab.position)
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+            override fun onTabReselected(tab: TabLayout.Tab) {}
+        })
+
+        val position = viewModel.getCurrentTabPosition()
+
+        viewPager.setCurrentItem(position, false)
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
@@ -53,8 +65,7 @@ class SubscriptionsFragment : Fragment() {
             }
         }.attach()
 
-        tabLayout.selectTab(tabLayout.getTabAt(1))
-
+        tabLayout.selectTab(tabLayout.getTabAt(position))
     }
 
     override fun onDestroyView() {
@@ -77,6 +88,7 @@ class SubscriptionsTabAdapter(fragment: Fragment) : FragmentStateAdapter(fragmen
             // Our object is just an integer :-P
             putInt(ARG_OBJECT, group)
         }
+
         return fragment
     }
 }
