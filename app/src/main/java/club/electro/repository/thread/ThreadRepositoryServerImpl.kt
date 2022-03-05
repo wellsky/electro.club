@@ -144,7 +144,7 @@ class ThreadRepositoryServerImpl @Inject constructor(
         while (true) {
             delay(2_000L)
             try {
-                val response = apiService.getAreaModifiedTime(
+                val response = apiService.getAreaStatus(
                     type = threadType,
                     objectId = threadId
                 )
@@ -155,12 +155,15 @@ class ThreadRepositoryServerImpl @Inject constructor(
                 val body = response.body() //?: throw ApiError(response.code(), response.message())
 
                 body?.let {
-                    if (body.data.time > threadStatus.value!!.lastUpdateTime) {
-                        val newStatus = ThreadStatus(
-                            lastUpdateTime = body.data.time,
-                            lastMessageTime = body.data.time // TODO надо получать время последнего сообщения
-                        )
-                        threadStatus.postValue(newStatus)
+                    with (it.data) {
+                        if (lastUpdateTime > threadStatus.value!!.lastUpdateTime) {
+                            val newStatus = ThreadStatus(
+                                lastUpdateTime = lastUpdateTime,
+                                lastMessageTime = lastMessageTime,
+                                messagesCount = messagesCount// TODO надо получать время последнего сообщения
+                            )
+                            threadStatus.postValue(newStatus)
+                        }
                     }
                     networkStatus.setStatus(NetworkStatus.Status.ONLINE)
                 }

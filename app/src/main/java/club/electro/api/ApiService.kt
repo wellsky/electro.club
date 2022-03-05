@@ -7,7 +7,6 @@ import club.electro.utils.urlTypeSerializer
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.SerializedName
 import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -97,11 +96,11 @@ interface ApiService {
 
     @FormUrlEncoded
     @POST(UPDATES_SERVER_URL)
-    suspend fun getAreaModifiedTime(
-        @Field("method") method: String = "getAreaModifiedTime",
+    suspend fun getAreaStatus(
+        @Field("method") method: String = "getAreaStatus",
         @Field("type") type: Byte,
         @Field("object_id") objectId: Long,
-    ): Response<ApiResponse<ApiAreaLastUpdateTime>>
+    ): Response<ApiResponse<ApiAreaStatus>>
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
@@ -258,8 +257,10 @@ data class ApiMapObjects(
     val map_objects: List<MapMarker>
 )
 
-data class ApiAreaLastUpdateTime (
-    val time: Long,
+data class ApiAreaStatus (
+    @SerializedName("modified_time") val lastUpdateTime: Long,
+    @SerializedName("last_message_time") val lastMessageTime: Long,
+    @SerializedName("messages_count") val messagesCount: Long,
 )
 
 data class ApiUserProfile (
