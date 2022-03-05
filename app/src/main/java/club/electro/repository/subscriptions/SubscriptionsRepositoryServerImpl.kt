@@ -39,8 +39,7 @@ class SubscriptionsRepositoryServerImpl @Inject constructor(
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
 
-            dao.removeAll()
-            dao.insert(body.data.items.toEntity())
+            insertItems(body.data.items, global)
 
             lastEventTime = body.data.lastEventTime
             networkStatus.setStatus(NetworkStatus.Status.ONLINE)
@@ -67,10 +66,7 @@ class SubscriptionsRepositoryServerImpl @Inject constructor(
 
                 body.let {
                     if (it.data.items.isNotEmpty()) {
-                        dao.removeAll()
-                        dao.insert(body.data.items.toEntity())
-                        
-
+                        insertItems(body.data.items, global)
                         lastEventTime = body.data.lastEventTime
                     }
                     networkStatus.setStatus(NetworkStatus.Status.ONLINE)
@@ -80,6 +76,16 @@ class SubscriptionsRepositoryServerImpl @Inject constructor(
             } catch (e: Exception) {
                 // throw UnknownError
             }
+        }
+    }
+
+    private suspend fun insertItems(items: List<SubscriptionArea>, global: Boolean) {
+        if (global) {
+            dao.removeAll()
+            dao.insert(items.toEntity())
+        } else {
+            dao.removeAll()
+            dao.insert(items.toEntity())
         }
     }
 

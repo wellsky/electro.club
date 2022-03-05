@@ -455,8 +455,6 @@ class ThreadFragment: Fragment() {
             adapter.refresh()
         }
 
-        //viewModel.startCheckUpdates()
-
         setHasOptionsMenu(true)
 
         return root
