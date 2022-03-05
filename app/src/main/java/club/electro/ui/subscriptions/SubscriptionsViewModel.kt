@@ -15,7 +15,7 @@ class SubscriptionsViewModel @Inject constructor(
     val repository: SubscriptionsRepository,
     val appAuth: AppAuth
 ) : ViewModel() {
-    
+
     fun items(group: Byte) = repository.items(group).asLiveData(Dispatchers.Default)
 
     fun loadSubscriptions(group: Byte) = viewModelScope.launch {
