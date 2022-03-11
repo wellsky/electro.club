@@ -11,6 +11,7 @@ import club.electro.repository.thread.ThreadRepository
 import club.electro.repository.thread.ThreadStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
@@ -71,19 +72,28 @@ class ThreadViewModel @Inject constructor(
             repository.threadStatus.asFlow().collectLatest { newStatus->
                 println("Repository thread status changed")
                 if (newStatus.lastUpdateTime > 0) { // Не инициализация переменной в репозитории
+                    println("Repository status not empty")
                     _threadStatus.value?.let { currentStatus-> // Не первые полученные данные
-                        println("Viewmodel thread status changed")
-                        if (newStatus.messagesCount > currentStatus.messagesCount) {
-                            // Появились новые сообщения
-                            _incomingChangesStatus = IncomingChangesStatus(
-                                newMessages = newStatus.messagesCount - currentStatus.messagesCount
-                            )
+                        if (currentStatus.lastUpdateTime > 0) {
+                            println("Viewmodel thread status changed")
+                            if (newStatus.messagesCount > currentStatus.messagesCount) {
+                                println("Viewmodel has new messages " + currentStatus.messagesCount + " : " + newStatus.messagesCount)
+                                // Появились новые сообщения
+                                repository.setThreadVisit()
+                                _incomingChangesStatus = IncomingChangesStatus(
+                                    newMessages = newStatus.messagesCount - currentStatus.messagesCount
+                                )
+                            }
                         }
-
                     }
                     _threadStatus.value = newStatus
                 }
             }
+        }
+
+        viewModelScope.launch {
+            delay(2_000L)
+            repository.setThreadVisit()
         }
     }
 

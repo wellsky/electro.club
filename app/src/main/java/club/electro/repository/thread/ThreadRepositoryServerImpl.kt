@@ -67,39 +67,58 @@ class ThreadRepositoryServerImpl @Inject constructor(
 
 
     override suspend fun getThread() {
-        appAuth.myToken()?.let { myToken ->
-            try {
-                val response = apiService.getThread(
-                    threadType = threadType,
-                    threadId = threadId
-                )
+        try {
+            val response = apiService.getThread(
+                threadType = threadType,
+                threadId = threadId
+            )
 
-                if (!response.isSuccessful) {
-                    throw ApiError(response.code(), response.message())
-                }
-                val body = response.body() ?: throw ApiError(response.code(), response.message())
-
-                threadDao.insert(body.data.thread.toEntity())
-
-                body.data.draftAttachments?.let {
-                    db.withTransaction {
-                        postAttachmentDao.removeUploadedDrafts(threadType, threadId)
-                        postAttachmentDao.insert(
-                            it.toEntity().map {
-                                it.copy(status = PostAttachment.STATUS_UPLOADED)
-                            }
-                        )
-                    }
-                } ?: run {
-                    postAttachmentDao.removeUploadedDrafts(threadType, threadId)
-                }
-
-                networkStatus.setStatus(NetworkStatus.Status.ONLINE)
-            } catch (e: IOException) {
-                networkStatus.setStatus(NetworkStatus.Status.ERROR)
-            } catch (e: Exception) {
-
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
             }
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+
+            threadDao.insert(body.data.thread.toEntity())
+
+            body.data.draftAttachments?.let {
+                db.withTransaction {
+                    postAttachmentDao.removeUploadedDrafts(threadType, threadId)
+                    postAttachmentDao.insert(
+                        it.toEntity().map {
+                            it.copy(status = PostAttachment.STATUS_UPLOADED)
+                        }
+                    )
+                }
+            } ?: run {
+                postAttachmentDao.removeUploadedDrafts(threadType, threadId)
+            }
+
+            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
+        } catch (e: IOException) {
+            networkStatus.setStatus(NetworkStatus.Status.ERROR)
+        } catch (e: Exception) {
+
+        }
+    }
+
+
+    override suspend fun setThreadVisit() {
+        println("Set thread visit")
+        try {
+            val response = apiService.setThreadVisit(
+                threadType = threadType,
+                threadId = threadId
+            )
+
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            //val body = response.body() ?: throw ApiError(response.code(), response.message())
+            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
+        } catch (e: IOException) {
+            networkStatus.setStatus(NetworkStatus.Status.ERROR)
+        } catch (e: Exception) {
+
         }
     }
 

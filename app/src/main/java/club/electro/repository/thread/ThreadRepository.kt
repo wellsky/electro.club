@@ -14,6 +14,7 @@ interface ThreadRepository {
     fun posts(refreshTarget: ThreadLoadTarget): Flow<PagingData<Post>>
 
     suspend fun getThread()
+    suspend fun setThreadVisit()
     suspend fun changeSubscription(newStatus: Byte)
 
     suspend fun savePostToServer(post: Post)

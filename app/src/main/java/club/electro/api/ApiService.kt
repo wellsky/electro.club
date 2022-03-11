@@ -76,6 +76,14 @@ interface ApiService {
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
+    suspend fun setThreadVisit(
+        @Field("method") method: String = "setThreadVisit",
+        @Field("thread_type") threadType: Byte,
+        @Field("thread_id") threadId: Long,
+    ): Response<ApiResponse<Unit>>
+
+    @FormUrlEncoded
+    @POST(BASE_SERVER_URL)
     suspend fun getThreadPosts(
         @Field("method") method: String = "getPosts",
         @Field("thread_type") threadType: Byte,
