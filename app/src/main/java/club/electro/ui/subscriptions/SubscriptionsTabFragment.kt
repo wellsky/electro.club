@@ -35,6 +35,7 @@ class SubscriptionsTabFragment : Fragment() {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
             mainViewModel.updateActionBarConfig(ToolBarConfig(
                 subtitle = "",
+                scroll = true,
                 onClick = {}
             ))
         }

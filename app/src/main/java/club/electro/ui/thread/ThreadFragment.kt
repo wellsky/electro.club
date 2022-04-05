@@ -72,6 +72,7 @@ class ThreadFragment: Fragment() {
                     mainViewModel.updateActionBarConfig(ToolBarConfig(
                         title = it.name,
                         subtitle = getString(R.string.subscribers_count) + it.subscribersCount.toString(),
+                        scroll = true,
                         onClick = {
                             findNavController().navigate(
                                 R.id.action_threadFragment_to_threadInfoFragment,
@@ -95,11 +96,19 @@ class ThreadFragment: Fragment() {
                 requireActivity().run {
                     if (thread.type != ThreadType.THREAD_TYPE_PERSONAL_CHAT.value) {
                         menuInflater.inflate(R.menu.menu_thread, menu)
-                        if (thread.subscriptionStatus.equals(SUBSCRIPTION_STATUS_NONE)) {
-                            menu.findItem(R.id.thread_unsubscribe).isVisible = false
-                            menu.findItem(R.id.thread_mute).isVisible = false
-                        } else {
-                            menu.findItem(R.id.thread_subscribe).isVisible = false
+
+                        when (thread.subscriptionStatus) {
+                            SUBSCRIPTION_STATUS_NONE -> {
+                                menu.findItem(R.id.thread_subscribe).isVisible = true
+                            }
+                            SUBSCRIPTION_STATUS_SUBSCRIBED -> {
+                                menu.findItem(R.id.thread_unsubscribe).isVisible = true
+                                menu.findItem(R.id.thread_mute).isVisible = true
+                            }
+                            SUBSCRIPTION_STATUS_MUTED -> {
+                                menu.findItem(R.id.thread_unsubscribe).isVisible = true
+                                menu.findItem(R.id.thread_unmute).isVisible = true
+                            }
                         }
                     }
                 }
@@ -120,6 +129,10 @@ class ThreadFragment: Fragment() {
             }
             R.id.thread_mute -> {
                 viewModel.changeSubscription(SUBSCRIPTION_STATUS_MUTED)
+                return true
+            }
+            R.id.thread_unmute -> {
+                viewModel.changeSubscription(SUBSCRIPTION_STATUS_SUBSCRIBED)
                 return true
             }
         }
@@ -454,7 +467,7 @@ class ThreadFragment: Fragment() {
         binding.bottomPanel.isVisible = false
         viewModel.thread.value?.let {
             if (viewModel.appAuth.authorized()) {
-                if (it.subscriptionStatus.equals(SUBSCRIPTION_STATUS_SUBSCRIBED)) {
+                if (it.subscriptionStatus.equals(SUBSCRIPTION_STATUS_SUBSCRIBED) || it.subscriptionStatus.equals(SUBSCRIPTION_STATUS_MUTED)) {
                     if (it.canPost) {
                         binding.bottomPanel.isVisible = true
                         binding.bottomPanelEditor.isVisible = true

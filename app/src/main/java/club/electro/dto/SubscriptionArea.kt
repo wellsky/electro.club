@@ -13,5 +13,6 @@ data class SubscriptionArea (
     @SerializedName("last_name")  val lastName: String,
     @SerializedName("last_text")  val lastText: String,
     @SerializedName("last_time")  val lastTime: Long = 0,
-    val url: String = ""
+    @SerializedName("url")  val url: String = "",
+    @SerializedName("mute")  val mute: Byte = 0
 )

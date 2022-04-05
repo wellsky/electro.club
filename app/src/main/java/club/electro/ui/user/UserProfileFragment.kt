@@ -1,5 +1,6 @@
 package club.electro.ui.user
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +27,8 @@ import dagger.hilt.android.AndroidEntryPoint
 class UserProfileFragment : Fragment() {
     companion object {
         var Bundle.userId: Long by LongArg
+
+        @SuppressLint("SimpleDateFormat")
         private val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm")
     }
 
@@ -51,7 +54,7 @@ class UserProfileFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentUserProfileBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
@@ -67,7 +70,7 @@ class UserProfileFragment : Fragment() {
 
                 user.primaryTransport?.let { primaryTransport ->
                     transportName.text = primaryTransport.name
-                    primaryTransport.image?.let {
+                    primaryTransport.image.let {
                         transportImage.loadCircleCrop(it)
                         Glide.with(transportImage.context)
                     }

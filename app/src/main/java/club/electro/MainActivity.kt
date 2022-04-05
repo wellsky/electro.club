@@ -1,34 +1,41 @@
 package club.electro
 
 import android.os.Bundle
-import android.view.MenuItem
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.viewModels
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.navigation.NavigationView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
-import androidx.lifecycle.lifecycleScope
 import club.electro.databinding.ActivityMainBinding
 import club.electro.model.NetworkStatus
 import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
+import club.electro.utils.FixScrollingFooterBehavior
 import club.electro.utils.loadCircleCrop
+import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+
 
 @AndroidEntryPoint
 class MainActivity: AppCompatActivity() {
@@ -38,6 +45,8 @@ class MainActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //supportRequestWindowFeature(FEATURE_ACTION_BAR_OVERLAY)
 
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -68,10 +77,8 @@ class MainActivity: AppCompatActivity() {
             )
         }
 
-        val navigationView: NavigationView = findViewById(R.id.nav_view) as NavigationView
-        navigationView.menu!!.findItem(R.id.nav_info).setOnMenuItemClickListener { menuItem: MenuItem? ->
-            //write your implementation here
-            //to close the navigation drawer
+        val navigationView: NavigationView = findViewById(R.id.nav_view)
+        navigationView.menu.findItem(R.id.nav_info).setOnMenuItemClickListener {
             navController.navigate(
                 R.id.action_global_threadFragment,
                 Bundle().apply {
@@ -87,7 +94,7 @@ class MainActivity: AppCompatActivity() {
             true
         }
 
-        viewModel.appAuth.authState.observe(this, { authState ->
+        viewModel.appAuth.authState.observe(this) { authState ->
             if (authState.authorized) {
                 headerImage.loadCircleCrop(authState.avatar)
 
@@ -100,11 +107,11 @@ class MainActivity: AppCompatActivity() {
                 textLine1.text = getString(R.string.nav_header_title)
                 textLine2.text = getString(R.string.nav_header_subtitle)
             }
-        })
+        }
 
 
         // https://developer.android.com/guide/fragments/appbar
-        viewModel.config.observe(this, { config ->
+        viewModel.config.observe(this) { config ->
             config.title?.let {
                 supportActionBar?.title = it
             }
@@ -116,7 +123,19 @@ class MainActivity: AppCompatActivity() {
                 //TODO или лучше сразу вызывать onClick, но тогда надо будет поменять параметры функции
                 config.onClick()
             }
-        })
+
+            /**
+             * Утсановка скроллинга аппбара
+             * supportActionBar?.isHideOnContentScrollEnabled = true - почему-то выдает ошибку:
+             * Hide on content scroll is not supported in this action bar configuration.
+             * Даже если в начале onCreate вызвать supportRequestWindowFeature(FEATURE_ACTION_BAR_OVERLAY)
+            */
+            if (config.scroll)
+                enableScrollingAppBar()
+            else
+                disableScrollingAppBar()
+
+        }
 
         CoroutineScope(Dispatchers.Default).launch {
             viewModel.networkStatus.status.collectLatest {
@@ -135,6 +154,42 @@ class MainActivity: AppCompatActivity() {
             // TODO как лучше запускать такие корутины, которые должны работать во время работы всего приложеия?
             viewModel.uploaderJob()
         }
+    }
+
+    private fun enableScrollingAppBar() {
+        val fragmentWrapperView = findViewById<ConstraintLayout>(R.id.contentMain)
+        val param: CoordinatorLayout.LayoutParams = fragmentWrapperView.layoutParams as CoordinatorLayout.LayoutParams
+        param.behavior = FixScrollingFooterBehavior()
+
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        val params = toolbar.layoutParams as AppBarLayout.LayoutParams
+
+        params.scrollFlags =
+            AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL +
+            AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
+
+        toolbar.layoutParams = params
+    }
+
+    private fun disableScrollingAppBar() {
+        val fragmentWrapperView = findViewById<ConstraintLayout>(R.id.contentMain)
+        val param: CoordinatorLayout.LayoutParams = fragmentWrapperView.layoutParams as CoordinatorLayout.LayoutParams
+        param.behavior = AppBarLayout.ScrollingViewBehavior()
+
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        val params = toolbar.layoutParams as AppBarLayout.LayoutParams
+
+        params.scrollFlags =
+            AppBarLayout.LayoutParams.SCROLL_FLAG_NO_SCROLL
+
+        toolbar.layoutParams = params
+
+        fragmentWrapperView.setPadding(
+            fragmentWrapperView.paddingLeft,
+            fragmentWrapperView.paddingTop,
+            fragmentWrapperView.paddingRight,
+            0
+        )
     }
 
     override fun onSupportNavigateUp(): Boolean {

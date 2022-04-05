@@ -18,7 +18,8 @@ data class AreaEntity(
     val lastName: String,
     val lastText: String,
     val lastTime: Long = 0,
-    val url: String = ""
+    val url: String = "",
+    val mute: Byte,
 ) {
     fun toDto() = SubscriptionArea(
         id = id,
@@ -30,7 +31,8 @@ data class AreaEntity(
         lastName = lastName,
         lastText = lastText,
         lastTime = lastTime,
-        count = count
+        count = count,
+        mute = mute,
     )
 
     companion object {
@@ -45,7 +47,8 @@ data class AreaEntity(
                 lastName = dto.lastName,
                 lastText = dto.lastText,
                 lastTime = dto.lastTime,
-                count = dto.count
+                count = dto.count,
+                mute = dto.mute,
             )
     }
 }

@@ -43,6 +43,7 @@
     <string name="action_subscribe">Subscribe</string>
     <string name="action_unsubscribe">Unsubscribe</string>
     <string name="action_mute">Mute</string>
+    <string name="action_unmute">Unmute</string>
     <string name="success_auth">Successful authorization</string>
     <string name="short_days">d.</string>
     <string name="delete_post_confirm_text">Delete this post?</string>

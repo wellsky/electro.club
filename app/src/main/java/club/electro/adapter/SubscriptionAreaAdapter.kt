@@ -6,6 +6,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import club.electro.R
 import club.electro.databinding.ItemSubscriptionBinding
 import club.electro.dto.SubscriptionArea
 import club.electro.utils.areaLastActivityTime
@@ -49,7 +50,15 @@ class SubscriptionAreaViewHolder(
             areaLastMessageTime.text = areaLastActivityTime(area.lastTime, this.root.context)
 
             areaUnreadMessagesCount.isVisible = ((area.group.toInt() != 0) && (area.count > 0))
-            areaUnreadMessagesCount.text = area.count.toString()
+
+            if (areaUnreadMessagesCount.isVisible) {
+                if (area.mute.toInt() == 1) {
+                    areaUnreadMessagesCount.setBackgroundResource(R.drawable.subscriptions_newmessages_mute_bg)
+                } else {
+                    areaUnreadMessagesCount.setBackgroundResource(R.drawable.subscriptions_newmessages_bg)
+                }
+                areaUnreadMessagesCount.text = area.count.toString()
+            }
 
             if (!area.image.isEmpty()) {
                 areaImage.loadCircleCrop(area.image)

@@ -47,5 +47,6 @@ class MainViewModel @Inject constructor(
 data class ToolBarConfig (
     val title: String? = null,
     val subtitle: String? = null,
+    val scroll: Boolean = false,
     val onClick: () -> Unit = {}
 )
