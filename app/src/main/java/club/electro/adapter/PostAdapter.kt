@@ -3,10 +3,14 @@ package club.electro.adapter
 import ImageGetter
 import QuoteSpanClass
 import android.content.res.Resources
+import android.graphics.Paint
 import android.text.Spannable
 import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.text.style.ImageSpan
 import android.text.style.QuoteSpan
 import android.text.style.URLSpan
 import android.text.util.Linkify
@@ -14,9 +18,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.TextView
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -24,12 +30,6 @@ import club.electro.R
 import club.electro.databinding.ItemPostBinding
 import club.electro.dto.Post
 import com.bumptech.glide.Glide
-import android.text.SpannableStringBuilder
-import android.widget.TextView
-import android.text.style.ClickableSpan
-import androidx.lifecycle.LifecycleCoroutineScope
-import android.graphics.Paint
-import club.electro.databinding.PartPostStatsBinding
 
 
 interface PostInteractionListener {
@@ -37,7 +37,7 @@ interface PostInteractionListener {
     fun onEditClicked(post: Post) {}
     fun onRemoveClicked(post: Post) {}
     fun onAvatarClicked(post: Post) {}
-    fun onUrlClicked(url: String?) {}
+    fun onUrlClicked(url: String) {}
     fun onAttachmentsClicked(post: Post) {}
     fun onOpenClicked(post: Post) {}
 }
@@ -194,6 +194,8 @@ class PostViewHolder(
             ) as Spannable
 
             val trimmedPostText: CharSequence = htmlSpan.trim()
+
+
             val result = trimmedPostText
             replaceQuoteSpans(result as Spannable)
 
@@ -220,7 +222,21 @@ class PostViewHolder(
                 )
             }
 
-            setTextViewHTML(content, restoreAnchorsSpan)
+            val newSpan = restoreAnchorsSpan
+
+            // Оборачиваем все изображения в ссылки
+            for (span in newSpan.getSpans(0, newSpan.length, ImageSpan::class.java)) {
+                val flags: Int = newSpan.getSpanFlags(span)
+                val start: Int = newSpan.getSpanStart(span)
+                val end: Int = newSpan.getSpanEnd(span)
+                newSpan.setSpan(object : URLSpan(span.source) {
+                    override fun onClick(v: View) {
+                        println("IMAGE CLICKED")
+                    }
+                }, start, end, flags)
+            }
+
+            setTextViewHTML(content, newSpan)
         }
     }
 
@@ -232,7 +248,8 @@ class PostViewHolder(
         val clickable: ClickableSpan = object : ClickableSpan() {
             override fun onClick(view: View) {
                 // Do something with span.getURL() to handle the link click...
-                onInteractionListener.onUrlClicked(span?.getURL())
+                if (span != null)
+                    onInteractionListener.onUrlClicked(span.url)
             }
         }
         strBuilder.setSpan(clickable, start, end, flags)

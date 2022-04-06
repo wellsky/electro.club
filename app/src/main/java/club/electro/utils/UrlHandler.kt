@@ -39,26 +39,24 @@ class UrlHandler @AssistedInject constructor(
 
     private val PRIMARY_HOST = "electro.club"
     private val PATH_USERS = "users"
-    private var url: String? = ""
+    private var url: String = ""
 
-    fun setUrl(url: String?): UrlHandler {
+    fun setUrl(url: String): UrlHandler {
         this.url = url
         return this
     }
 
     fun open() {
-        url?.let { url ->
-            val uri = URI(url)
-            val host: String = uri.host
+        val uri = URI(url)
+        val host: String = uri.host
 
-            if (host == PRIMARY_HOST) {
-                parseUriLocal(uri)
-                    ?.let(UrlDataResultDto::toDomainModel)
-                    ?.let(this::openUrlData)
-                    ?: parseUriRemoteAndOpen(uri)
-            } else {
-                urlHandlerAction.openUnknown(uri.toString())
-            }
+        if (host == PRIMARY_HOST) {
+            parseUriLocal(uri)
+                ?.let(UrlDataResultDto::toDomainModel)
+                ?.let(this::openUrlData)
+                ?: parseUriRemoteAndOpen(uri)
+        } else {
+            urlHandlerAction.openUnknown(uri.toString())
         }
     }
 

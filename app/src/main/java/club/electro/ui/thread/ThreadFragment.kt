@@ -220,27 +220,37 @@ class ThreadFragment: Fragment() {
                 }
             }
 
-            override fun onUrlClicked(url: String?) {
-                val action = object : UrlHandlerAction(findNavController(), requireContext()) {
-                    override fun openThread(data: UrlDataResult.Thread) {
-                        if ((data.threadType.value == threadType) && (data.threadId == threadId)) {
-                            Snackbar.make(binding.root, getString(R.string.you_are_viewing_this_thread), Snackbar.LENGTH_LONG)
-                                .show()
-                        } else {
-                            super.openThread(data)
+            override fun onUrlClicked(url: String) {
+                if (url.isImageUrl()) {
+                    StfalconImageViewer.Builder(context, listOf(url)) { view, image ->
+                        Picasso.get().load(image).into(view)
+                    }.show()
+                } else {
+                    val action = object : UrlHandlerAction(findNavController(), requireContext()) {
+                        override fun openThread(data: UrlDataResult.Thread) {
+                            if ((data.threadType.value == threadType) && (data.threadId == threadId)) {
+                                Snackbar.make(
+                                    binding.root,
+                                    getString(R.string.you_are_viewing_this_thread),
+                                    Snackbar.LENGTH_LONG
+                                )
+                                    .show()
+                            } else {
+                                super.openThread(data)
+                            }
+                        }
+
+                        override fun openMessageInThread(data: UrlDataResult.MessageInThread) {
+                            if ((data.threadType.value == threadType) && (data.threadId == threadId)) {
+                                viewModel.reloadPosts(ThreadLoadTarget(data.postId))
+                            } else {
+                                super.openMessageInThread(data)
+                            }
                         }
                     }
 
-                    override fun openMessageInThread(data: UrlDataResult.MessageInThread) {
-                        if ((data.threadType.value == threadType) && (data.threadId == threadId)) {
-                            viewModel.reloadPosts(ThreadLoadTarget(data.postId))
-                        } else {
-                            super.openMessageInThread(data)
-                        }
-                    }
+                    urlHandlerFactory.create(action).setUrl(url).open()
                 }
-
-                urlHandlerFactory.create(action).setUrl(url).open()
             }
         }, lifecycleScope)
 
@@ -515,7 +525,7 @@ class ThreadFragment: Fragment() {
     /**
      * Прижимает все сообщения к низу
      */
-    fun setGravityBottom() {
+    private fun setGravityBottom() {
         val linearLayoutManager = LinearLayoutManager(this.context)
         linearLayoutManager.reverseLayout = true
         linearLayoutManager.stackFromEnd = false
@@ -525,40 +535,35 @@ class ThreadFragment: Fragment() {
     /**
      * Устанавливает гравитацию в зависимости от целевого поста
      */
-    fun setGravityForTarget(target: ThreadLoadTarget) {
-        println("Set gravity for target " + target.targetPostId)
+    private fun setGravityForTarget(target: ThreadLoadTarget) {
         if (target.targetPostId > 0) {
-            println("1")
             setGravityTop()
         }
         if (target.targetPostId == TARGET_POSITION_FIRST_UNREAD) {
-            println("2")
             setGravityTop()
             scrolledToTop = true
             binding.buttonScrollToBegin.isVisible = false
         }
         if (target.targetPostId == TARGET_POSITION_FIRST) {
-            println("3")
             setGravityTop()
             scrolledToTop = true
             binding.buttonScrollToBegin.isVisible = false
 
         }
         if (target.targetPostId == TARGET_POSITION_LAST) {
-            println("4")
             setGravityBottom()
             scrolledToBottom = true
             binding.buttonScrollToEnd.isVisible = false
         }
     }
 
-    fun scrollToTop() {
-        binding.postsList.getAdapter()?.let {
-            binding.postsList.smoothScrollToPosition(it.getItemCount() - 1);
+    private fun scrollToTop() {
+        binding.postsList.adapter?.let {
+            binding.postsList.smoothScrollToPosition(it.itemCount - 1);
         }
     }
 
-    fun scrollToBottom() {
+    private fun scrollToBottom() {
         binding.postsList.smoothScrollToPosition(0);
     }
 
@@ -575,4 +580,11 @@ class ThreadFragment: Fragment() {
             }
         }
     }
+
+    private fun String.isImageUrl(): Boolean =
+        this.takeLast(4) == ".jpg" ||
+        this.takeLast(5) == ".jpeg" ||
+        this.takeLast(4) == ".png" ||
+        this.takeLast(4) == ".gif"
+
 }
