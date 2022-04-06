@@ -11,7 +11,7 @@ fun ImageView.load(url: String?, vararg transforms: BitmapTransformation = empty
         .load(url)
         .timeout(5_000)
         .transform(*transforms)
-        .placeholder(R.drawable.ic_loading_100dp)
+        .placeholder(R.drawable.progress_animation)
         .error(R.drawable.ic_error_100dp)
         .into(this)
 

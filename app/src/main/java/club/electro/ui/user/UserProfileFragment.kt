@@ -79,6 +79,7 @@ class UserProfileFragment : Fragment() {
                 }
 
                 user.avatar?.let {
+                    println("Loading avatar")
                     avatar.loadCircleCrop(it)
                 }
 

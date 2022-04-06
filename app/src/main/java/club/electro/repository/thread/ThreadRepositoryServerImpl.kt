@@ -103,7 +103,6 @@ class ThreadRepositoryServerImpl @Inject constructor(
 
 
     override suspend fun setThreadVisit() {
-        println("Set thread visit")
         try {
             val response = apiService.setThreadVisit(
                 threadType = threadType,

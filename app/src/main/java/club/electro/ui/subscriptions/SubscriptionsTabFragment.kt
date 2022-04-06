@@ -63,7 +63,10 @@ class SubscriptionsTabFragment : Fragment() {
                     Bundle().apply {
                         threadType = area.type
                         threadId = area.objectId
-                        targetPostId = if (area.count > 0) ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD else ThreadLoadTarget.TARGET_POSITION_LAST // Если есть непрочитанные, то грузить с первого непрочитанного, иначе с последнего сообщения в теме
+                        targetPostId = if (currentGroup == 0.toByte() || area.count == 0)
+                                            ThreadLoadTarget.TARGET_POSITION_LAST
+                                        else
+                                            ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD
                     }
                 )
             }
@@ -71,8 +74,7 @@ class SubscriptionsTabFragment : Fragment() {
 
         binding.subscriptionsList.adapter = adapter
 
-        viewModel.items(currentGroup).observe(viewLifecycleOwner, { items ->
-            //binding.swiperefresh.isActivated = it.authorized
+        viewModel.items(currentGroup).observe(viewLifecycleOwner) { items ->
             if (items.isEmpty()) {
                 binding.swiperefresh.isVisible = false
                 if (viewModel.appAuth.authorized()) {
@@ -87,8 +89,8 @@ class SubscriptionsTabFragment : Fragment() {
             }
 
             adapter.submitList(items)
-            binding.swiperefresh.setRefreshing(false)
-        })
+            binding.swiperefresh.isRefreshing = false
+        }
 
         binding.swiperefresh.setOnRefreshListener {
             viewModel.loadSubscriptions(currentGroup)
