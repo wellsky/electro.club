@@ -1,6 +1,7 @@
 package club.electro.repository.feed
 
 import club.electro.api.ApiService
+import club.electro.api.checkIfOk
 import club.electro.dao.FeedPostDao
 import club.electro.dto.FeedPost
 import club.electro.entity.toEntity
@@ -31,20 +32,10 @@ class FeedRepositoryServerImpl @Inject constructor(
     }.flowOn(Dispatchers.Default)
 
     override suspend fun getFeedPosts() {
-        try {
-            val response = apiService.getFeedPosts()
+        val result = apiService.getFeedPosts().checkIfOk(networkStatus)
 
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
-            }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-
-            dao.insert(body.data.messages.toEntity())
-            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
-        } catch (e: IOException) {
-            networkStatus.setStatus(NetworkStatus.Status.ERROR)
-        } catch (e: Exception) {
-            throw UnknownError
+        if (result != null) {
+            dao.insert(result.data.messages.toEntity())
         }
     }
 }

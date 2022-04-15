@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -14,6 +15,7 @@ import club.electro.MainViewModel
 import club.electro.R
 import club.electro.ToolBarConfig
 import club.electro.databinding.FragmentUserProfileBinding
+import club.electro.dto.ThreadLink
 import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
@@ -22,6 +24,9 @@ import club.electro.utils.LongArg
 import club.electro.utils.loadCircleCrop
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class UserProfileFragment : Fragment() {
@@ -34,8 +39,6 @@ class UserProfileFragment : Fragment() {
 
     private var _binding: FragmentUserProfileBinding? = null
     private val binding get() = _binding!!
-
-    //private lateinit var viewModel: UserProfileViewModel
 
     private val viewModel: UserProfileViewModel by viewModels()
 
@@ -83,21 +86,44 @@ class UserProfileFragment : Fragment() {
                     avatar.loadCircleCrop(it)
                 }
 
-                chat.isVisible = false
-                user.myChat?.let { link ->
-                    chat.isVisible = true
+
+                chat.isVisible = viewModel.appAuth.authorized()
+
+                if (user.myChat != null) {
                     chat.setOnClickListener {
-                        findNavController().navigate(
-                            R.id.action_userProfileFragment_to_threadFragment,
-                            Bundle().apply {
-                                threadType = link.threadType
-                                threadId = link.threadId
-                                targetPostId = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD
+                        openChat(ThreadLink(
+                            threadType = user.myChat.threadType,
+                            threadId = user.myChat.threadId
+                        ))
+                    }
+                } else {
+                    chat.setOnClickListener {
+                        val builder = AlertDialog.Builder(requireContext())
+                        builder.setMessage(getString(R.string.create_new_chat, user.name))
+                            .setCancelable(false)
+                            .setPositiveButton(getString(R.string.delete_post_confirm_yes)) { dialog, id ->
+                                viewModel.getChatWith(user.id).observe(viewLifecycleOwner) {
+                                    if (it != null) {
+                                        openChat(
+                                            ThreadLink(
+                                                threadType = it.threadType,
+                                                threadId = it.threadId
+                                            )
+                                        )
+                                    }
+                                }
                             }
-                        )
+                            .setNegativeButton(getString(R.string.delete_post_confirm_no)) { dialog, id ->
+                                dialog.dismiss()
+                            }
+                        val alert = builder.create()
+                        alert.show()
                     }
                 }
             }
+
+
+
 
             requireActivity().run {
                 val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -115,5 +141,16 @@ class UserProfileFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun openChat(thread: ThreadLink) {
+        findNavController().navigate(
+            R.id.action_userProfileFragment_to_threadFragment,
+            Bundle().apply {
+                threadType = thread.threadType
+                threadId = thread.threadId
+                targetPostId = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD
+            }
+        )
     }
 }

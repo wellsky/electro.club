@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.paging.PagingData
 import club.electro.dto.Post
 import club.electro.dto.PostsThread
+import club.electro.dto.ThreadLink
 import kotlinx.coroutines.flow.Flow
 
 interface ThreadRepository {

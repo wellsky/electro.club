@@ -40,7 +40,7 @@ class NetworkModule {
                 context.resources.getString(R.string.electro_club_access_token)
 
             val requestBuilder = request.newBuilder()
-                //.header("Host", "electro.local")
+                .header("Host", "electro.local")
                 .header("ACCESS-TOKEN", accessToken)
 
 

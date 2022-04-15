@@ -28,7 +28,6 @@ import java.net.URI
 
 
 class UrlHandler @AssistedInject constructor(
-    //@Assisted val navController: NavController,
     @Assisted val urlHandlerAction: UrlHandlerAction,
     val apiService: ApiService
 ) {
@@ -37,8 +36,11 @@ class UrlHandler @AssistedInject constructor(
         fun create(urlHandlerAction: UrlHandlerAction): UrlHandler
     }
 
-    private val PRIMARY_HOST = "electro.club"
-    private val PATH_USERS = "users"
+    companion object {
+        private const val PRIMARY_HOST = "electro.club"
+        private const val PATH_USERS = "users"
+    }
+
     private var url: String = ""
 
     fun setUrl(url: String): UrlHandler {
@@ -60,7 +62,7 @@ class UrlHandler @AssistedInject constructor(
         }
     }
 
-    fun parseUriLocal(uri: URI): UrlDataResultDto? {
+    private fun parseUriLocal(uri: URI): UrlDataResultDto? {
         val path: String = uri.path
         if (path.isNotBlank()) {
             val firstPath = path.substringAfter("/").substringBefore("/")
@@ -80,7 +82,7 @@ class UrlHandler @AssistedInject constructor(
     }
 
 
-    fun parseUriRemoteAndOpen(uri: URI) {
+    private fun parseUriRemoteAndOpen(uri: URI) {
         CoroutineScope(Dispatchers.Main).launch {
             val response = apiService.getUrlData(
                 url = uri.toString()
@@ -95,7 +97,7 @@ class UrlHandler @AssistedInject constructor(
         }
     }
 
-    fun openUrlData(data: UrlDataResult) {
+    private fun openUrlData(data: UrlDataResult) {
         when (data) {
             is UrlDataResult.Thread -> {
                 urlHandlerAction.openThread(data)
@@ -115,8 +117,8 @@ class UrlHandler @AssistedInject constructor(
 
 
 open class UrlHandlerAction(
-    val navController: NavController,
-    val context: Context
+    private val navController: NavController,
+    private val context: Context
 ) {
     open fun openThread(data: UrlDataResult.Thread) {
         navController.navigate(
