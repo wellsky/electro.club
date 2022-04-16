@@ -103,6 +103,8 @@
                 android:paddingBottom="@dimen/common_spacing"
                 android:layout_marginStart="@dimen/common_spacing"
                 android:layout_marginEnd="@dimen/common_spacing"
+                android:textIsSelectable="true"
+                android:textColorHighlight="@color/grey_d"
                 tools:text="@sample/posts.json/data/text" />
 
             <com.google.android.material.button.MaterialButton

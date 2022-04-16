@@ -87,7 +87,8 @@ class UserProfileFragment : Fragment() {
                 }
 
 
-                chat.isVisible = viewModel.appAuth.authorized()
+                chat.isVisible =
+                     viewModel.appAuth.authorized() && viewModel.appAuth.myId() != user.id
 
                 if (user.myChat != null) {
                     chat.setOnClickListener {
