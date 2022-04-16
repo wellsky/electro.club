@@ -22,7 +22,7 @@
     <string name="enter_login_data">Sign in to electro.club</string>
     <string name="error_auth">Authorization error</string>
     <string name="button_signout">Sign out</string>
-    <string name="enter_login_hint">Login...</string>
+    <string name="enter_login_hint">Login (e-mail)...</string>
     <string name="enter_password_hint">Password...</string>
     <string name="error_empty_post">Can not save empty post</string>
     <string name="notification_thread_post">%1$s published new post</string>
@@ -105,4 +105,5 @@
     <string name="confirm_change_socket_status">Change socket status to:  %1$s?</string>
     <string name="confirm_confirm_socket_status">Confirm socket status %1$s?</string>
     <string name="socket_status_hint">Are you near this power socket? Confirm or change its status to help keep this map up to date :)</string>
+    <string name="transport">Transport</string>
 </resources>

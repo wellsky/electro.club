@@ -1,5 +1,6 @@
 package club.electro.api
 
+import club.electro.BuildConfig
 import club.electro.dto.*
 import club.electro.utils.UrlDataResultDto
 import club.electro.utils.UrlType
@@ -49,7 +50,10 @@ fun retrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
 interface ApiService {
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)
-    suspend fun getFeedPosts(@Field("method") method: String = "getFeedPosts"): Response<ApiResponse<ApiFeedPostsData>>
+    suspend fun getFeedPosts(
+        @Field("method") method: String = "getFeedPosts",
+        @Field("version") version: Int = BuildConfig.VERSION_CODE
+    ): Response<ApiResponse<ApiFeedPostsData>>
 
     @FormUrlEncoded
     @POST(BASE_SERVER_URL)

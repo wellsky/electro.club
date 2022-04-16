@@ -2,6 +2,7 @@ package club.electro.adapter
 
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
+import club.electro.BuildConfig
 import club.electro.dto.Post
 import club.electro.dto.User
 import club.electro.entity.PostEntity
@@ -89,6 +90,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
         prepareImagesOnNewLine()
         prepareBasicTags()
         prepareRelativeUrls()
+        prepareAppVersionTag()
 
         // suspend:
         prepareAnswerTo()
@@ -99,7 +101,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
     }
 
 
-    fun prepareBasicTags(): PostEntityContentPreparator {
+    private fun prepareBasicTags(): PostEntityContentPreparator {
         var newText = text
         //newText = newText.replace("<br /></p>", "</p>")
         //newText = newText.replace("<p>", "")
@@ -109,7 +111,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
         return this
     }
 
-    suspend fun prepareAnswerTo(): PostEntityContentPreparator {
+    private suspend fun prepareAnswerTo(): PostEntityContentPreparator {
         fun shortTextPreview(content: String): String {
             val noHtmlTags = HtmlCompat.fromHtml(content, FROM_HTML_MODE_LEGACY).toString()
 
@@ -135,7 +137,17 @@ class PostEntityContentPreparator @AssistedInject constructor(
         return this
     }
 
-    fun preparePlainText(): PostEntityContentPreparator {
+    /**
+     * Тэг, отображающий номер версии
+     */
+    private fun prepareAppVersionTag(): PostEntityContentPreparator {
+        var newText = text
+        newText = newText.replace("[app_version]", BuildConfig.VERSION_NAME)
+        text = newText
+        return this
+    }
+
+    private fun preparePlainText(): PostEntityContentPreparator {
         var newText = text
         newText = newText.replace("<br>", "\n")
         newText = newText.replace("<br />", "\n")
@@ -147,7 +159,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
     /**
      * Если в тексте изображение имеет относительный URL, добавляет полностю домен
      */
-    fun prepareRelativeUrls(): PostEntityContentPreparator {
+    private fun prepareRelativeUrls(): PostEntityContentPreparator {
         var newText = text
         newText = newText.replace("src=\"/data/", "src=\"https://electro.club/data/")
 
@@ -158,7 +170,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
     /**
      * Заменяет тэги [quote messge=<id>]<text>[/quote] на цитату
      */
-    suspend fun prepareQuotes(): PostEntityContentPreparator {
+    private suspend fun prepareQuotes(): PostEntityContentPreparator {
         postEntity?.let { post ->
             val pattern = """\[quote message=(\d+?)\](.*?)\[\/quote\]"""
             val result = Regex(pattern).replace(text) {
@@ -184,7 +196,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
     /**
      * Заменяет тэги [user=<id>] на никнейм, ссылающийся на профиль пользователя
      */
-    suspend fun prepareUsers(): PostEntityContentPreparator {
+    private suspend fun prepareUsers(): PostEntityContentPreparator {
         val pattern = """\[user=(\d+?)\]"""
 
         val result = Regex(pattern).replace(text) {
@@ -202,7 +214,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
     /**
      * Заменяет тэги [quote="<authorName>"]<text>[/quote] и [quote ]<text>[/quote] на цитату
      */
-    fun prepareLegacyQuotes(): PostEntityContentPreparator {
+    private fun prepareLegacyQuotes(): PostEntityContentPreparator {
         val pattern1= """\[quote="(.*?)"\](.*?)\[\/quote\]"""
 
         val result1 = Regex(pattern1).replace(text) {
@@ -224,7 +236,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
         return this
     }
 
-    fun prepareLegacyUrls(): PostEntityContentPreparator {
+    private fun prepareLegacyUrls(): PostEntityContentPreparator {
         val pattern= """\[url=(.*?)\](.*?)\[\/url\]"""
 
         val result = Regex(pattern).replace(text) {
@@ -241,7 +253,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
      * В текстах встречаются изображения с классом emojione
      * Вместо этих изображений надо подставить эмоджи, который указан у них в alt
      */
-    fun prepareEmojies(): PostEntityContentPreparator {
+    private fun prepareEmojies(): PostEntityContentPreparator {
         val pattern = """<img class="emojione".*?alt="(.*?)"[^\>]+>"""
         val result = Regex(pattern).replace(text) {
             val (emojieChar) = it.destructured
@@ -252,7 +264,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
     }
 
 
-    fun prepareImagesOnNewLine() : PostEntityContentPreparator {
+    private fun prepareImagesOnNewLine() : PostEntityContentPreparator {
         var newText = text
         newText = newText.replace("<img", "<br><img")
 

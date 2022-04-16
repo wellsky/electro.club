@@ -80,11 +80,11 @@
     <fragment
         android:id="@+id/socketFragment"
         android:name="club.electro.ui.map.socket.SocketFragment"
-        android:label="Power socket" />
+        android:label="@string/socket_title" />
     <fragment
         android:id="@+id/nav_transport_list"
         android:name="club.electro.ui.transport.TransportListFragment"
-        android:label="Transport" >
+        android:label="@string/transport" >
         <action
             android:id="@+id/action_nav_transport_list_to_transportFragment"
             app:destination="@id/transportFragment" />
@@ -96,5 +96,5 @@
     <fragment
         android:id="@+id/postAttachmentsFragment"
         android:name="club.electro.ui.thread.ThreadAttachmentsFragment"
-        android:label="Attachments" />
+        android:label="@string/attachments" />
 </navigation>
