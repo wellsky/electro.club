@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:padding="16dp">
 
         <TextView
@@ -74,11 +74,11 @@
             android:id="@+id/statusTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/socketImage"
-            app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="24dp"
             android:text="@string/socket_status"
-            />
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/socketImage" />
 
         <TextView
             android:id="@+id/statusValue"
@@ -86,7 +86,17 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="@id/statusTitle"
             app:layout_constraintStart_toEndOf="@id/statusTitle"
+            android:textStyle="bold"
             tools:text="@string/socket_status_on"
+            />
+
+        <TextView
+            android:id="@+id/statusHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/statusTitle"
+            app:layout_constraintStart_toStartOf="@id/statusTitle"
+            android:text="@string/socket_status_hint"
             />
 
         <com.google.android.material.button.MaterialButton
@@ -96,7 +106,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:padding="16dp"
-            app:layout_constraintTop_toBottomOf="@id/statusTitle"
+            app:layout_constraintTop_toBottomOf="@id/statusHint"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintHorizontal_chainStyle="spread"
             android:text="@string/socket_status_on"

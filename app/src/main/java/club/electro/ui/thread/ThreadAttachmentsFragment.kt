@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import club.electro.MainViewModel
@@ -16,8 +15,6 @@ import club.electro.adapter.PostAttachmentAdapter
 import club.electro.adapter.PostAttachmentInteractionListener
 import club.electro.databinding.FragmentThreadAttachmentsBinding
 import club.electro.dto.PostAttachment
-import club.electro.utils.ByteArg
-import club.electro.utils.LongArg
 import com.esafirm.imagepicker.features.*
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -60,10 +57,10 @@ class ThreadAttachmentsFragment: Fragment(R.layout.fragment_thread_attachments) 
                 val builder = AlertDialog.Builder(requireContext())
                 builder.setMessage(getString(R.string.delete_post_attachment_confirm_text))
                     .setCancelable(false)
-                    .setPositiveButton(getString(R.string.delete_post_confirm_yes)) { dialog, id ->
+                    .setPositiveButton(getString(R.string.confirm_yes)) { dialog, id ->
                         viewModel.removeAttachment(attachment)
                     }
-                    .setNegativeButton(getString(R.string.delete_post_confirm_no)) { dialog, id ->
+                    .setNegativeButton(getString(R.string.confirm_no)) { dialog, id ->
                         dialog.dismiss()
                     }
                 val alert = builder.create()

@@ -2,6 +2,7 @@ package club.electro.repository.map
 
 import club.electro.dto.MapMarker
 import club.electro.dto.Socket
+import club.electro.dto.SocketStatus
 import kotlinx.coroutines.flow.Flow
 
 interface MapRepository {
@@ -9,7 +10,9 @@ interface MapRepository {
 
     suspend fun getAll()
 
-    fun setMerkersFilter(list: List<Byte>)
+    fun observeSocket(id: Long): Flow<Socket?>
+    suspend fun updateSocket(id: Long)
 
-    fun getSocket(id: Long): Flow<Socket>
+    fun setMarkersFilter(list: List<Byte>)
+    suspend fun setSocketStatus(socketId: Long, status: SocketStatus)
 }

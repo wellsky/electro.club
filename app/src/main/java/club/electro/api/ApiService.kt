@@ -18,8 +18,8 @@ import retrofit2.http.*
  * Кроме изменения основого адреса, надо добавить в манифест поддержку http, а также в токен-интерцепторе подстановку хоста
  * Отменить запросы к srv1 в SubscriptionsRepository и ThreadRepository
  */
-//const val BASE_SERVER_URL = "https://electro.club/api/v1/"
-const val BASE_SERVER_URL = "http://10.0.2.2:80/api/v1/"
+const val BASE_SERVER_URL = "https://electro.club/api/v1/"
+//const val BASE_SERVER_URL = "http://10.0.2.2:80/api/v1/"
 const val UPDATES_SERVER_URL = "https://srv1.electro.club/api/"
 
 
@@ -122,6 +122,14 @@ interface ApiService {
     suspend fun getSocketDetails(
         @Field("method") method: String = "getSocketDetails",
         @Field("socket_id") socketId: Long,
+    ): Response<ApiResponse<ApiSocketDetails>>
+
+    @FormUrlEncoded
+    @POST(BASE_SERVER_URL)
+    suspend fun setSocketStatus(
+        @Field("method") method: String = "setSocketStatus",
+        @Field("socket_id") socketId: Long,
+        @Field("status") status: SocketStatus,
     ): Response<ApiResponse<ApiSocketDetails>>
 
     @FormUrlEncoded

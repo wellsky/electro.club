@@ -178,10 +178,10 @@ class ThreadFragment: Fragment() {
                 val builder = AlertDialog.Builder(requireContext())
                 builder.setMessage(getString(R.string.delete_post_confirm_text))
                     .setCancelable(false)
-                    .setPositiveButton(getString(R.string.delete_post_confirm_yes)) { dialog, id ->
+                    .setPositiveButton(getString(R.string.confirm_yes)) { dialog, id ->
                         viewModel.removePost(post)
                     }
-                    .setNegativeButton(getString(R.string.delete_post_confirm_no)) { dialog, id ->
+                    .setNegativeButton(getString(R.string.confirm_no)) { dialog, id ->
                         dialog.dismiss()
                     }
                 val alert = builder.create()

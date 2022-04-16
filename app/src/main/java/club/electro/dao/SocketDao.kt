@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SocketDao {
     @Query("SELECT * FROM SocketEntity WHERE id = :id")
-    fun get(id: Long): Socket
+    fun observe(id: Long): Flow<Socket?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(socket: SocketEntity)

@@ -5,6 +5,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import club.electro.dto.Post
 import club.electro.dto.Socket
+import club.electro.dto.SocketStatus
 
 @Entity
 data class SocketEntity(
@@ -12,7 +13,7 @@ data class SocketEntity(
     val id: Long,
     val name: String,
     val text: String,
-    val status: String,
+    val status: SocketStatus,
     val created: Long,
     val modified: Long,
     val authorId: Long,

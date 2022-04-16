@@ -36,7 +36,7 @@ class MapViewModel @Inject constructor(
         markersFilter.addAll(
             Gson().fromJson<MutableList<Byte>>(filterJson, object : TypeToken<MutableList<Byte>>() {}.type)
         )
-        repository.setMerkersFilter(markersFilter)
+        repository.setMarkersFilter(markersFilter)
     }
 
     fun getAllMarkers() = viewModelScope.launch {
@@ -63,7 +63,7 @@ class MapViewModel @Inject constructor(
 
     fun setFilter(value: Byte, show: Boolean) {
         if (show) markersFilter.add(value) else markersFilter.remove(value)
-        repository.setMerkersFilter(markersFilter)
+        repository.setMarkersFilter(markersFilter)
         with(prefs.edit()) {
             putString(
                 filterKey,

@@ -47,8 +47,8 @@
     <string name="success_auth">Successful authorization</string>
     <string name="short_days">d.</string>
     <string name="delete_post_confirm_text">Delete this post?</string>
-    <string name="delete_post_confirm_yes">Yes</string>
-    <string name="delete_post_confirm_no">No</string>
+    <string name="confirm_yes">Yes</string>
+    <string name="confirm_no">No</string>
     <string name="map_filter_groups">Groups</string>
     <string name="map_filter_sockets">Sockets</string>
     <string name="network_status_online">Network status: online</string>
@@ -102,4 +102,7 @@
     <string name="image_picker_done">DONE</string>
     <string name="subscriptions_empty_list">A list of your subscriptions will be displayed here. You don\'t have subscriptions at the moment.</string>
     <string name="create_new_chat">A new chat will be created and %1$s will see it even if you don\'t write anything. Continue?</string>
+    <string name="confirm_change_socket_status">Change socket status to:  %1$s?</string>
+    <string name="confirm_confirm_socket_status">Confirm socket status %1$s?</string>
+    <string name="socket_status_hint">Are you near this power socket? Confirm or change its status to help keep this map up to date :)</string>
 </resources>

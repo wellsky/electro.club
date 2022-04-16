@@ -24,9 +24,6 @@ import club.electro.utils.LongArg
 import club.electro.utils.loadCircleCrop
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class UserProfileFragment : Fragment() {
@@ -102,7 +99,7 @@ class UserProfileFragment : Fragment() {
                         val builder = AlertDialog.Builder(requireContext())
                         builder.setMessage(getString(R.string.create_new_chat, user.name))
                             .setCancelable(false)
-                            .setPositiveButton(getString(R.string.delete_post_confirm_yes)) { dialog, id ->
+                            .setPositiveButton(getString(R.string.confirm_yes)) { dialog, id ->
                                 viewModel.getChatWith(user.id).observe(viewLifecycleOwner) {
                                     if (it != null) {
                                         openChat(
@@ -114,7 +111,7 @@ class UserProfileFragment : Fragment() {
                                     }
                                 }
                             }
-                            .setNegativeButton(getString(R.string.delete_post_confirm_no)) { dialog, id ->
+                            .setNegativeButton(getString(R.string.confirm_no)) { dialog, id ->
                                 dialog.dismiss()
                             }
                         val alert = builder.create()

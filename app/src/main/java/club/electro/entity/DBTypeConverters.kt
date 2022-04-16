@@ -77,4 +77,10 @@ class DBTypeConverters {
         val type = object : TypeToken<TransportSpecs>() {}.type
         return Gson().fromJson<TransportSpecs>(primaryString, type)
     }
+
+    @TypeConverter
+    fun toSocketStatus(value: String) = enumValueOf<SocketStatus>(value)
+
+    @TypeConverter
+    fun fromSocketStatus(value: SocketStatus) = value.name
 }

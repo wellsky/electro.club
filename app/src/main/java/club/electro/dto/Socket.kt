@@ -6,7 +6,7 @@ data class Socket (
     val id: Long,
     val name: String,
     val text: String,
-    val status: String,
+    val status: SocketStatus,
     val created: Long,
     val modified: Long,
     @SerializedName("author_id") val authorId: Long,
@@ -15,3 +15,15 @@ data class Socket (
 
     val images: List<String>?
 )
+
+enum class SocketStatus(value: String) {
+    @SerializedName("on")
+    ON("on"),
+
+    @SerializedName("off")
+    OFF("off"),
+
+    @SerializedName("missing")
+    MISSING("missing")
+}
+

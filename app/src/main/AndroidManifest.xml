@@ -20,7 +20,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Electroclub"
         android:name=".application.ElectroClubApp"
-        android:usesCleartextTraffic="true"
         >
         <!-- android:usesCleartextTraffic="true" -->
 

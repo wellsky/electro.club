@@ -1,14 +1,14 @@
 package club.electro.repository.map
 
 import android.content.Context
-import androidx.room.withTransaction
 import club.electro.api.ApiService
+import club.electro.api.NetworkService
 import club.electro.dao.MapMarkerDao
 import club.electro.dao.SocketDao
-import club.electro.db.AppDb
 import club.electro.dto.MARKER_TYPE_GROUP
 import club.electro.dto.MARKER_TYPE_SOCKET
 import club.electro.dto.Socket
+import club.electro.dto.SocketStatus
 import club.electro.entity.MapMarkerEntity
 import club.electro.entity.toDto
 import club.electro.entity.toEntity
@@ -26,6 +26,7 @@ class MapRepositoryServerImpl @Inject constructor(
     private val apiService: ApiService,
     private val markerDao: MapMarkerDao,
     private val socketDao: SocketDao,
+    private val networkService: NetworkService
 ): MapRepository {
 
     val resources = context.resources
@@ -36,7 +37,7 @@ class MapRepositoryServerImpl @Inject constructor(
         markerDao.getByTypes(list).map(List<MapMarkerEntity>::toDto).flowOn(Dispatchers.Default)
     }
 
-    override fun setMerkersFilter(list: List<Byte>) {
+    override fun setMarkersFilter(list: List<Byte>) {
         targetFlow.value = list.toList() // Необходимо создавать копию списка, чтобы трегернуть flatMapLatest
     }
 
@@ -59,26 +60,32 @@ class MapRepositoryServerImpl @Inject constructor(
         }
     }
 
-    override fun getSocket(id: Long): Flow<Socket> = flow {
-        socketDao.get(id)?.let {
-            emit(it)
-        }
+    override fun observeSocket(id: Long): Flow<Socket?> = socketDao.observe(id)
 
-        try {
-            val response = apiService.getSocketDetails(
-                socketId = id
-            )
-
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
+    override suspend fun updateSocket(id: Long) {
+        networkService.safeApiCall(
+            apiCall = {
+                apiService.getSocketDetails(
+                    socketId = id
+                )
+            },
+            onSuccess = {
+                socketDao.insert(it.data.socket.toEntity())
             }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            socketDao.insert(body.data.socket.toEntity())
-            emit(body.data.socket)
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
-    }.flowOn(Dispatchers.Default)
+        )
+    }
+
+    override suspend fun setSocketStatus(socketId: Long, status: SocketStatus) {
+        networkService.safeApiCall(
+            apiCall = {
+                apiService.setSocketStatus(
+                    socketId = socketId,
+                    status = status
+                )
+            },
+            onSuccess = {
+                socketDao.insert(it.data.socket.toEntity())
+            }
+        )
+    }
 }
