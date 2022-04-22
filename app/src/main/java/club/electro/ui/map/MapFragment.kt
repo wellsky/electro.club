@@ -1,33 +1,31 @@
 package club.electro.ui.map
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import club.electro.R
-import club.electro.ui.map.socket.SocketFragment.Companion.socketId
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import club.electro.MainViewModel
+import club.electro.R
 import club.electro.ToolBarConfig
 import club.electro.dto.MARKER_TYPE_GROUP
 import club.electro.dto.MARKER_TYPE_SOCKET
 import club.electro.dto.MapMarkerData
 import club.electro.repository.thread.ThreadLoadTarget
+import club.electro.ui.map.socket.SocketFragment.Companion.socketId
 import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import com.google.android.gms.maps.model.BitmapDescriptorFactory.fromResource
 import com.google.android.material.snackbar.Snackbar
+import com.yandex.mapkit.MapKitFactory
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class MapFragment : Fragment() {
@@ -140,23 +138,36 @@ class MapFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        map = MapYandexImpl(
+            onMapReady = { mapReadyCallback(map) },
+            onFailure = { }
+        )
+
+        map.initBeforeInflate(this.requireContext())
+
         setHasOptionsMenu(true)
         return inflater.inflate(R.layout.fragment_map, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        map = MapGoogleImpl(
-            onMapReady = { mapReadyCallback(map) },
-            onFailure = { message ->
-                Snackbar.make(view, message, Snackbar.LENGTH_LONG)
-                    .show()
-            }
-        )
+        map.setView(requireView().findViewById(R.id.yandex_map))
 
-        map.init (
-            view = childFragmentManager.findFragmentById(R.id.map),
-        )
+//        map = MapGoogleImpl(
+//            onMapReady = {
+//                mapReadyCallback(map)
+//            },
+//            onFailure = { message ->
+//                Snackbar.make(view, message, Snackbar.LENGTH_LONG)
+//                    .show()
+//            }
+//        )
+//
+//        map.initAfterInflate (
+//            view = childFragmentManager.findFragmentById(R.id.google_map),
+//        )
+
+
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -185,6 +196,16 @@ class MapFragment : Fragment() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        map.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        map.onStop()
     }
 }
 

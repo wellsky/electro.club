@@ -1,14 +1,15 @@
 package club.electro.ui.map
 
 import android.content.Context
+import android.view.View
 import androidx.fragment.app.Fragment
 import club.electro.dto.MapMarkerData
 import com.google.android.gms.maps.model.BitmapDescriptor
 
 interface Map {
-    fun init(
-        view: Fragment?
-    )
+    fun initBeforeInflate(context: Context)
+    fun initAfterInflate(view: Fragment?)
+    fun setView(view: View)
 
     fun moveCamera(position: ECCameraPosition)
     fun clear()
@@ -19,6 +20,9 @@ interface Map {
     fun cameraLat(): Double
     fun cameraLng(): Double
     fun cameraZoom(): Float
+
+    fun onStart()
+    fun onStop()
 }
 
 data class ECMarker (

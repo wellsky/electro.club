@@ -2,6 +2,7 @@ package club.electro.ui.map
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
@@ -24,7 +25,11 @@ class MapGoogleImpl(
 ): Map {
     private lateinit var googleMap: GoogleMap
 
-    override fun init (
+    override fun initBeforeInflate(context: Context) {
+
+    }
+
+    override fun initAfterInflate (
         view: Fragment?,
     ) {
         val mapFragment = view as SupportMapFragment?
@@ -33,6 +38,10 @@ class MapGoogleImpl(
         } catch (e :Exception) {
             onFailure(e.message.toString())
         }
+    }
+
+    override fun setView(view: View) {
+
     }
 
     override fun moveCamera(position: ECCameraPosition) {
@@ -77,6 +86,14 @@ class MapGoogleImpl(
     override fun cameraLat() = googleMap.cameraPosition.target.latitude
     override fun cameraLng() = googleMap.cameraPosition.target.longitude
     override fun cameraZoom() = googleMap.cameraPosition.zoom
+
+    override fun onStart() {
+
+    }
+
+    override fun onStop() {
+
+    }
 
 }
 
