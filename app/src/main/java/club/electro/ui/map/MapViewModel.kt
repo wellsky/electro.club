@@ -3,9 +3,7 @@ package club.electro.ui.map
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.*
-import androidx.paging.cachedIn
 import club.electro.dto.MARKER_TYPE_GROUP
-import club.electro.dto.UserPrimaryTransport
 import club.electro.repository.map.MapRepository
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -44,7 +42,7 @@ class MapViewModel @Inject constructor(
     }
 
     // TODO можно ли во viewModel сохранять и загружать sharedPrefs с т.ч. чистой архитектуры?
-    fun saveCameraState(position: MapCameraPosition) {
+    fun saveCameraState(position: ECCameraPosition) {
         with(prefs.edit()) {
             putDouble(latKey, position.lat)
             putDouble(lngKey, position.lng)
@@ -53,8 +51,8 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun loadCameraState(): MapCameraPosition {
-        return MapCameraPosition(
+    fun loadCameraState(): ECCameraPosition {
+        return ECCameraPosition(
             lat = prefs.getDouble(latKey, 0.0),
             lng = prefs.getDouble(lngKey, 0.0),
             zoom = prefs.getFloat(zoomKey, 0F),

@@ -1,6 +1,5 @@
 package club.electro.ui.map
 
-import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -9,27 +8,23 @@ import club.electro.R
 import club.electro.ui.map.socket.SocketFragment.Companion.socketId
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import android.graphics.Bitmap
-import android.view.*
-import android.widget.ImageView
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import club.electro.MainViewModel
 import club.electro.ToolBarConfig
-import club.electro.dto.*
+import club.electro.dto.MARKER_TYPE_GROUP
+import club.electro.dto.MARKER_TYPE_SOCKET
+import club.electro.dto.MapMarkerData
 import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.google.android.gms.maps.model.Marker
-import com.bumptech.glide.request.target.Target
 import com.google.android.gms.maps.model.BitmapDescriptorFactory.fromResource
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,7 +32,9 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MapFragment : Fragment() {
     private val viewModel: MapViewModel by viewModels ()
-    private var currentMarkers: List<MapMarker> = listOf()
+    private var currentMarkerData: List<MapMarkerData> = listOf()
+
+    private lateinit var map: Map
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -55,48 +52,54 @@ class MapFragment : Fragment() {
         viewModel.getAllMarkers()
     }
 
-    private val callback = OnMapReadyCallback { googleMap ->
+    private fun mapReadyCallback(map: Map) {
         val cameraPosition = viewModel.loadCameraState()
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(cameraPosition.lat, cameraPosition.lng), cameraPosition.zoom))
+        map.moveCamera(cameraPosition)
+
         viewModel.markers.observe(viewLifecycleOwner) { markersList ->
-            if (!(currentMarkers == markersList)) {
-                currentMarkers = markersList
-                googleMap.clear()
+            if (currentMarkerData != markersList) {
+                currentMarkerData = markersList
+                map.clear()
 
                 val socketIcon = fromResource(R.drawable.map_socket)
                 val groupIcon = fromResource(R.drawable.map_group)
+                val context = requireContext()
 
-
-                markersList.forEach { marker ->
-                    val coords = LatLng(marker.lat, marker.lng)
-
-                    val mapMarker = when (marker.type) {
-                        MARKER_TYPE_SOCKET -> googleMap.addMarker(
-                            MarkerOptions().position(coords).icon(socketIcon)
+                markersList.forEach { item ->
+                    val ecMarker = when (item.type) {
+                        MARKER_TYPE_SOCKET -> map.addMarker(
+                            ECMarker(
+                                lat = item.lat,
+                                lng = item.lng,
+                                icon = socketIcon,
+                                data = item,
+                                iconUrl = item.icon
+                            ),
+                            context = context,
                         )
-                        MARKER_TYPE_GROUP -> googleMap.addMarker(
-                            MarkerOptions().position(coords).icon(groupIcon)
+                        MARKER_TYPE_GROUP -> map.addMarker(
+                            ECMarker(
+                                lat = item.lat,
+                                lng = item.lng,
+                                icon = groupIcon,
+                                data = item,
+                                iconUrl = item.icon
+                            ),
+                            context = context,
                         )
                         else -> null
-                    }
-
-                    mapMarker?.let { it ->
-                        it.tag = marker
-                        marker.icon?.let { icon ->
-                            mapMarker.loadIcon(requireContext(), icon)
-                        }
                     }
                 }
             }
         }
 
-        googleMap.setOnCameraMoveListener {
+        map.setOnCameraMoveListener {
             try {
                 viewModel.saveCameraState(
-                    MapCameraPosition(
-                        lat = googleMap.cameraPosition.target.latitude,
-                        lng = googleMap.cameraPosition.target.longitude,
-                        zoom = googleMap.cameraPosition.zoom,
+                    ECCameraPosition(
+                        lat = map.cameraLat(),
+                        lng = map.cameraLng(),
+                        zoom = map.cameraZoom()
                     )
                 )
             } catch (e: Exception) {
@@ -104,14 +107,14 @@ class MapFragment : Fragment() {
             }
         }
 
-        googleMap.setOnMarkerClickListener {
-            val marker = it.tag as MapMarker
-            when (marker.type) {
+        map.setOnMarkerClickListener {
+            val markerData = it.data
+            when (markerData.type) {
                 MARKER_TYPE_SOCKET -> {
                     findNavController().navigate(
                         R.id.action_nav_map_to_socketFragment,
                         Bundle().apply {
-                            socketId = marker.id
+                            socketId = markerData.id
                         }
                     )
                 }
@@ -120,8 +123,8 @@ class MapFragment : Fragment() {
                     findNavController().navigate(
                         R.id.action_nav_map_to_threadFragment,
                         Bundle().apply {
-                            threadType = marker.data!!.threadType!!
-                            threadId = marker.data!!.threadId!!
+                            threadType = markerData.data!!.threadType!!
+                            threadId = markerData.data!!.threadId!!
                             targetPostId = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD
                         }
                     )
@@ -143,14 +146,17 @@ class MapFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+        map = MapGoogleImpl(
+            onMapReady = { mapReadyCallback(map) },
+            onFailure = { message ->
+                Snackbar.make(view, message, Snackbar.LENGTH_LONG)
+                    .show()
+            }
+        )
 
-        try {
-            mapFragment?.getMapAsync(callback)
-        } catch (e :Exception) {
-            Snackbar.make(view, e.message.toString(), Snackbar.LENGTH_LONG)
-                .show()
-        }
+        map.init (
+            view = childFragmentManager.findFragmentById(R.id.map),
+        )
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -182,56 +188,6 @@ class MapFragment : Fragment() {
     }
 }
 
-data class MapCameraPosition (
-    val lat: Double,
-    val lng: Double,
-    val zoom: Float
-)
 
-// https://stackoverflow.com/questions/63491864/kotlin-for-android-setting-a-google-maps-marker-image-to-a-url
-fun Marker.loadIcon(context: Context, url: String?) {
-    val img = ImageView(context)
-        // Чтобы вызвать RequestListener.onResourceReady на UI-потоке, необходимо построить запрос Glide с помощью метода into()
-        // Для этого нужен фейковый ImageView
-        // Если вызывать не на главном потоке, то setIcon() выдаст ошибку
-        // https://bumptech.github.io/glide/javadocs/4120/index.html?com/bumptech/glide/request/RequestListener.html
 
-    Glide.with(context)
-        .asBitmap()
-        .override(100, 100)
-        .load(url)
-        .timeout(5_000)
-        //.error(R.drawable.map_group) // to show a default icon in case of any errors
-        .listener(object : RequestListener<Bitmap> {
-            override fun onLoadFailed(
-                e: GlideException?,
-                model: Any?,
-                target: Target<Bitmap>?,
-                isFirstResource: Boolean
-            ): Boolean {
-                return false
-            }
-
-            override fun onResourceReady(
-                resource: Bitmap?,
-                model: Any?,
-                target: Target<Bitmap>?,
-                dataSource: DataSource?,
-                isFirstResource: Boolean
-            ): Boolean {
-                return resource?.let {
-                    BitmapDescriptorFactory.fromBitmap(it)
-                }?.let {
-                    try {
-                        setIcon(it)
-                        true
-                    } catch (e: Exception) {
-                        // Маркер был удален с карты?
-                        println("Marker removed")
-                        false
-                    }
-                } ?: false
-            }
-        }).into(img)
-}
 

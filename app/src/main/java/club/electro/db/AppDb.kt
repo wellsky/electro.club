@@ -11,7 +11,7 @@ import club.electro.entity.*
     AreaEntity::class,
     PostEntity::class,
     PostRemoteKeyEntity::class,
-    MapMarkerEntity::class,
+    MapMarkerDataEntity::class,
     UserEntity::class,
     FeedPostEntity::class,
     ThreadEntity::class,
@@ -19,7 +19,7 @@ import club.electro.entity.*
     TransportEntity::class,
     DiscussionEntity::class,
     PostAttachmentEntity::class,
- ], version = 146, exportSchema = false)
+ ], version = 147, exportSchema = false)
 @TypeConverters(DBTypeConverters::class)
 abstract class AppDb : RoomDatabase() {
     abstract fun postDao(): PostDao

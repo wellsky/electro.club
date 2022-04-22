@@ -1,12 +1,12 @@
 package club.electro.repository.map
 
-import club.electro.dto.MapMarker
+import club.electro.dto.MapMarkerData
 import club.electro.dto.Socket
 import club.electro.dto.SocketStatus
 import kotlinx.coroutines.flow.Flow
 
 interface MapRepository {
-    val markers: Flow<List<MapMarker>>
+    val markers: Flow<List<MapMarkerData>>
 
     suspend fun getAll()
 

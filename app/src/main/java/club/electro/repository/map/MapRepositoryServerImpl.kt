@@ -9,7 +9,7 @@ import club.electro.dto.MARKER_TYPE_GROUP
 import club.electro.dto.MARKER_TYPE_SOCKET
 import club.electro.dto.Socket
 import club.electro.dto.SocketStatus
-import club.electro.entity.MapMarkerEntity
+import club.electro.entity.MapMarkerDataEntity
 import club.electro.entity.toDto
 import club.electro.entity.toEntity
 import club.electro.error.ApiError
@@ -34,7 +34,7 @@ class MapRepositoryServerImpl @Inject constructor(
     var targetFlow = MutableStateFlow(value = listOf<Byte>())
 
     override val markers = targetFlow.flatMapLatest { list ->
-        markerDao.getByTypes(list).map(List<MapMarkerEntity>::toDto).flowOn(Dispatchers.Default)
+        markerDao.getByTypes(list).map(List<MapMarkerDataEntity>::toDto).flowOn(Dispatchers.Default)
     }
 
     override fun setMarkersFilter(list: List<Byte>) {

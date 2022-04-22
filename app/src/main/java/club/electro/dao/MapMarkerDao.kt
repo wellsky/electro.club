@@ -1,30 +1,29 @@
 package club.electro.dao
 
 import androidx.room.*
-import club.electro.entity.MapMarkerEntity
-import club.electro.entity.PostEntity
+import club.electro.entity.MapMarkerDataEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MapMarkerDao {
-    @Query("SELECT * FROM MapMarkerEntity")
-    fun getAll(): Flow<List<MapMarkerEntity>>
+    @Query("SELECT * FROM MapMarkerDataEntity")
+    fun getAll(): Flow<List<MapMarkerDataEntity>>
 
-    @Query("SELECT * FROM MapMarkerEntity WHERE type IN(:types)")
-    fun getByTypes(types: List<Byte>): Flow<List<MapMarkerEntity>>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(marker: MapMarkerEntity)
+    @Query("SELECT * FROM MapMarkerDataEntity WHERE type IN(:types)")
+    fun getByTypes(types: List<Byte>): Flow<List<MapMarkerDataEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(markers: List<MapMarkerEntity>)
+    suspend fun insert(markerData: MapMarkerDataEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(markerData: List<MapMarkerDataEntity>)
 
     @Transaction
-    suspend fun reset(markers: List<MapMarkerEntity>) {
+    suspend fun reset(markerData: List<MapMarkerDataEntity>) {
         clear()
-        insert(markers)
+        insert(markerData)
     }
 
-    @Query("DELETE FROM MapMarkerEntity")
+    @Query("DELETE FROM MapMarkerDataEntity")
     suspend fun clear()
 }

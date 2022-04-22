@@ -102,36 +102,44 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonOn"
             android:layout_width="0dp"
-            app:layout_constraintWidth_percent="0.3"
+            app:layout_constraintWidth_percent="0.32"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:padding="16dp"
+            android:paddingVertical="16dp"
+            android:paddingHorizontal="4dp"
             app:layout_constraintTop_toBottomOf="@id/statusHint"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintHorizontal_chainStyle="spread"
+            android:maxLines="1"
+            android:textSize="10sp"
             android:text="@string/socket_status_on"
             />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonOff"
             android:layout_width="0dp"
-            app:layout_constraintWidth_percent="0.3"
+            app:layout_constraintWidth_percent="0.32"
             android:layout_height="wrap_content"
-            android:padding="16dp"
+            android:paddingVertical="16dp"
+            android:paddingHorizontal="4dp"
             app:layout_constraintTop_toTopOf="@id/buttonOn"
             app:layout_constraintStart_toEndOf="@id/buttonOn"
             app:layout_constraintEnd_toStartOf="@id/buttonMissing"
+            android:maxLines="1"
+            android:textSize="10sp"
             android:text="@string/socket_status_off"
             />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonMissing"
             android:layout_width="0dp"
-            app:layout_constraintWidth_percent="0.3"
+            app:layout_constraintWidth_percent="0.32"
             android:layout_height="wrap_content"
-            android:padding="16dp"
+            android:paddingVertical="16dp"
+            android:paddingHorizontal="4dp"
             app:layout_constraintTop_toTopOf="@id/buttonOn"
-
+            android:maxLines="1"
+            android:textSize="10sp"
             app:layout_constraintEnd_toEndOf="parent"
             android:text="@string/socket_status_missing"
             />

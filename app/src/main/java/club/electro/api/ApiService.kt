@@ -281,7 +281,7 @@ data class ApiAccountUserData (
 )
 
 data class ApiMapObjects(
-    val map_objects: List<MapMarker>
+    val map_objects: List<MapMarkerData>
 )
 
 data class ApiAreaStatus (

@@ -19,9 +19,9 @@
     <string name="empty_posts">Список сообщений пуст</string>
     <string name="message_text">Текст сообщения</string>
     <string name="submit_login_form">Войти</string>
-    <string name="enter_login_data">Войти в electro.club</string>
+    <string name="enter_login_data">Вход в electro.club</string>
     <string name="error_auth">Ошибка авторизации</string>
-    <string name="button_signout">Sign out</string>
+    <string name="button_signout">Выйти</string>
     <string name="enter_login_hint">Логин (e-mail)...</string>
     <string name="enter_password_hint">Пароль...</string>
     <string name="error_empty_post">Нельзя сохранить пустое сообщение</string>
