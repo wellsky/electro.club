@@ -1,5 +1,6 @@
 package club.electro
 
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -7,6 +8,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -46,7 +48,7 @@ class MainActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //supportRequestWindowFeature(FEATURE_ACTION_BAR_OVERLAY)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -196,4 +198,22 @@ class MainActivity: AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
+
+//    override fun getTheme(): Resources.Theme {
+//        // Смениа стандартных светлой/темной темы:
+//        //https://stackoverflow.com/questions/47495534/how-to-enable-night-mode-programmatically
+//
+//        // Назначение кастомных тем:
+//        // https://stackoverflow.com/questions/11562051/change-activitys-theme-programmatically
+//
+//        val theme: Resources.Theme = super.getTheme()
+//        if (true) {
+//            theme.applyStyle(R.style.Theme_Electroclub, true)
+//            theme.applyStyle(R.style.Theme_Electroclub, true)
+//        }
+//
+//        // you could also use a switch if you have many themes that could apply
+//
+//        return theme
+//    }
 }

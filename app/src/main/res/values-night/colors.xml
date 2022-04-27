@@ -22,14 +22,13 @@
     <color name="postInactiveTextColor">#777777</color>
     <color name="postQuoteColor">#f1f1f1</color>
     <color name="postQuoteStripColor">#999999</color>
+    <color name="textPrimary">#c1c7d1</color>
 
 
     <color name="startOrange">#f7a307</color>
     <color name="endOrange">#ee711c</color>
 
-    <color name="surface1">#FFFFFF</color>
-    <color name="surface2">#EEEEEE</color>
-    <color name="postBackground">#FFFFFF</color>
-    <color name="textPrimary">#222222</color>
-
+    <color name="surface1">#1a1f25</color>
+    <color name="surface2">#1a1f25</color>
+    <color name="postBackground">#222931</color>
 </resources>

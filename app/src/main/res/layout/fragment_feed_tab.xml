@@ -6,7 +6,7 @@
     android:id="@+id/swiperefresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_e">
+    android:background="@color/surface2">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id = "@+id/feedPostsList"
