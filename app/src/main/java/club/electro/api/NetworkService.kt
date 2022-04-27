@@ -13,15 +13,17 @@ class NetworkService @Inject constructor(
             apiCall: suspend () -> Response<T>,
             onSuccess: suspend(body: T) -> Unit = {},
             onError: suspend() -> Unit = {},
-    ) {
-        try {
+    ): T? {
+        return try {
             apiCall.invoke().body()?.let {
+                networkStatus.setStatus(NetworkStatus.Status.ONLINE)
                 onSuccess(it)
+                it
             }
-            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
         } catch (throwable: Throwable) {
             networkStatus.setStatus(NetworkStatus.Status.ERROR)
             onError.invoke()
+            null
         }
     }
 }

@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.work.*
 import club.electro.adapter.PostsEntitiesPreparator
 import club.electro.api.ApiService
+import club.electro.api.NetworkService
 import club.electro.auth.AppAuth
 import club.electro.dao.PostDao
 import club.electro.dto.Post
@@ -25,6 +26,7 @@ class PostRepositoryServerImpl @Inject constructor(
     private val apiService: ApiService,
     private val appAuth: AppAuth,
     private val networkStatus: NetworkStatus,
+    private val networkService: NetworkService,
     private val postsEntitiesPreparatorFactory: PostsEntitiesPreparator.Factory
 ): PostRepository {
 
@@ -69,32 +71,22 @@ class PostRepositoryServerImpl @Inject constructor(
     }
 
     override suspend fun getRemoteById(threadType: Byte, threadId: Long, id: Long): Post? {
-        try {
-            val response = apiService.getThreadPosts(
-                threadType = threadType,
-                threadId = threadId,
-                from = id.toString(),
-                included = 1,
-                count = 1
-            )
+        val result = networkService.safeApiCall(
+            apiCall = {
+                apiService.getThreadPosts(
+                    threadType = threadType,
+                    threadId = threadId,
+                    from = id.toString(),
+                    included = 1,
+                    count = 1
+                )
+            },
+        )
 
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
-            }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-
-            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
-
-            return if (body.data.messages.size > 0) {
-                body.data.messages[0]
-            } else {
-                null
-            }
-        } catch (e: IOException) {
-            networkStatus.setStatus(NetworkStatus.Status.ERROR)
-            return null
-        } catch (e: Exception) {
-            throw UnknownError
+        return result?.let {
+            val post = it.data.messages.first()
+            // Может придти не тот пост, если нужный был удален или не существует и т.п.
+            if (post.id == id) post else null
         }
     }
 

@@ -158,7 +158,7 @@ class ThreadRepositoryServerImpl @Inject constructor(
         postRepository.removePostFromServer(post)
     }
 
-    override suspend fun checkThreadUpdates()  {
+    override suspend fun checkThreadUpdates() {
         while (true) {
             delay(2_000L)
             try {
