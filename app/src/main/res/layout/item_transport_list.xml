@@ -10,13 +10,22 @@
 
     >
 
-    <ImageView
+    <androidx.cardview.widget.CardView
         android:id="@+id/transportImage"
         android:layout_width="80dp"
         android:layout_height="80dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/avatars" />
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        >
+        <ImageView
+            android:id="@+id/transportImageContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:srcCompat="@tools:sample/avatars"
+            />
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/transportName"
@@ -26,7 +35,7 @@
         android:layout_marginTop="4dp"
         android:ellipsize="end"
         android:singleLine="true"
-        android:textColor="@color/grey_26"
+        android:textColor="@color/textPrimary"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/transportImage"
@@ -46,7 +55,7 @@
         android:src="@drawable/ic_baseline_people_alt_24"
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
-        app:tint="@color/grey_a"
+        app:tint="@color/iconTint2"
     />
 
     <TextView
@@ -57,6 +66,7 @@
         app:layout_constraintBottom_toBottomOf="@id/usersIcon"
         app:layout_constraintStart_toEndOf="@id/usersIcon"
         android:layout_marginStart="8dp"
+        android:textColor="@color/textLight2"
         tools:text="256"
         />
 
@@ -68,7 +78,7 @@
         app:layout_constraintStart_toEndOf="@id/usersValue"
         android:src="@drawable/ic_baseline_star_rate_24"
         android:layout_marginStart="24dp"
-        app:tint="@color/grey_a"
+        app:tint="@color/iconTint2"
         />
 
     <TextView
@@ -79,6 +89,7 @@
         app:layout_constraintBottom_toBottomOf="@id/ratingIcon"
         app:layout_constraintStart_toEndOf="@id/ratingIcon"
         android:layout_marginStart="8dp"
+        android:textColor="@color/textLight2"
         tools:text="4.5"
         />
 
@@ -95,13 +106,14 @@
         app:layout_constraintBottom_toBottomOf="@id/transportImage"
         android:layout_marginBottom="4dp"
         android:text="14kg, 1200W"
+        android:textColor="@color/textLight2"
         tools:text="14kg, 1200W"/>
 
     <View
         android:id="@+id/panelLine"
         android:layout_width="wrap_content"
         android:layout_height="1dp"
-        android:background="@color/grey_d"
+        android:background="@color/divider"
         app:layout_constraintTop_toBottomOf="@id/transportImage"
         app:layout_constraintStart_toStartOf="@id/transportImage"
         android:layout_marginTop="8dp"

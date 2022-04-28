@@ -16,19 +16,30 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="green">#50cb60</color>
-    <color name="beige">#7e4d00</color>
-
-    <color name="postTextColor">#222222</color>
-    <color name="postInactiveTextColor">#777777</color>
-    <color name="postQuoteColor">#f1f1f1</color>
-    <color name="postQuoteStripColor">#999999</color>
-    <color name="textPrimary">#c1c7d1</color>
-
 
     <color name="startOrange">#f7a307</color>
     <color name="endOrange">#ee711c</color>
 
+
     <color name="surface1">#1a1f25</color>
-    <color name="surface2">#1a1f25</color>
+    <color name="surface2">#1a1e27</color>
     <color name="postBackground">#222931</color>
+    <color name="textPrimary">#c9cfd9</color>
+    <color name="textPrimaryDisabled">#758197</color>
+    <color name="textLight1">#86add3</color>
+    <color name="textLight2">#93a1c3</color>
+    <color name="textLight3">#616e8c</color>
+    <color name="postQuoteColor">#2a354b</color>
+    <color name="postQuoteStripColor">#3c4962</color>
+    <color name="iconTint1">#93a1c3</color>
+    <color name="iconTint2">#606d8b</color>
+    <color name="appBarBackground">#2b354a</color>
+    <color name="statusBarBackground">#2b354a</color>
+    <color name="link">#d37018</color>
+    <color name="divider">#1f2b48</color>
+
+
+    <color name="darkGradientStart">#1a1f25</color>
+    <color name="darkGradientCenter">#4f5e71</color>
+    <color name="darkGradientEnd">#8ba3c1</color>
 </resources>

@@ -90,7 +90,7 @@ class PostViewHolder(
 
             menu.isVisible = false
             attachments.isVisible = false
-            content.setTextColor(getColor(this.root.context, R.color.postInactiveTextColor))
+            content.setTextColor(getColor(this.root.context, R.color.textPrimaryDisabled))
 
             when (post.status) {
                 Post.STATUS_CREATED_LOCAL -> {
@@ -105,7 +105,7 @@ class PostViewHolder(
                 Post.STATUS_PUBLISHED -> {
                     //published.text = sdf.format(date).toString() + " (id: " + post.id + ")"
                     published.text = sdf.format(date).toString()
-                    content.setTextColor(getColor(this.root.context, R.color.postTextColor))
+                    content.setTextColor(getColor(this.root.context, R.color.textPrimary))
                     menu.isVisible = header.isVisible
                 }
             }

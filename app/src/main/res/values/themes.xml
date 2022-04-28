@@ -2,7 +2,7 @@
     <!-- Base application theme. -->
     <style name="Theme.Electroclub" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/grey_5</item>
+        <item name="colorPrimary">@color/appBarBackground</item>
         <item name="colorPrimaryVariant">@color/grey_7</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
@@ -10,7 +10,7 @@
         <item name="colorSecondaryVariant">@color/white</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/statusBarBackground</item>
         <!-- Customize your theme here. -->
     </style>
 
@@ -27,7 +27,7 @@
 
     <style name="OptionsButton" parent="Widget.AppCompat.CompoundButton.CheckBox">
         <item name="icon">@drawable/ic_baseline_more_vert_24</item>
-        <item name="iconTint">?attr/colorControlNormal</item>
+        <item name="iconTint">@color/iconTint1</item>
         <item name="android:minWidth">@dimen/icon_button_min_size</item>
         <item name="android:minHeight">@dimen/icon_button_min_size</item>
         <item name="android:padding">0dp</item>
@@ -36,7 +36,7 @@
 
     <style name="CommentsIcon" parent="Widget.AppCompat.CompoundButton.CheckBox">
         <item name="icon">@drawable/ic_baseline_mode_comment_24</item>
-        <item name="iconTint">?attr/colorControlNormal</item>
+        <item name="iconTint">@color/iconTint1</item>
         <item name="android:minWidth">@dimen/icon_button_min_size</item>
         <item name="android:minHeight">@dimen/icon_button_min_size</item>
         <item name="android:padding">0dp</item>
@@ -44,7 +44,7 @@
 
     <style name="ViewsIcon" parent="Widget.AppCompat.CompoundButton.CheckBox">
         <item name="icon">@drawable/ic_baseline_visibility_24</item>
-        <item name="iconTint">?attr/colorControlNormal</item>
+        <item name="iconTint">@color/iconTint1</item>
         <item name="android:minWidth">@dimen/icon_button_min_size</item>
         <item name="android:minHeight">@dimen/icon_button_min_size</item>
         <item name="android:padding">0dp</item>
@@ -52,8 +52,8 @@
 
     <style name="AttachmentsIcon" parent="Widget.AppCompat.CompoundButton.CheckBox">
         <item name="icon">@drawable/ic_baseline_attachment_24</item>
-        <item name="iconTint">@color/beige</item>
-        <item name="android:textColor">@color/beige</item>
+        <item name="iconTint">@color/link</item>
+        <item name="android:textColor">@color/link</item>
         <item name="android:minWidth">@dimen/icon_button_min_size</item>
         <item name="android:minHeight">@dimen/icon_button_min_size</item>
         <item name="android:padding">0dp</item>

@@ -16,20 +16,30 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="green">#50cb60</color>
-    <color name="beige">#7e4d00</color>
-
-    <color name="postTextColor">#222222</color>
-    <color name="postInactiveTextColor">#777777</color>
-    <color name="postQuoteColor">#f1f1f1</color>
-    <color name="postQuoteStripColor">#999999</color>
-
 
     <color name="startOrange">#f7a307</color>
     <color name="endOrange">#ee711c</color>
+
+
 
     <color name="surface1">#FFFFFF</color>
     <color name="surface2">#EEEEEE</color>
     <color name="postBackground">#FFFFFF</color>
     <color name="textPrimary">#222222</color>
+    <color name="textPrimaryDisabled">#777777</color>
+    <color name="textLight1">#444444</color>
+    <color name="textLight2">#777777</color>
+    <color name="textLight3">#bbbbbb</color>
+    <color name="postQuoteColor">#f1f1f1</color>
+    <color name="postQuoteStripColor">#999999</color>
+    <color name="iconTint1">#555555</color>
+    <color name="iconTint2">#aaaaaa</color>
+    <color name="appBarBackground">#555555</color>
+    <color name="statusBarBackground">#777777</color>
+    <color name="link">#7e4d00</color>
+    <color name="divider">#f6f6f6</color>
 
+    <color name="darkGradientStart">#333</color>
+    <color name="darkGradientCenter">#555</color>
+    <color name="darkGradientEnd">#999</color>
 </resources>

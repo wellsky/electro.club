@@ -14,10 +14,9 @@
     >
     <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
+        android:background="@color/postBackground"
         >
             <ImageView
                 android:id="@+id/authorAvatar"
@@ -40,6 +39,7 @@
                 android:layout_marginEnd="@dimen/common_spacing"
                 android:ellipsize="end"
                 android:singleLine="true"
+                android:textColor="@color/textLight1"
                 app:layout_constraintBottom_toTopOf="@id/published"
                 app:layout_constraintEnd_toStartOf="@id/menu"
                 app:layout_constraintStart_toEndOf="@id/authorAvatar"
@@ -55,6 +55,7 @@
                 android:layout_marginRight="@dimen/common_spacing"
                 android:ellipsize="end"
                 android:singleLine="true"
+                android:textColor="@color/textLight1"
                 app:layout_constraintTop_toBottomOf="@id/authorName"
                 app:layout_constraintBottom_toBottomOf="@id/authorAvatar"
                 app:layout_constraintEnd_toStartOf="@id/menu"
@@ -94,8 +95,8 @@
                 android:id="@+id/content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/postTextColor"
-                android:textColorLink="@color/beige"
+                android:textColor="@color/textPrimary"
+                android:textColorLink="@color/link"
                 android:textSize="15sp"
                 app:layout_constraintTop_toBottomOf="@id/barrier"
                 app:lineHeight="19dp"

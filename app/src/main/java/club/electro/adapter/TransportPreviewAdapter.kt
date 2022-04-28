@@ -57,7 +57,7 @@ class TransportPreviewViewHolder(
 
 
             transport.image?.let {
-                transportImage.load(it)
+                transportImageContent.load(it)
             }
 
             root.setOnClickListener {

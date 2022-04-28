@@ -29,12 +29,11 @@
         android:layout_marginStart="@dimen/fab_margin"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="4dp"
-        android:textColor="@color/grey_26"
+        android:textColor="@color/textPrimary"
         android:textStyle="bold"
         android:textSize="16sp"
         android:ellipsize="end"
         android:singleLine="true"
-
         tools:text="Название темы очень длиное которое не умещается в одну строку"
         >
     </TextView>
@@ -52,7 +51,7 @@
         android:singleLine="true"
         android:layout_marginStart="@dimen/fab_margin"
         android:layout_marginBottom="4dp"
-        android:textColor="@color/beige"
+        android:textColor="@color/link"
         android:text="@string/messages"
         >
     </TextView>
@@ -67,7 +66,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:ellipsize="end"
         android:singleLine="true"
-        android:textColor="@color/grey_7"
+        android:textColor="@color/textLight2"
         tools:text="123"
         >
     </TextView>
@@ -76,7 +75,7 @@
         android:id="@+id/panelLine"
         android:layout_width="wrap_content"
         android:layout_height="1dp"
-        android:background="@color/grey_f6"
+        android:background="@color/divider"
         app:layout_constraintTop_toBottomOf="@id/discussionImage"
         app:layout_constraintStart_toEndOf="@id/discussionImage"
         android:layout_marginTop="8dp"

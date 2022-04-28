@@ -69,7 +69,7 @@ class TransportFragment : Fragment() {
             }
 
             transport.fullImage?.let {
-                binding.transportImage.load(it)
+                binding.transportImageContent.load(it)
             }
         }
 

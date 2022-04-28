@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
 
-        <ImageView
+        <androidx.cardview.widget.CardView
             android:id="@+id/transportImage"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -23,8 +24,16 @@
             android:layout_marginLeft="48dp"
             android:layout_marginRight="48dp"
             android:layout_marginTop="24dp"
-            tools:srcCompat="@tools:sample/avatars"
-            />
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp"
+            >
+            <ImageView
+                android:id="@+id/transportImageContent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:srcCompat="@tools:sample/avatars"
+                />
+        </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/transportName"
@@ -34,7 +43,7 @@
             android:layout_marginTop="16dp"
             android:textAlignment="center"
             android:textSize="18sp"
-            android:textColor="@color/grey_3"
+            android:textColor="@color/textPrimary"
             tools:text="Xiaomi M365 Special Edition"
             />
 
@@ -45,6 +54,7 @@
             app:layout_constraintTop_toTopOf="@id/transportRatingTitle"
             app:layout_constraintStart_toEndOf="@id/transportRatingTitle"
             app:layout_constraintEnd_toEndOf="parent"
+            android:textColor="@color/textLight2"
             tools:text="4.5"
             />
 
@@ -58,6 +68,7 @@
             android:layout_marginTop="2dp"
             android:textAlignment="center"
             app:layout_constraintHorizontal_chainStyle="packed"
+            android:textColor="@color/textLight2"
             android:text="@string/rating"
             />
 
@@ -70,7 +81,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/powerValue"
             android:textSize="24sp"
-            android:textColor="@color/grey_3"
+            android:textColor="@color/textPrimary"
             tools:text="22"
             />
 
@@ -81,6 +92,7 @@
             app:layout_constraintTop_toBottomOf="@id/weightValue"
             app:layout_constraintStart_toStartOf="@id/weightValue"
             app:layout_constraintEnd_toEndOf="@id/weightValue"
+            android:textColor="@color/textLight2"
             android:text="@string/weight"
             />
 
@@ -92,7 +104,7 @@
             app:layout_constraintStart_toEndOf="@id/weightValue"
             app:layout_constraintEnd_toEndOf="parent"
             android:textSize="24sp"
-            android:textColor="@color/grey_3"
+            android:textColor="@color/textPrimary"
             tools:text="22"
             />
 
@@ -103,6 +115,7 @@
             app:layout_constraintTop_toBottomOf="@id/powerValue"
             app:layout_constraintStart_toStartOf="@id/powerValue"
             app:layout_constraintEnd_toEndOf="@id/powerValue"
+            android:textColor="@color/textLight2"
             android:text="@string/power"
             />
 
@@ -117,6 +130,7 @@
             android:layout_marginStart="10dp"
             android:text="@string/discussion"
             android:textSize="18sp"
+            android:textColor="@color/textLight1"
             />
 
         <include

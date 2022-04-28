@@ -28,7 +28,7 @@
         app:layout_constraintEnd_toStartOf="@id/areaLastMessageTime"
         android:layout_marginStart="@dimen/fab_margin"
         android:layout_marginTop="4dp"
-        android:textColor="@color/grey_26"
+        android:textColor="@color/textPrimary"
         android:textStyle="bold"
         android:textSize="16sp"
         android:ellipsize="end"
@@ -47,7 +47,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/areaName"
         android:layout_marginStart="@dimen/fab_margin"
-        android:textColor="@color/grey_7"
+        android:textColor="@color/textLight2"
         android:textFontWeight="700"
         tools:text="12:12"
         >
@@ -65,7 +65,7 @@
         android:singleLine="true"
         android:layout_marginStart="@dimen/fab_margin"
         android:layout_marginBottom="4dp"
-        android:textColor="@color/beige"
+        android:textColor="@color/link"
         tools:text="Имя пользователя:"
         >
     </TextView>
@@ -80,7 +80,7 @@
         app:layout_constraintEnd_toStartOf="@id/areaUnreadMessagesCount"
         android:ellipsize="end"
         android:singleLine="true"
-        android:textColor="@color/grey_7"
+        android:textColor="@color/textLight2"
         tools:text="Текст последнего сообщения в теме который должен автоматически обрезаться с точками"
         >
     </TextView>
@@ -107,7 +107,7 @@
         android:id="@+id/panelLine"
         android:layout_width="wrap_content"
         android:layout_height="1dp"
-        android:background="@color/grey_f6"
+        android:background="@color/divider"
         app:layout_constraintTop_toBottomOf="@id/areaImage"
         app:layout_constraintStart_toEndOf="@id/areaImage"
         android:layout_marginTop="8dp"
