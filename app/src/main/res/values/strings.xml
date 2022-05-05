@@ -106,4 +106,12 @@
     <string name="confirm_confirm_socket_status">Confirm socket status %1$s?</string>
     <string name="socket_status_hint">Are you near this power socket? Confirm or change its status to help keep this map up to date :)</string>
     <string name="transport">Transport</string>
+    <string name="settings">Settings</string>
+    <string name="settings_theme_title">Color theme</string>
+    <string name="settings_map_title">Map provider</string>
+    <string name="settings_theme_device">Use OS settings</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_map_google">Google</string>
+    <string name="settings_map_yandex">Yandex</string>
 </resources>

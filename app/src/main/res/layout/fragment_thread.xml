@@ -73,7 +73,7 @@
         android:id="@+id/panelLine"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray"
+        android:background="@color/iconTint2"
         app:layout_constraintBottom_toTopOf="@id/bottomPanel"
         />
 
@@ -82,7 +82,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:background="@color/white"
+        android:background="@color/surface1"
         android:paddingBottom="1dp"
         android:visibility="gone"
         >
@@ -98,6 +98,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:text="@string/subscribe_and_start_chatting"
             android:textSize="18sp"
+            android:textColor="@color/textPrimary"
+            android:background="@color/surface1"
             android:visibility="gone"
         />
 
@@ -106,8 +108,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:background="@color/white"
-            android:visibility="gone"
+            android:textColor="@color/textPrimary"
+            android:background="@color/surface1"
             >
 
             <ImageView
@@ -122,6 +124,7 @@
                 android:layout_marginBottom="12dp"
                 android:layout_marginStart="12dp"
                 android:src="@drawable/ic_baseline_edit_24"
+                app:tint="@color/iconTint1"
                 />
 
             <TextView
@@ -150,6 +153,7 @@
                 app:layout_constraintBottom_toBottomOf="@id/editedImage"
                 app:layout_constraintLeft_toRightOf="@id/editedPostContent"
                 app:srcCompat="@drawable/ic_baseline_cancel_24"
+                app:tint="@color/iconTint1"
                 />
 
             <androidx.constraintlayout.widget.Group
@@ -172,6 +176,7 @@
                 android:layout_marginBottom="12dp"
                 android:layout_marginStart="12dp"
                 android:src="@drawable/ic_baseline_reply_24"
+                app:tint="@color/iconTint1"
                 />
 
             <TextView
@@ -200,6 +205,7 @@
                 app:layout_constraintBottom_toBottomOf="@id/answerToImage"
                 app:layout_constraintLeft_toRightOf="@id/answerToContent"
                 app:srcCompat="@drawable/ic_baseline_cancel_24"
+                app:tint="@color/iconTint1"
                 />
 
             <androidx.constraintlayout.widget.Group
@@ -224,6 +230,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/editorAttachments"
                 app:layout_constraintStart_toStartOf="parent"
+                android:textColor="@color/textPrimary"
                 />
 
             <ImageButton
@@ -237,7 +244,9 @@
                 app:layout_constraintEnd_toStartOf="@id/editorPostSave"
                 app:layout_constraintStart_toEndOf="@id/editorPostContent"
                 app:layout_constraintTop_toTopOf="@+id/editorPostContent"
-                app:srcCompat="@drawable/ic_baseline_attach_file_24" />
+                app:srcCompat="@drawable/ic_baseline_attach_file_24"
+                app:tint="@color/iconTint1"
+                />
 
             <ImageButton
                 android:id="@+id/editorPostSave"
@@ -251,7 +260,9 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/editorAttachments"
                 app:layout_constraintTop_toTopOf="@+id/editorPostContent"
-                app:srcCompat="@drawable/ic_baseline_send_24" />
+                app:srcCompat="@drawable/ic_baseline_send_24"
+                app:tint="@color/iconTint1"
+                />
 
             <TextView
                 android:id="@+id/attachmentsCount"

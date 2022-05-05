@@ -1,0 +1,23 @@
+<resources>
+    <string-array name="settings_theme_entries">
+        <item>@string/settings_theme_device</item>
+        <item>@string/settings_theme_light</item>
+        <item>@string/settings_theme_dark</item>
+    </string-array>
+
+    <string-array name="settings_theme_values">
+        <item>device</item>
+        <item>light</item>
+        <item>dark</item>
+    </string-array>
+
+    <string-array name="settings_map_type_entries">
+        <item>@string/settings_map_google</item>
+        <item>@string/settings_map_yandex</item>
+    </string-array>
+
+    <string-array name="settings_map_type_values">
+        <item>google</item>
+        <item>yandex</item>
+    </string-array>
+</resources>

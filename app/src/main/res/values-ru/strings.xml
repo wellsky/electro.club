@@ -106,4 +106,12 @@
     <string name="confirm_confirm_socket_status">Подтвердить статус розетки %1$s?</string>
     <string name="socket_status_hint">Находитесь рядом с этой розеткой? Подтвердите или измените ее статус, чтобы помочь поддерживать актуальность этой карты :)</string>
     <string name="transport">Транспорт</string>
+    <string name="settings">Настройки</string>
+    <string name="settings_theme_title">Цветовая тема</string>
+    <string name="settings_map_title">Провайдер карт</string>
+    <string name="settings_theme_device">Использовать настройки ОС</string>
+    <string name="settings_theme_light">Светлая</string>
+    <string name="settings_theme_dark">Темная</string>
+    <string name="settings_map_google">Google</string>
+    <string name="settings_map_yandex">Yandex</string>
 </resources>

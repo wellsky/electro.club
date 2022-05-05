@@ -1,5 +1,6 @@
 package club.electro
 
+import android.content.Context
 import android.content.res.Resources
 import android.os.Bundle
 import android.view.View
@@ -48,7 +49,7 @@ class MainActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
 
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -156,6 +157,7 @@ class MainActivity: AppCompatActivity() {
             // TODO как лучше запускать такие корутины, которые должны работать во время работы всего приложеия?
             viewModel.uploaderJob()
         }
+
     }
 
     private fun enableScrollingAppBar() {

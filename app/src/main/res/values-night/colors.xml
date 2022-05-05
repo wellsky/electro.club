@@ -23,6 +23,7 @@
 
     <color name="surface1">#1a1f25</color>
     <color name="surface2">#1a1e27</color>
+    <color name="surfaceLight">#2a303f</color>
     <color name="postBackground">#222931</color>
     <color name="textPrimary">#c9cfd9</color>
     <color name="textPrimaryDisabled">#758197</color>
@@ -38,6 +39,7 @@
     <color name="link">#d37018</color>
     <color name="divider">#1f2b48</color>
 
+    <color name="backgroundLight">#606d8b</color>
 
     <color name="darkGradientStart">#1a1f25</color>
     <color name="darkGradientCenter">#4f5e71</color>

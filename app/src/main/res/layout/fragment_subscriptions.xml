@@ -2,7 +2,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/surface2"
+    >
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
@@ -11,6 +13,7 @@
         app:tabTextColor="@color/textLight3"
         app:tabSelectedTextColor="@color/textPrimary"
         app:tabIndicatorColor="@color/textPrimary"
+        app:tabBackground="@color/surface2"
         />
 
     <androidx.viewpager2.widget.ViewPager2

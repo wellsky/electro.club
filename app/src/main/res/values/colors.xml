@@ -24,6 +24,7 @@
 
     <color name="surface1">#FFFFFF</color>
     <color name="surface2">#EEEEEE</color>
+    <color name="surfaceLight">#FFFFFF</color>
     <color name="postBackground">#FFFFFF</color>
     <color name="textPrimary">#222222</color>
     <color name="textPrimaryDisabled">#777777</color>
@@ -38,6 +39,8 @@
     <color name="statusBarBackground">#777777</color>
     <color name="link">#7e4d00</color>
     <color name="divider">#f6f6f6</color>
+
+    <color name="backgroundLight">#ABABAB</color>
 
     <color name="darkGradientStart">#333</color>
     <color name="darkGradientCenter">#555</color>
