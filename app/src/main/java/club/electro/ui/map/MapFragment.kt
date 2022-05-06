@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import club.electro.MainViewModel
 import club.electro.R
 import club.electro.ToolBarConfig
@@ -18,20 +19,23 @@ import club.electro.dto.MARKER_TYPE_SOCKET
 import club.electro.dto.MapMarkerData
 import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.ui.map.socket.SocketFragment.Companion.socketId
+import club.electro.ui.settings.SETTINGS_MAP_KEY
+import club.electro.ui.settings.SETTINGS_MAP_VALUE_YANDEX
+import club.electro.ui.settings.SETTINGS_THEME_KEY
 import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import com.google.android.gms.maps.model.BitmapDescriptorFactory.fromResource
 import com.google.android.material.snackbar.Snackbar
-import com.yandex.mapkit.MapKitFactory
 import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
 class MapFragment : Fragment() {
-    private val viewModel: MapViewModel by viewModels ()
+    private val viewModel: MapViewModel by viewModels()
     private var currentMarkerData: List<MapMarkerData> = listOf()
 
+    private lateinit var mapProvider: String
     private lateinit var map: Map
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -48,6 +52,9 @@ class MapFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.getAllMarkers()
+
+        val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        mapProvider = prefs.getString(SETTINGS_MAP_KEY, SETTINGS_MAP_VALUE_YANDEX) ?: SETTINGS_MAP_VALUE_YANDEX
     }
 
     private fun mapReadyCallback(map: Map) {
@@ -138,36 +145,37 @@ class MapFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        map = MapYandexImpl(
-            onMapReady = { mapReadyCallback(map) },
-            onFailure = { }
-        )
-
-        map.initBeforeInflate(this.requireContext())
-
         setHasOptionsMenu(true)
-        return inflater.inflate(R.layout.fragment_map, container, false)
+
+        return when (mapProvider) {
+            SETTINGS_MAP_VALUE_YANDEX -> inflater.inflate(R.layout.fragment_map_yandex, container, false)
+            else -> inflater.inflate(R.layout.fragment_map_google, container, false)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        map.setView(requireView().findViewById(R.id.yandex_map))
 
-//        map = MapGoogleImpl(
-//            onMapReady = {
-//                mapReadyCallback(map)
-//            },
-//            onFailure = { message ->
-//                Snackbar.make(view, message, Snackbar.LENGTH_LONG)
-//                    .show()
-//            }
-//        )
-//
-//        map.initAfterInflate (
-//            view = childFragmentManager.findFragmentById(R.id.google_map),
-//        )
+        if (mapProvider == SETTINGS_MAP_VALUE_YANDEX) {
+            map = MapYandexImpl(
+                onMapReady = { mapReadyCallback(map) },
+                onFailure = { }
+            )
 
+            map.setView(requireView().findViewById(R.id.yandex_map))
+        } else {
+            map = MapGoogleImpl(
+                onMapReady = { mapReadyCallback(map) },
+                onFailure = { message ->
+                    Snackbar.make(view, message, Snackbar.LENGTH_LONG)
+                        .show()
+                }
+            )
 
+            map.init(
+                view = childFragmentManager.findFragmentById(R.id.google_map),
+            )
+        }
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {

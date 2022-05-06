@@ -16,12 +16,7 @@ class MapYandexImpl(
 ): Map {
     private lateinit var mapView: MapView
 
-    override fun initBeforeInflate(context: Context) {
-        MapKitFactory.setApiKey("8ffd78cd-bd8a-4a07-a053-dd6d10795633")
-        MapKitFactory.initialize(context)
-    }
-
-    override fun initAfterInflate(view: Fragment?) {
+    override fun init(view: Fragment?) {
         TODO("Not yet implemented")
     }
 

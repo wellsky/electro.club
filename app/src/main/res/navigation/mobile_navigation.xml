@@ -29,7 +29,7 @@
         android:id="@+id/nav_map"
         android:name="club.electro.ui.map.MapFragment"
         android:label="@string/menu_map"
-        tools:layout="@layout/fragment_map" >
+        tools:layout="@layout/fragment_map_google" >
         <action
             android:id="@+id/action_nav_map_to_socketFragment"
             app:destination="@id/socketFragment" />

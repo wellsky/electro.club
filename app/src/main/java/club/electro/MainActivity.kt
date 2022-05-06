@@ -22,17 +22,22 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
 import club.electro.databinding.ActivityMainBinding
 import club.electro.model.NetworkStatus
 import club.electro.repository.thread.ThreadLoadTarget
+import club.electro.ui.map.getDouble
+import club.electro.ui.settings.SETTINGS_THEME_KEY
 import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
+import club.electro.utils.AndroidUtils
 import club.electro.utils.FixScrollingFooterBehavior
 import club.electro.utils.loadCircleCrop
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.yandex.mapkit.MapKitFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -60,9 +65,10 @@ class MainActivity: AppCompatActivity() {
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
 
+        // Этот список разделов будет в аппбаре отображать кнопку меню вместо кнопки "назад"
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_feed, R.id.nav_transport_list, R.id.nav_subscriptions, R.id.nav_map, R.id.nav_info
+                R.id.nav_feed, R.id.nav_transport_list, R.id.nav_subscriptions, R.id.nav_map, R.id.nav_info, R.id.nav_settings
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -158,6 +164,11 @@ class MainActivity: AppCompatActivity() {
             viewModel.uploaderJob()
         }
 
+        // TODO нормально ли инициализировать карту здесь или надо во фрагменте?
+        MapKitFactory.initialize(this)
+
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        AndroidUtils.setTheme(prefs.getString(SETTINGS_THEME_KEY, ""))
     }
 
     private fun enableScrollingAppBar() {

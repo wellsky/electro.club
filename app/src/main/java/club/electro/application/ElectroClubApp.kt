@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import club.electro.repository.attachments.AttachmentsRepository
+import com.yandex.mapkit.MapKitFactory
 import com.yandex.metrica.YandexMetrica
 import com.yandex.metrica.YandexMetricaConfig
 import dagger.hilt.android.HiltAndroidApp
@@ -27,9 +28,14 @@ class ElectroClubApp: Application(), Configuration.Provider {
         super.onCreate()
         // Creating an extended library configuration.
         val config: YandexMetricaConfig = YandexMetricaConfig.newConfigBuilder("004ca1b9-34ee-4c7f-9c5e-59bfe8115d40").build()
+
         // Initializing the AppMetrica SDK.
         YandexMetrica.activate(applicationContext, config)
+
         // Automatic tracking of user activity.
         YandexMetrica.enableActivityAutoTracking(this)
+
+        // Устанавливаем API-ключ для Яндекс.Карт. Дальше надо вызвать initialize
+        MapKitFactory.setApiKey("8ffd78cd-bd8a-4a07-a053-dd6d10795633")
     }
 }

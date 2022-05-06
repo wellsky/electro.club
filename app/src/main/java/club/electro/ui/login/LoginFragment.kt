@@ -13,7 +13,7 @@ import club.electro.R
 import club.electro.ToolBarConfig
 import club.electro.auth.AppAuth
 import club.electro.databinding.FragmentLoginBinding
-import club.electro.util.AndroidUtils
+import club.electro.utils.AndroidUtils
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.viewmodel.LoginFormState
 import ru.netology.nmedia.viewmodel.LoginViewModel

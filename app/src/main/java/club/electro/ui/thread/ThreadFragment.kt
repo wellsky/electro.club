@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import club.electro.MainViewModel
 import club.electro.R
 import club.electro.ui.user.UserProfileFragment.Companion.userId
-import club.electro.util.AndroidUtils
+import club.electro.utils.AndroidUtils
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import androidx.core.view.isVisible

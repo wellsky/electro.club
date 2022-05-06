@@ -16,7 +16,7 @@ import club.electro.adapter.TransportPreviewInteractionListener
 import club.electro.databinding.FragmentTransportListBinding
 import club.electro.dto.TransportPreview
 import club.electro.ui.transport.TransportFragment.Companion.transportId
-import club.electro.util.AndroidUtils
+import club.electro.utils.AndroidUtils
 //import club.electro.dto.Transport
 import dagger.hilt.android.AndroidEntryPoint
 

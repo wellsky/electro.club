@@ -25,11 +25,7 @@ class MapGoogleImpl(
 ): Map {
     private lateinit var googleMap: GoogleMap
 
-    override fun initBeforeInflate(context: Context) {
-
-    }
-
-    override fun initAfterInflate (
+    override fun init (
         view: Fragment?,
     ) {
         val mapFragment = view as SupportMapFragment?

@@ -7,8 +7,12 @@ import club.electro.dto.MapMarkerData
 import com.google.android.gms.maps.model.BitmapDescriptor
 
 interface Map {
-    fun initBeforeInflate(context: Context)
-    fun initAfterInflate(view: Fragment?)
+    // Если какой-то провайдер потребует инициализацию до раздувания фрагмента,
+    // То понадобится раделить init на 2 части
+    // fun initBeforeInflate(context: Context)
+    // fun initAfterInflate(view: Fragment?)
+    fun init(view: Fragment?)
+
     fun setView(view: View)
 
     fun moveCamera(position: ECCameraPosition)
