@@ -25,8 +25,10 @@ import club.electro.ui.settings.SETTINGS_THEME_KEY
 import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
+import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.BitmapDescriptorFactory.fromResource
 import com.google.android.material.snackbar.Snackbar
+import com.yandex.mapkit.map.PlacemarkMapObject
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -55,7 +57,41 @@ class MapFragment : Fragment() {
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
         mapProvider = prefs.getString(SETTINGS_MAP_KEY, SETTINGS_MAP_VALUE_YANDEX) ?: SETTINGS_MAP_VALUE_YANDEX
+
+        MapsInitializer.initialize(requireContext())
     }
+    private val globalMarkersList = mutableListOf<PlacemarkMapObject?>()
+
+
+    private val markerClickListener: (it: ECMarker) -> Boolean = {
+        val markerData = it.data
+        println(markerData)
+        when (markerData.type) {
+            MARKER_TYPE_SOCKET -> {
+                findNavController().navigate(
+                    R.id.action_nav_map_to_socketFragment,
+                    Bundle().apply {
+                        socketId = markerData.id
+                    }
+                )
+            }
+
+            MARKER_TYPE_GROUP -> {
+                println("Click on group")
+                findNavController().navigate(
+                    R.id.action_nav_map_to_threadFragment,
+                    Bundle().apply {
+                        threadType = markerData.data!!.threadType!!
+                        threadId = markerData.data!!.threadId!!
+                        targetPostId = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD
+                    }
+                )
+            }
+
+        }
+        true
+    }
+
 
     private fun mapReadyCallback(map: Map) {
         val cameraPosition = viewModel.loadCameraState()
@@ -66,8 +102,9 @@ class MapFragment : Fragment() {
                 currentMarkerData = markersList
                 map.clear()
 
-                val socketIcon = fromResource(R.drawable.map_socket)
-                val groupIcon = fromResource(R.drawable.map_group)
+                val socketIcon = R.drawable.map_socket
+                val groupIcon = R.drawable.map_group
+
                 val context = requireContext()
 
                 markersList.forEach { item ->
@@ -80,6 +117,7 @@ class MapFragment : Fragment() {
                                 data = item,
                                 iconUrl = item.icon
                             ),
+                            clickListener = markerClickListener,
                             context = context,
                         )
                         MARKER_TYPE_GROUP -> map.addMarker(
@@ -90,10 +128,12 @@ class MapFragment : Fragment() {
                                 data = item,
                                 iconUrl = item.icon
                             ),
+                            clickListener = markerClickListener,
                             context = context,
                         )
                         else -> null
                     }
+                    globalMarkersList.add(ecMarker)
                 }
             }
         }
@@ -113,30 +153,31 @@ class MapFragment : Fragment() {
         }
 
         map.setOnMarkerClickListener {
-            val markerData = it.data
-            when (markerData.type) {
-                MARKER_TYPE_SOCKET -> {
-                    findNavController().navigate(
-                        R.id.action_nav_map_to_socketFragment,
-                        Bundle().apply {
-                            socketId = markerData.id
-                        }
-                    )
-                }
-
-                MARKER_TYPE_GROUP -> {
-                    findNavController().navigate(
-                        R.id.action_nav_map_to_threadFragment,
-                        Bundle().apply {
-                            threadType = markerData.data!!.threadType!!
-                            threadId = markerData.data!!.threadId!!
-                            targetPostId = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD
-                        }
-                    )
-                }
-
-            }
-            true
+            markerClickListener(it)
+//            val markerData = it.data
+//            when (markerData.type) {
+//                MARKER_TYPE_SOCKET -> {
+//                    findNavController().navigate(
+//                        R.id.action_nav_map_to_socketFragment,
+//                        Bundle().apply {
+//                            socketId = markerData.id
+//                        }
+//                    )
+//                }
+//
+//                MARKER_TYPE_GROUP -> {
+//                    findNavController().navigate(
+//                        R.id.action_nav_map_to_threadFragment,
+//                        Bundle().apply {
+//                            threadType = markerData.data!!.threadType!!
+//                            threadId = markerData.data!!.threadId!!
+//                            targetPostId = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD
+//                        }
+//                    )
+//                }
+//
+//            }
+//            true
         }
     }
 
@@ -159,7 +200,10 @@ class MapFragment : Fragment() {
         if (mapProvider == SETTINGS_MAP_VALUE_YANDEX) {
             map = MapYandexImpl(
                 onMapReady = { mapReadyCallback(map) },
-                onFailure = { }
+                onFailure = { message ->
+                    Snackbar.make(view, message, Snackbar.LENGTH_LONG)
+                        .show()
+                }
             )
 
             map.setView(requireView().findViewById(R.id.yandex_map))

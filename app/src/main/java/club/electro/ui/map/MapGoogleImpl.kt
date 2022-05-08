@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
+import club.electro.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -18,6 +19,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Marker
+import com.yandex.mapkit.map.PlacemarkMapObject
 
 class MapGoogleImpl(
     val onMapReady: (map: Map) -> Unit,
@@ -53,11 +55,11 @@ class MapGoogleImpl(
         onMapReady(this)
     }
 
-    override fun addMarker(ecMarker: ECMarker, context: Context?) {
+    override fun addMarker(ecMarker: ECMarker, clickListener: (it: ECMarker) -> Boolean, context: Context?): PlacemarkMapObject? {
         val position = LatLng(ecMarker.lat, ecMarker.lng)
 
         val gmMarker = googleMap.addMarker(
-            MarkerOptions().position(position).icon(ecMarker.icon)
+            MarkerOptions().position(position).icon(BitmapDescriptorFactory.fromResource(ecMarker.icon))
         )
 
         if (gmMarker != null) {
@@ -67,6 +69,8 @@ class MapGoogleImpl(
                 gmMarker.loadIcon(context, ecMarker.iconUrl)
             }
         }
+
+        return null
     }
 
     override fun setOnCameraMoveListener(listener: () -> Unit) {
