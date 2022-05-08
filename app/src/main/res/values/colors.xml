@@ -22,6 +22,14 @@
 
 
 
+    <color name="colorPrimary">#ec7f1f</color>
+    <color name="colorPrimaryVariant">#f19d20</color>
+    <color name="colorOnPrimary">#ffffff</color>
+    <color name="colorSecondary">#ec7f1f</color>
+    <color name="colorSecondaryVariant">#f19d20</color>
+    <color name="colorOnSecondary">#ffffff</color>
+    <color name="statusBarBackground">#ec7f1f</color>
+
     <color name="surface1">#FFFFFF</color>
     <color name="surface2">#EEEEEE</color>
     <color name="surfaceLight">#FFFFFF</color>
@@ -35,14 +43,12 @@
     <color name="postQuoteStripColor">#999999</color>
     <color name="iconTint1">#555555</color>
     <color name="iconTint2">#aaaaaa</color>
-    <color name="appBarBackground">#555555</color>
-    <color name="statusBarBackground">#777777</color>
-    <color name="link">#7e4d00</color>
+    <color name="link">#db7511</color>
     <color name="divider">#f6f6f6</color>
 
     <color name="backgroundLight">#ABABAB</color>
 
-    <color name="darkGradientStart">#333</color>
-    <color name="darkGradientCenter">#555</color>
-    <color name="darkGradientEnd">#999</color>
+    <color name="bgGradientStart">#f97813</color>
+    <color name="bgGradientCenter">#f97813</color>
+    <color name="bgGradientEnd">#f19b1d</color>
 </resources>
