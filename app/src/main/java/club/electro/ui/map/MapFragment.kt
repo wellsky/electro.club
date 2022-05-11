@@ -21,21 +21,18 @@ import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.ui.map.socket.SocketFragment.Companion.socketId
 import club.electro.ui.settings.SETTINGS_MAP_KEY
 import club.electro.ui.settings.SETTINGS_MAP_VALUE_YANDEX
-import club.electro.ui.settings.SETTINGS_THEME_KEY
 import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import com.google.android.gms.maps.MapsInitializer
-import com.google.android.gms.maps.model.BitmapDescriptorFactory.fromResource
 import com.google.android.material.snackbar.Snackbar
-import com.yandex.mapkit.map.PlacemarkMapObject
 import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
 class MapFragment : Fragment() {
     private val viewModel: MapViewModel by viewModels()
-    private var currentMarkerData: List<MapMarkerData> = listOf()
+    private var currentMarkerData: List<MapMarkerData> = emptyList()
 
     private lateinit var mapProvider: String
     private lateinit var map: Map
@@ -60,8 +57,6 @@ class MapFragment : Fragment() {
 
         MapsInitializer.initialize(requireContext())
     }
-    private val globalMarkersList = mutableListOf<PlacemarkMapObject?>()
-
 
     private val markerClickListener: (it: ECMarker) -> Boolean = {
         val markerData = it.data
@@ -92,13 +87,16 @@ class MapFragment : Fragment() {
         true
     }
 
-
     private fun mapReadyCallback(map: Map) {
         val cameraPosition = viewModel.loadCameraState()
         map.moveCamera(cameraPosition)
 
+        println("callback running")
+
         viewModel.markers.observe(viewLifecycleOwner) { markersList ->
+            println("markers observed")
             if (currentMarkerData != markersList) {
+                println("markers observed are different")
                 currentMarkerData = markersList
                 map.clear()
 
@@ -133,7 +131,6 @@ class MapFragment : Fragment() {
                         )
                         else -> null
                     }
-                    globalMarkersList.add(ecMarker)
                 }
             }
         }
@@ -154,30 +151,6 @@ class MapFragment : Fragment() {
 
         map.setOnMarkerClickListener {
             markerClickListener(it)
-//            val markerData = it.data
-//            when (markerData.type) {
-//                MARKER_TYPE_SOCKET -> {
-//                    findNavController().navigate(
-//                        R.id.action_nav_map_to_socketFragment,
-//                        Bundle().apply {
-//                            socketId = markerData.id
-//                        }
-//                    )
-//                }
-//
-//                MARKER_TYPE_GROUP -> {
-//                    findNavController().navigate(
-//                        R.id.action_nav_map_to_threadFragment,
-//                        Bundle().apply {
-//                            threadType = markerData.data!!.threadType!!
-//                            threadId = markerData.data!!.threadId!!
-//                            targetPostId = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD
-//                        }
-//                    )
-//                }
-//
-//            }
-//            true
         }
     }
 
@@ -258,6 +231,18 @@ class MapFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         map.onStop()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (map.destroyObjectsOnPause()) {
+            currentMarkerData = emptyList()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        map.onStart()
     }
 }
 

@@ -27,6 +27,11 @@ class MapGoogleImpl(
 ): Map {
     private lateinit var googleMap: GoogleMap
 
+    private val callback = OnMapReadyCallback {
+        googleMap = it
+        onMapReady(this)
+    }
+
     override fun init (
         view: Fragment?,
     ) {
@@ -37,6 +42,8 @@ class MapGoogleImpl(
             onFailure(e.message.toString())
         }
     }
+
+    override fun destroyObjectsOnPause() = false
 
     override fun setView(view: View) {
 
@@ -50,12 +57,7 @@ class MapGoogleImpl(
         googleMap.clear()
     }
 
-    private val callback = OnMapReadyCallback {
-        googleMap = it
-        onMapReady(this)
-    }
-
-    override fun addMarker(ecMarker: ECMarker, clickListener: (it: ECMarker) -> Boolean, context: Context?): PlacemarkMapObject? {
+    override fun addMarker(ecMarker: ECMarker, clickListener: (it: ECMarker) -> Boolean, context: Context?) {
         val position = LatLng(ecMarker.lat, ecMarker.lng)
 
         val gmMarker = googleMap.addMarker(
@@ -69,8 +71,6 @@ class MapGoogleImpl(
                 gmMarker.loadIcon(context, ecMarker.iconUrl)
             }
         }
-
-        return null
     }
 
     override fun setOnCameraMoveListener(listener: () -> Unit) {

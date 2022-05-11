@@ -19,7 +19,7 @@ interface Map {
 
     fun moveCamera(position: ECCameraPosition)
     fun clear()
-    fun addMarker(ecMarker: ECMarker, clickListener: (it: ECMarker) -> Boolean = { true }, context: Context? = null): PlacemarkMapObject?
+    fun addMarker(ecMarker: ECMarker, clickListener: (it: ECMarker) -> Boolean = { true }, context: Context? = null)
     fun setOnCameraMoveListener(listener: () -> Unit)
     fun setOnMarkerClickListener(listener: (ecMarker: ECMarker) -> Boolean)
 
@@ -29,6 +29,11 @@ interface Map {
 
     fun onStart()
     fun onStop()
+
+    /**
+     * Если провайдер карт удаляет свои маркеры на паузе фрагмента, то метод возвращает true
+     */
+    fun destroyObjectsOnPause(): Boolean
 }
 
 data class ECMarker (

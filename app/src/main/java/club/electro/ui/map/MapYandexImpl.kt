@@ -11,13 +11,10 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
-import com.yandex.mapkit.layers.GeoObjectTapListener
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.IconStyle
-import com.yandex.mapkit.map.MapObject
 import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.map.PlacemarkMapObject
@@ -32,11 +29,13 @@ class MapYandexImpl(
     private lateinit var mapView: MapView
 
     private lateinit var mapObjects: MapObjectCollection
-    private val markersList = mutableListOf<PlacemarkMapObject>()
 
-    override fun init(view: Fragment?) {
+    // Дич заключается в том, что для MapKit все листенеры надо хранить явным образом.
+    // И листенер там не один на все маркеры, а у каждого свой
+    private val markerListenerList = mutableListOf<MapObjectTapListener>()
 
-    }
+    override fun init(view: Fragment?) {}
+    override fun destroyObjectsOnPause() = true
 
     override fun setView(view: View) {
         mapView = view as MapView
@@ -46,9 +45,7 @@ class MapYandexImpl(
 
     override fun moveCamera(position: ECCameraPosition) {
         mapView.map.move(
-            CameraPosition(Point(position.lat, position.lng), position.zoom, 0.0f, 0.0f),
-            Animation(Animation.Type.SMOOTH, 1f),
-            null
+            CameraPosition(Point(position.lat, position.lng), position.zoom, 0.0f, 0.0f)
         )
     }
 
@@ -56,32 +53,7 @@ class MapYandexImpl(
         mapObjects.clear()
     }
 
-    private val cliiistener: (mapObject: MapObject, clickListener: (it: ECMarker) -> Boolean) -> MapObjectTapListener = { mapObject, clickListener ->
-//        println("Click on creator")
-//        println(mapObject)
-//        val ecMarker = (mapObject as PlacemarkMapObject).userData as ECMarker
-//        println(ecMarker)
-//        clickListener(ecMarker)
-//        true
-
-        MapObjectTapListener { mapObject, _ ->
-            println("Click on setter")
-            val ecMarker = (mapObject as PlacemarkMapObject).userData as ECMarker
-            println(ecMarker)
-            clickListener(ecMarker)
-            true
-        }
-    }
-
-//    private val mmlistener = MapObjectTapListener { mapObject, _ ->
-//        println("Click on setter")
-//        val ecMarker = (mapObject as PlacemarkMapObject).userData as ECMarker
-//        println(ecMarker)
-//        listener(ecMarker)
-//        true
-//    }
-
-    override fun addMarker(ecMarker: ECMarker, clickListener: (it: ECMarker) -> Boolean, context: Context?): PlacemarkMapObject? {
+    override fun addMarker(ecMarker: ECMarker, clickListener: (it: ECMarker) -> Boolean, context: Context?) {
         val mark = mapObjects.addPlacemark(Point(ecMarker.lat, ecMarker.lng))
 
         mark.setIcon(ImageProvider.fromResource(context, ecMarker.icon), IconStyle().setAnchor(PointF(0.5f, 1.0f)))
@@ -92,29 +64,22 @@ class MapYandexImpl(
             mark.loadIcon(context, ecMarker.iconUrl)
         }
 
-        mark.addTapListener(cliiistener(mark, clickListener))
+        val listener = MapObjectTapListener { mapObject, _ ->
+            clickListener((mapObject as PlacemarkMapObject).userData as ECMarker)
+            true
+        }
 
-        markersList.add(mark)
+        mark.addTapListener(listener)
 
-        return mark
+        markerListenerList.add(listener)
     }
 
     override fun setOnCameraMoveListener(listener: () -> Unit) {
 
     }
 
-    private lateinit var mlistener: GeoObjectTapListener
-
     override fun setOnMarkerClickListener(listener: (ecMarker: ECMarker) -> Boolean) {
-        println("SetOnClickListener")
-        mlistener = GeoObjectTapListener { mapObject ->
-            println("Click on setter")
-            val ecMarker = (mapObject as PlacemarkMapObject).userData as ECMarker
-            println(ecMarker)
-            listener(ecMarker)
-            true
-        }
-        mapView.map.addTapListener(mlistener)
+
     }
 
     override fun cameraLat(): Double {
