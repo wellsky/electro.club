@@ -31,6 +31,8 @@ class ThreadViewModel @Inject constructor(
     val targetPostId: Long = state.get("targetPostId") ?: 0L
     val editedPostId: Long = state.get("editedPostId") ?: 0L
 
+    val authLiveData = appAuth.authState.asLiveData()
+
     val thread = repository.thread.asLiveData()
 
 

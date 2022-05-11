@@ -103,61 +103,101 @@ class MainActivity: AppCompatActivity() {
             true
         }
 
-        viewModel.appAuth.authState.observe(this) { authState ->
-            if (authState.authorized) {
-                headerImage.loadCircleCrop(authState.avatar)
-
-                textLine1.text = authState.name
-                authState.transportName?.let {
-                    textLine2.text = it
-                } ?: run { textLine2.text = getString(R.string.transport_not_set) }
-            } else {
-                headerImage.setImageResource(R.drawable.electro_club_icon_white_256)
-                textLine1.text = getString(R.string.nav_header_title)
-                textLine2.text = getString(R.string.nav_header_subtitle)
-            }
-        }
-
-
-        // https://developer.android.com/guide/fragments/appbar
-        viewModel.config.observe(this) { config ->
-            config.title?.let {
-                supportActionBar?.title = it
-            }
-            config.subtitle?.let {
-                supportActionBar?.subtitle = it
+        viewModel.state.observe(this) { state ->
+            with (state.menuHeader) {
+                textLine1.text = title
+                textLine2.text = subTitle
+                if (imageUrl != null) {
+                    headerImage.loadCircleCrop(imageUrl)
+                } else {
+                    headerImage.setImageResource(R.drawable.electro_club_icon_white_256)
+                }
             }
 
-            binding.appBarMain.toolbar.setOnClickListener {
-                //TODO или лучше сразу вызывать onClick, но тогда надо будет поменять параметры функции
-                config.onClick()
-            }
-
-            /**
-             * Утсановка скроллинга аппбара
-             * supportActionBar?.isHideOnContentScrollEnabled = true - почему-то выдает ошибку:
-             * Hide on content scroll is not supported in this action bar configuration.
-             * Даже если в начале onCreate вызвать supportRequestWindowFeature(FEATURE_ACTION_BAR_OVERLAY)
-            */
-            if (config.scroll)
-                enableScrollingAppBar()
-            else
-                disableScrollingAppBar()
-
-        }
-
-        CoroutineScope(Dispatchers.Default).launch {
-            viewModel.networkStatus.status.collectLatest {
-                val statusString = when (it) {
-                    NetworkStatus.Status.ONLINE -> getString(R.string.network_status_online)
-                    NetworkStatus.Status.OFFLINE -> getString(R.string.network_status_offline)
-                    NetworkStatus.Status.ERROR -> getString(R.string.network_status_error)
+            with (state.toolBar) {
+                // https://developer.android.com/guide/fragments/appbar
+                title?.let {
+                    supportActionBar?.title = it
+                }
+                subtitle?.let {
+                    supportActionBar?.subtitle = it
                 }
 
-                Snackbar.make(binding.root, statusString, Snackbar.LENGTH_LONG)
-                    .show()
+                binding.appBarMain.toolbar.setOnClickListener {
+                    //TODO или лучше сразу вызывать onClick, но тогда надо будет поменять параметры функции
+                    onClick()
+                }
+
+                /**
+                 * Утсановка скроллинга аппбара
+                 * supportActionBar?.isHideOnContentScrollEnabled = true - почему-то выдает ошибку:
+                 * Hide on content scroll is not supported in this action bar configuration.
+                 * Даже если в начале onCreate вызвать supportRequestWindowFeature(FEATURE_ACTION_BAR_OVERLAY)
+                 */
+                if (scroll)
+                    enableScrollingAppBar()
+                else
+                    disableScrollingAppBar()
             }
+
         }
+
+
+//
+//        viewModel.appAuth.authState.observe(this) { authState ->
+//            if (authState.authorized) {
+//                headerImage.loadCircleCrop(authState.avatar)
+//
+//                textLine1.text = authState.name
+//                authState.transportName?.let {
+//                    textLine2.text = it
+//                } ?: run { textLine2.text = getString(R.string.transport_not_set) }
+//            } else {
+//                headerImage.setImageResource(R.drawable.electro_club_icon_white_256)
+//                textLine1.text = getString(R.string.nav_header_title)
+//                textLine2.text = getString(R.string.nav_header_subtitle)
+//            }
+//        }
+
+
+//        // https://developer.android.com/guide/fragments/appbar
+//        viewModel.toolBarConfig.observe(this) { config ->
+//            config.title?.let {
+//                supportActionBar?.title = it
+//            }
+//            config.subtitle?.let {
+//                supportActionBar?.subtitle = it
+//            }
+//
+//            binding.appBarMain.toolbar.setOnClickListener {
+//                config.onClick()
+//            }
+//
+//            /**
+//             * Утсановка скроллинга аппбара
+//             * supportActionBar?.isHideOnContentScrollEnabled = true - почему-то выдает ошибку:
+//             * Hide on content scroll is not supported in this action bar configuration.
+//             * Даже если в начале onCreate вызвать supportRequestWindowFeature(FEATURE_ACTION_BAR_OVERLAY)
+//            */
+//            if (config.scroll)
+//                enableScrollingAppBar()
+//            else
+//                disableScrollingAppBar()
+//
+//        }
+
+//        CoroutineScope(Dispatchers.Default).launch {
+//            viewModel.networkStatus.status.collectLatest {
+//                val statusString = when (it) {
+//                    NetworkStatus.Status.ONLINE -> getString(R.string.network_status_online)
+//                    NetworkStatus.Status.OFFLINE -> getString(R.string.network_status_offline)
+//                    NetworkStatus.Status.ERROR -> getString(R.string.network_status_error)
+//                }
+//
+//                Snackbar.make(binding.root, statusString, Snackbar.LENGTH_LONG)
+//                    .show()
+//            }
+//        }
 
         lifecycleScope.launch {
             // TODO как лучше запускать такие корутины, которые должны работать во время работы всего приложеия?

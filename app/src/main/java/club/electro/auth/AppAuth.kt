@@ -56,23 +56,23 @@ class AppAuth @Inject constructor(
         sendPushToken()
     }
 
-    val authStateFlow: StateFlow<AuthState> = _authStateFlow.asStateFlow()
-    val authState: LiveData<AuthState> = authStateFlow.asLiveData()
+    val authState: StateFlow<AuthState> = _authStateFlow.asStateFlow()
+    //val authState: LiveData<AuthState> = authStateFlow.asLiveData()
 
     fun myId(): Long {
-        return authStateFlow.value.id
+        return authState.value.id
     }
 
     fun myToken(): String? {
-        return authStateFlow.value.token
+        return authState.value.token
     }
 
     fun myName(): String? {
-        return authStateFlow.value.name
+        return authState.value.name
     }
 
     fun myAvatar(): String? {
-        return authStateFlow.value.avatar
+        return authState.value.avatar
     }
 
     fun authorized():Boolean {

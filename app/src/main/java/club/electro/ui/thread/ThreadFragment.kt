@@ -341,7 +341,7 @@ class ThreadFragment: Fragment() {
             }
         }
 
-        viewModel.appAuth.authState.observe(viewLifecycleOwner) {
+        viewModel.authLiveData.observe(viewLifecycleOwner) {
             requireActivity().invalidateOptionsMenu()
             invalidateBottomPanel()
         }
