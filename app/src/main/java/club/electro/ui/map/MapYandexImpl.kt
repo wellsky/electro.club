@@ -13,12 +13,18 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
+import com.yandex.metrica.impl.ob.p0
+import com.yandex.metrica.impl.ob.p1
+import com.yandex.metrica.impl.ob.p2
+import com.yandex.metrica.impl.ob.p3
 import com.yandex.runtime.image.ImageProvider
 
 
@@ -30,9 +36,10 @@ class MapYandexImpl(
 
     private lateinit var mapObjects: MapObjectCollection
 
-    // Дич заключается в том, что для MapKit все листенеры надо хранить явным образом.
+    // Дичь заключается в том, что для MapKit все листенеры надо хранить явным образом.
     // И листенер там не один на все маркеры, а у каждого свой
     private val markerListenerList = mutableListOf<MapObjectTapListener>()
+    private var cameraMoveListener: CameraListener = CameraListener { p0, p1, p2, p3 -> { } }
 
     override fun init(view: Fragment?) {}
     override fun destroyObjectsOnPause() = true
@@ -75,7 +82,9 @@ class MapYandexImpl(
     }
 
     override fun setOnCameraMoveListener(listener: () -> Unit) {
-
+        println("asd")
+        cameraMoveListener = CameraListener { p0, p1, p2, p3 -> listener.invoke() }
+        mapView.map.addCameraListener(cameraMoveListener)
     }
 
     override fun setOnMarkerClickListener(listener: (ecMarker: ECMarker) -> Boolean) {

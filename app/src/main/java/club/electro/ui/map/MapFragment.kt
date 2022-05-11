@@ -137,6 +137,7 @@ class MapFragment : Fragment() {
 
         map.setOnCameraMoveListener {
             try {
+                println("save coords")
                 viewModel.saveCameraState(
                     ECCameraPosition(
                         lat = map.cameraLat(),
@@ -144,6 +145,7 @@ class MapFragment : Fragment() {
                         zoom = map.cameraZoom()
                     )
                 )
+                println("save coords: lat " + map.cameraLat())
             } catch (e: Exception) {
                 println("saveCameraState exception")
             }
