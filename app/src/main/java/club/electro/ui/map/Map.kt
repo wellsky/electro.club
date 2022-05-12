@@ -30,6 +30,8 @@ interface Map {
     fun onStart()
     fun onStop()
 
+    fun setMyLocationMode(enabled: Boolean, context: Context)
+
     /**
      * Если провайдер карт удаляет свои маркеры на паузе фрагмента, то метод возвращает true
      */

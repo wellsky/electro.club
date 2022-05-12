@@ -113,6 +113,10 @@ class MapYandexImpl(
         MapKitFactory.getInstance().onStop()
     }
 
+    override fun setMyLocationMode(enabled: Boolean, context: Context) {
+        TODO("Not yet implemented")
+    }
+
 }
 
 

@@ -16,7 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    private val repository: MapRepository
+    private val repository: MapRepository,
+    private val locationProvider: LocationProvider,
 ) : ViewModel() {
     val markers = repository.markers.asLiveData(Dispatchers.Default)
 
@@ -35,6 +36,9 @@ class MapViewModel @Inject constructor(
             Gson().fromJson<MutableList<Byte>>(filterJson, object : TypeToken<MutableList<Byte>>() {}.type)
         )
         repository.setMarkersFilter(markersFilter)
+
+        locationProvider.getLocationUpdates()
+        locationProvider.startUpdates()
     }
 
     fun getAllMarkers() = viewModelScope.launch {

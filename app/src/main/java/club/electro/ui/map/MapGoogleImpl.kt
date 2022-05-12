@@ -1,11 +1,17 @@
 package club.electro.ui.map
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.view.View
 import android.widget.ImageView
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import club.electro.R
+import club.electro.ui.map.PermissionUtils.isPermissionGranted
+import club.electro.ui.map.PermissionUtils.requestPermission
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -19,16 +25,15 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Marker
-import com.yandex.mapkit.map.PlacemarkMapObject
 
 class MapGoogleImpl(
     val onMapReady: (map: Map) -> Unit,
     val onFailure: (message: String) -> Unit
 ): Map {
-    private lateinit var googleMap: GoogleMap
+    private lateinit var map: GoogleMap
 
     private val callback = OnMapReadyCallback {
-        googleMap = it
+        map = it
         onMapReady(this)
     }
 
@@ -50,17 +55,17 @@ class MapGoogleImpl(
     }
 
     override fun moveCamera(position: ECCameraPosition) {
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(position.lat, position.lng), position.zoom))
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(position.lat, position.lng), position.zoom))
     }
 
     override fun clear() {
-        googleMap.clear()
+        map.clear()
     }
 
     override fun addMarker(ecMarker: ECMarker, clickListener: (it: ECMarker) -> Boolean, context: Context?) {
         val position = LatLng(ecMarker.lat, ecMarker.lng)
 
-        val gmMarker = googleMap.addMarker(
+        val gmMarker = map.addMarker(
             MarkerOptions().position(position).icon(BitmapDescriptorFactory.fromResource(ecMarker.icon))
         )
 
@@ -74,18 +79,26 @@ class MapGoogleImpl(
     }
 
     override fun setOnCameraMoveListener(listener: () -> Unit) {
-        googleMap.setOnCameraMoveListener(listener)
+        map.setOnCameraMoveListener(listener)
     }
 
     override fun setOnMarkerClickListener(listener: (ecMarker: ECMarker) -> Boolean) {
-        googleMap.setOnMarkerClickListener {
+        map.setOnMarkerClickListener {
             listener(it.tag as ECMarker)
         }
     }
 
-    override fun cameraLat() = googleMap.cameraPosition.target.latitude
-    override fun cameraLng() = googleMap.cameraPosition.target.longitude
-    override fun cameraZoom() = googleMap.cameraPosition.zoom
+    override fun setMyLocationMode(enabled: Boolean, context: Context) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED) {
+            //map.isMyLocationEnabled = true
+            map.isMyLocationEnabled = enabled
+        }
+    }
+
+    override fun cameraLat() = map.cameraPosition.target.latitude
+    override fun cameraLng() = map.cameraPosition.target.longitude
+    override fun cameraZoom() = map.cameraPosition.zoom
 
     override fun onStart() {
 
