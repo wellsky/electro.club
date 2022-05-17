@@ -1,28 +1,34 @@
 package club.electro.ui.map
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.pm.PackageManager
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
-
+@Singleton
 class LocationProvider @Inject constructor (
     @ApplicationContext val context: Context
 ) {
+    val permissionsRequired = MutableStateFlow(false)
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    // declare a global variable FusedLocationProviderClient
-    // private lateinit var fusedLocationClient: FusedLocationProviderClient
-
-    // in onCreate() initialize FusedLocationProviderClient
-    //fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-
 
     // globally declare LocationRequest
     private lateinit var locationRequest: LocationRequest
@@ -37,7 +43,6 @@ class LocationProvider @Inject constructor (
      */
     fun getLocationUpdates()
     {
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
         locationRequest = LocationRequest()
         locationRequest.interval = 500
@@ -50,8 +55,7 @@ class LocationProvider @Inject constructor (
 
                 if (locationResult.locations.isNotEmpty()) {
                     // get latest location
-                    val location =
-                        locationResult.lastLocation
+                    val location = locationResult.lastLocation
                     // use your location object
                     // get latitude , longitude and other info from this
                     println("LOCATION UPDATE")
@@ -80,6 +84,10 @@ class LocationProvider @Inject constructor (
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+            CoroutineScope(Dispatchers.Default).launch {
+                println("emit true")
+                permissionsRequired.emit(true)
+            }
             return
         }
 
@@ -88,6 +96,10 @@ class LocationProvider @Inject constructor (
             locationCallback,
             null /* Looper */
         )
+    }
+
+    fun onPermissionsChanged() {
+        startLocationUpdates()
     }
 
     // stop location updates
@@ -105,3 +117,9 @@ class LocationProvider @Inject constructor (
         startLocationUpdates()
     }
 }
+
+/**
+ * Permissions utils:
+ * https://gist.github.com/tatocaster/b4a5c5834208b94e7548295b6c98b187
+ *
+ */

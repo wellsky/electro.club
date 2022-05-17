@@ -1,13 +1,17 @@
 package club.electro
 
+import android.Manifest
 import android.content.Context
 import android.content.res.Resources
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
@@ -51,6 +55,7 @@ class MainActivity: AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -142,62 +147,13 @@ class MainActivity: AppCompatActivity() {
 
         }
 
-
-//
-//        viewModel.appAuth.authState.observe(this) { authState ->
-//            if (authState.authorized) {
-//                headerImage.loadCircleCrop(authState.avatar)
-//
-//                textLine1.text = authState.name
-//                authState.transportName?.let {
-//                    textLine2.text = it
-//                } ?: run { textLine2.text = getString(R.string.transport_not_set) }
-//            } else {
-//                headerImage.setImageResource(R.drawable.electro_club_icon_white_256)
-//                textLine1.text = getString(R.string.nav_header_title)
-//                textLine2.text = getString(R.string.nav_header_subtitle)
-//            }
-//        }
-
-
-//        // https://developer.android.com/guide/fragments/appbar
-//        viewModel.toolBarConfig.observe(this) { config ->
-//            config.title?.let {
-//                supportActionBar?.title = it
-//            }
-//            config.subtitle?.let {
-//                supportActionBar?.subtitle = it
-//            }
-//
-//            binding.appBarMain.toolbar.setOnClickListener {
-//                config.onClick()
-//            }
-//
-//            /**
-//             * Утсановка скроллинга аппбара
-//             * supportActionBar?.isHideOnContentScrollEnabled = true - почему-то выдает ошибку:
-//             * Hide on content scroll is not supported in this action bar configuration.
-//             * Даже если в начале onCreate вызвать supportRequestWindowFeature(FEATURE_ACTION_BAR_OVERLAY)
-//            */
-//            if (config.scroll)
-//                enableScrollingAppBar()
-//            else
-//                disableScrollingAppBar()
-//
-//        }
-
-//        CoroutineScope(Dispatchers.Default).launch {
-//            viewModel.networkStatus.status.collectLatest {
-//                val statusString = when (it) {
-//                    NetworkStatus.Status.ONLINE -> getString(R.string.network_status_online)
-//                    NetworkStatus.Status.OFFLINE -> getString(R.string.network_status_offline)
-//                    NetworkStatus.Status.ERROR -> getString(R.string.network_status_error)
-//                }
-//
-//                Snackbar.make(binding.root, statusString, Snackbar.LENGTH_LONG)
-//                    .show()
-//            }
-//        }
+        viewModel.requireLocationPermission.observe(this) { required ->
+            println("request observed")
+            if (required) {
+                println("true")
+                requestLocationPermissions()
+            }
+        }
 
         lifecycleScope.launch {
             // TODO как лучше запускать такие корутины, которые должны работать во время работы всего приложеия?
@@ -207,6 +163,7 @@ class MainActivity: AppCompatActivity() {
         // TODO нормально ли инициализировать карту здесь или надо во фрагменте?
         MapKitFactory.initialize(this)
 
+        //https://stackoverflow.com/questions/47495534/how-to-enable-night-mode-programmatically
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         AndroidUtils.setTheme(prefs.getString(SETTINGS_THEME_KEY, ""))
     }
@@ -252,21 +209,29 @@ class MainActivity: AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-//    override fun getTheme(): Resources.Theme {
-//        // Смениа стандартных светлой/темной темы:
-//        //https://stackoverflow.com/questions/47495534/how-to-enable-night-mode-programmatically
-//
-//        // Назначение кастомных тем:
-//        // https://stackoverflow.com/questions/11562051/change-activitys-theme-programmatically
-//
-//        val theme: Resources.Theme = super.getTheme()
-//        if (true) {
-//            theme.applyStyle(R.style.Theme_Electroclub, true)
-//            theme.applyStyle(R.style.Theme_Electroclub, true)
-//        }
-//
-//        // you could also use a switch if you have many themes that could apply
-//
-//        return theme
-//    }
+
+    private fun requestLocationPermissions() {
+        println("request location permissions dialog")
+        locationPermissionRequest.launch(arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ))
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    val locationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        when {
+            permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+                viewModel.updateLocationPermissions()
+            // Precise location access granted.
+            }
+            permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                // Only approximate location access granted.
+            } else -> {
+                // No location access granted.
+            }
+        }
+    }
 }

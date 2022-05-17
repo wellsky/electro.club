@@ -1,17 +1,11 @@
 package club.electro.ui.map
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -30,16 +24,13 @@ import club.electro.ui.settings.SETTINGS_MAP_VALUE_YANDEX
 import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
-import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapsInitializer
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
-class MapFragment : Fragment(), GoogleMap.OnMyLocationButtonClickListener,
-    GoogleMap.OnMyLocationClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
+class MapFragment : Fragment() {
     private val viewModel: MapViewModel by viewModels()
     private var currentMarkerData: List<MapMarkerData> = emptyList()
 
@@ -163,8 +154,6 @@ class MapFragment : Fragment(), GoogleMap.OnMyLocationButtonClickListener,
         map.setOnMarkerClickListener {
             markerClickListener(it)
         }
-
-        enableMyLocation()
     }
 
     override fun onCreateView(
@@ -206,6 +195,7 @@ class MapFragment : Fragment(), GoogleMap.OnMyLocationButtonClickListener,
                 view = childFragmentManager.findFragmentById(R.id.google_map),
             )
         }
+
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -236,43 +226,7 @@ class MapFragment : Fragment(), GoogleMap.OnMyLocationButtonClickListener,
         }
     }
 
-    private fun enableMyLocation() {
-        if (!::map.isInitialized) return
-        // [START maps_check_location_permission]
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED) {
-            map.setMyLocationMode(true, requireContext())
-        } else {
-            // Permission to access the location is missing. Show rationale and request permission
-            PermissionUtils.requestPermission(
-                requireActivity() as AppCompatActivity, LOCATION_PERMISSION_REQUEST_CODE,
-                Manifest.permission.ACCESS_FINE_LOCATION, true
-            )
-        }
-        // [END maps_check_location_permission]
-    }
 
-    // [START maps_check_location_permission_result]
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) {
-            return
-        }
-        if (PermissionUtils.isPermissionGranted(
-                permissions,
-                grantResults,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
-        ) {
-            // Enable the my location layer if the permission has been granted.
-            enableMyLocation()
-        } else {
-            // Permission was denied. Display an error message
-            // [START_EXCLUDE]
-            // Display the missing permission error dialog when the fragments resume.
-            // permissionDenied = true
-            // [END_EXCLUDE]
-        }
-    }
 
     override fun onStart() {
         super.onStart()
@@ -295,25 +249,4 @@ class MapFragment : Fragment(), GoogleMap.OnMyLocationButtonClickListener,
         super.onResume()
         map.onStart()
     }
-
-    companion object {
-        /**
-         * Request code for location permission request.
-         *
-         * @see .onRequestPermissionsResult
-         */
-        private const val LOCATION_PERMISSION_REQUEST_CODE = 1
-    }
-
-    override fun onMyLocationButtonClick(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun onMyLocationClick(p0: Location) {
-        TODO("Not yet implemented")
-    }
 }
-
-
-
-

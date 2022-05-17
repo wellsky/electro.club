@@ -6,12 +6,8 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.view.View
 import android.widget.ImageView
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import club.electro.ui.map.PermissionUtils.isPermissionGranted
-import club.electro.ui.map.PermissionUtils.requestPermission
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
