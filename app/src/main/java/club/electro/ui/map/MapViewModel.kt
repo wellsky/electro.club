@@ -37,8 +37,20 @@ class MapViewModel @Inject constructor(
         )
         repository.setMarkersFilter(markersFilter)
 
-        locationProvider.getLocationUpdates()
-        locationProvider.startUpdates()
+        //locationProvider.installLocationUpdates()
+        //locationProvider.startUpdates()
+        startLocationListener()
+    }
+
+    fun startLocationListener() {
+        locationProvider.addSubscriber("my_current_location") {
+            println("LOCATION UPDATE")
+            println(it.latitude)
+        }
+    }
+
+    fun stopLocationListener() {
+        locationProvider.removeSubscriber("my_current_location")
     }
 
     fun getAllMarkers() = viewModelScope.launch {

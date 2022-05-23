@@ -1,14 +1,10 @@
 package club.electro.ui.map
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.pm.PackageManager
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import android.location.Location
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -26,7 +22,23 @@ import javax.inject.Singleton
 class LocationProvider @Inject constructor (
     @ApplicationContext val context: Context
 ) {
+    /**
+     * Если принимает значение true, значит провайдер нарвался на отсутствие разрешений и кто-то
+     * в UI-слое должен создать запрос на получение разрешений
+     * и после этого вызывать onPermissionsChanged()
+     */
     val permissionsRequired = MutableStateFlow(false)
+
+    /**
+     * Ключ - любая строка, которая должна быть уникальной для каждого слушателя
+     * Значение - коллбэк, который будет вызываться при изменении координат
+     */
+    private val subscribers = mutableMapOf<String, (location: Location) -> Unit>()
+
+    /**
+     * Проверяется при старте обновлений. Если true, то еще раз стартовать не надо.
+     */
+    private var updatesEnabled = false
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
@@ -36,12 +48,27 @@ class LocationProvider @Inject constructor (
     // globally declare LocationCallback
     private lateinit var locationCallback: LocationCallback
 
+    init {
+        installLocationUpdates()
+    }
+
+    fun addSubscriber(name: String, callback: (location: Location) -> Unit) {
+        subscribers[name] = callback
+        startUpdates()
+    }
+
+    fun removeSubscriber(name: String) {
+        subscribers.remove(name)
+        if (subscribers.isEmpty()) {
+            stopUpdates()
+        }
+    }
 
     /**
      * call this method in onCreate
      * onLocationResult call when location is changed
      */
-    fun getLocationUpdates()
+    private fun installLocationUpdates()
     {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
         locationRequest = LocationRequest()
@@ -54,12 +81,11 @@ class LocationProvider @Inject constructor (
                 locationResult ?: return
 
                 if (locationResult.locations.isNotEmpty()) {
-                    // get latest location
+
                     val location = locationResult.lastLocation
-                    // use your location object
-                    // get latitude , longitude and other info from this
-                    println("LOCATION UPDATE")
-                    println(location.latitude)
+                    subscribers.forEach {
+                        it.value.invoke(location)
+                    }
                 }
 
 
@@ -67,7 +93,6 @@ class LocationProvider @Inject constructor (
         }
     }
 
-    //start location updates
     private fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(
                 context,
@@ -85,7 +110,6 @@ class LocationProvider @Inject constructor (
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
             CoroutineScope(Dispatchers.Default).launch {
-                println("emit true")
                 permissionsRequired.emit(true)
             }
             return
@@ -99,22 +123,21 @@ class LocationProvider @Inject constructor (
     }
 
     fun onPermissionsChanged() {
-        startLocationUpdates()
-    }
-
-    // stop location updates
-    private fun stopLocationUpdates() {
-        fusedLocationClient.removeLocationUpdates(locationCallback)
+        startUpdates()
     }
 
     // stop receiving location update when activity not visible/foreground
     fun stopUpdates() {
-        stopLocationUpdates()
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+        updatesEnabled = false
     }
 
     // start receiving location update when activity  visible/foreground
     fun startUpdates() {
-        startLocationUpdates()
+        if (!updatesEnabled) {
+            startLocationUpdates()
+        }
+        updatesEnabled = true
     }
 }
 

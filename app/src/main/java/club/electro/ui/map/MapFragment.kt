@@ -55,7 +55,7 @@ class MapFragment : Fragment() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
         mapProvider = prefs.getString(SETTINGS_MAP_KEY, SETTINGS_MAP_VALUE_YANDEX) ?: SETTINGS_MAP_VALUE_YANDEX
 
-        MapsInitializer.initialize(requireContext())
+        //MapsInitializer.initialize(requireContext())
     }
 
     private val markerClickListener: (it: ECMarker) -> Boolean = {
@@ -137,7 +137,6 @@ class MapFragment : Fragment() {
 
         map.setOnCameraMoveListener {
             try {
-                println("save coords")
                 viewModel.saveCameraState(
                     ECCameraPosition(
                         lat = map.cameraLat(),
@@ -145,7 +144,6 @@ class MapFragment : Fragment() {
                         zoom = map.cameraZoom()
                     )
                 )
-                println("save coords: lat " + map.cameraLat())
             } catch (e: Exception) {
                 println("saveCameraState exception")
             }
@@ -235,11 +233,13 @@ class MapFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
+        viewModel.stopLocationListener()
         map.onStop()
     }
 
     override fun onPause() {
         super.onPause()
+        viewModel.stopLocationListener()
         if (map.destroyObjectsOnPause()) {
             currentMarkerData = emptyList()
         }
@@ -247,6 +247,7 @@ class MapFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        viewModel.startLocationListener()
         map.onStart()
     }
 }
