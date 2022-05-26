@@ -11,26 +11,23 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
-import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.MapObjectCollection
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
-import com.yandex.metrica.impl.ob.p0
-import com.yandex.metrica.impl.ob.p1
-import com.yandex.metrica.impl.ob.p2
-import com.yandex.metrica.impl.ob.p3
 import com.yandex.runtime.image.ImageProvider
 
 
 class MapYandexImpl(
     val onMapReady: (map: Map) -> Unit,
-    val onFailure: (message: String) -> Unit
+    val onFailure: (message: String) -> Unit,
+    val context: Context,
 ): Map {
     private lateinit var mapView: MapView
 
@@ -50,35 +47,46 @@ class MapYandexImpl(
         onMapReady(this)
     }
 
-    override fun moveCamera(position: ECCameraPosition) {
-        mapView.map.move(
-            CameraPosition(Point(position.lat, position.lng), position.zoom, 0.0f, 0.0f)
-        )
+    override fun moveCamera(position: club.electro.ui.map.CameraPosition, smooth: Boolean) {
+        if (smooth) {
+            mapView.map.move(
+                CameraPosition(Point(position.lat, position.lng), position.zoom, 0.0f, 0.0f),
+                Animation(Animation.Type.SMOOTH, 1f),
+                null
+            )
+
+        } else {
+            mapView.map.move(
+                CameraPosition(Point(position.lat, position.lng), position.zoom, 0.0f, 0.0f),
+            )
+        }
     }
 
     override fun clear() {
         mapObjects.clear()
     }
 
-    override fun addMarker(ecMarker: ECMarker, clickListener: (it: ECMarker) -> Boolean, context: Context?) {
-        val mark = mapObjects.addPlacemark(Point(ecMarker.lat, ecMarker.lng))
+    override fun addMarker(mapMarker: MapMarker, clickListener: (it: MapMarker) -> Boolean) {
+        val mark = mapObjects.addPlacemark(Point(mapMarker.lat, mapMarker.lng))
 
-        mark.setIcon(ImageProvider.fromResource(context, ecMarker.icon), IconStyle().setAnchor(PointF(0.5f, 1.0f)))
+        mark.setIcon(ImageProvider.fromResource(context, mapMarker.icon), IconStyle().setAnchor(PointF(0.5f, 1.0f)))
 
-        mark.userData = ecMarker
+        mark.userData = mapMarker
 
-        if (ecMarker.iconUrl != null && context != null) {
-            mark.loadIcon(context, ecMarker.iconUrl)
+        if (mapMarker.iconUrl != null) {
+            mark.loadIcon(context, mapMarker.iconUrl)
         }
 
         val listener = MapObjectTapListener { mapObject, _ ->
-            clickListener((mapObject as PlacemarkMapObject).userData as ECMarker)
+            clickListener((mapObject as PlacemarkMapObject).userData as MapMarker)
             true
         }
-
         mark.addTapListener(listener)
-
         markerListenerList.add(listener)
+    }
+
+    override fun setMarkerPosition(mapMarker: MapMarker, lat: Double, lng: Double) {
+        //TODO
     }
 
     override fun setOnCameraMoveListener(listener: () -> Unit) {
@@ -87,7 +95,7 @@ class MapYandexImpl(
         mapView.map.addCameraListener(cameraMoveListener)
     }
 
-    override fun setOnMarkerClickListener(listener: (ecMarker: ECMarker) -> Boolean) {
+    override fun setOnMarkerClickListener(listener: (mapMarker: MapMarker) -> Boolean) {
 
     }
 
@@ -113,8 +121,8 @@ class MapYandexImpl(
         MapKitFactory.getInstance().onStop()
     }
 
-    override fun setMyLocationMode(enabled: Boolean, context: Context) {
-        TODO("Not yet implemented")
+    override fun setMyLocationMode(enabled: Boolean) {
+        // TODO
     }
 
 }

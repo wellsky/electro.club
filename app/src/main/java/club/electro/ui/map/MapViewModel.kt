@@ -2,6 +2,7 @@ package club.electro.ui.map
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.location.Location
 import androidx.lifecycle.*
 import club.electro.dto.MARKER_TYPE_GROUP
 import club.electro.repository.map.MapRepository
@@ -21,6 +22,9 @@ class MapViewModel @Inject constructor(
 ) : ViewModel() {
     val markers = repository.markers.asLiveData(Dispatchers.Default)
 
+    // Местоположение устройства
+    val currentLocation = MutableLiveData<Location>()
+
     val markersFilter: MutableList<Byte>  = mutableListOf()
 
     private val prefs = context.getSharedPreferences("map", Context.MODE_PRIVATE)
@@ -37,28 +41,25 @@ class MapViewModel @Inject constructor(
         )
         repository.setMarkersFilter(markersFilter)
 
-        //locationProvider.installLocationUpdates()
-        //locationProvider.startUpdates()
         startLocationListener()
     }
 
     fun startLocationListener() {
-        locationProvider.addSubscriber("my_current_location") {
-            println("LOCATION UPDATE")
-            println(it.latitude)
+        locationProvider.addSubscriber(CURRENT_LOCATION_LISTENER_NAME) {
+            currentLocation.value = it
         }
     }
 
     fun stopLocationListener() {
-        locationProvider.removeSubscriber("my_current_location")
+        locationProvider.removeSubscriber(CURRENT_LOCATION_LISTENER_NAME)
     }
 
     fun getAllMarkers() = viewModelScope.launch {
         repository.getAll()
     }
 
-    // TODO можно ли во viewModel сохранять и загружать sharedPrefs с т.ч. чистой архитектуры?
-    fun saveCameraState(position: ECCameraPosition) {
+    // TODO можно ли во viewModel сохранять и загружать sharedPrefs с т.ч. MVVM?
+    fun saveCameraState(position: CameraPosition) {
         with(prefs.edit()) {
             putDouble(latKey, position.lat)
             putDouble(lngKey, position.lng)
@@ -67,8 +68,8 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun loadCameraState(): ECCameraPosition {
-        return ECCameraPosition(
+    fun loadCameraState(): CameraPosition {
+        return CameraPosition(
             lat = prefs.getDouble(latKey, 0.0),
             lng = prefs.getDouble(lngKey, 0.0),
             zoom = prefs.getFloat(zoomKey, 0F),
@@ -85,6 +86,10 @@ class MapViewModel @Inject constructor(
             )
             apply()
         }
+    }
+
+    companion object {
+        private const val CURRENT_LOCATION_LISTENER_NAME = "my_current_location"
     }
 }
 

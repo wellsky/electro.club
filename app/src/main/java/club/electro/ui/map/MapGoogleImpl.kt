@@ -24,9 +24,11 @@ import com.google.android.gms.maps.model.Marker
 
 class MapGoogleImpl(
     val onMapReady: (map: Map) -> Unit,
-    val onFailure: (message: String) -> Unit
+    val onFailure: (message: String) -> Unit,
+    val context: Context,
 ): Map {
     private lateinit var map: GoogleMap
+    private val markers = mutableMapOf<String, Marker>()
 
     private val callback = OnMapReadyCallback {
         map = it
@@ -50,27 +52,43 @@ class MapGoogleImpl(
 
     }
 
-    override fun moveCamera(position: ECCameraPosition) {
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(position.lat, position.lng), position.zoom))
+    override fun moveCamera(position: CameraPosition, smooth: Boolean) {
+        val cameraPosition = CameraUpdateFactory.newLatLngZoom(LatLng(position.lat, position.lng), position.zoom)
+
+        if (smooth) {
+            map.animateCamera(cameraPosition)
+        } else {
+            map.moveCamera(cameraPosition)
+        }
     }
 
     override fun clear() {
         map.clear()
+        markers.clear()
     }
 
-    override fun addMarker(ecMarker: ECMarker, clickListener: (it: ECMarker) -> Boolean, context: Context?) {
-        val position = LatLng(ecMarker.lat, ecMarker.lng)
+    override fun addMarker(mapMarker: MapMarker, clickListener: (it: MapMarker) -> Boolean) {
+        val position = LatLng(mapMarker.lat, mapMarker.lng)
 
         val gmMarker = map.addMarker(
-            MarkerOptions().position(position).icon(BitmapDescriptorFactory.fromResource(ecMarker.icon))
+            MarkerOptions().position(position).icon(BitmapDescriptorFactory.fromResource(mapMarker.icon))
         )
 
         if (gmMarker != null) {
-            gmMarker.tag = ecMarker
+            gmMarker.tag = mapMarker
+            markers[mapMarker.id] = gmMarker
 
-            if (ecMarker.iconUrl != null && context != null) {
-                gmMarker.loadIcon(context, ecMarker.iconUrl)
+            if (mapMarker.iconUrl != null) {
+                gmMarker.loadIcon(context, mapMarker.iconUrl)
             }
+        }
+    }
+
+    override fun setMarkerPosition(mapMarker: MapMarker, lat: Double, lng: Double) {
+        val gmMarker = markers.getOrDefault(mapMarker.id, null)
+
+        if (gmMarker != null) {
+            gmMarker.position = LatLng(lat, lng)
         }
     }
 
@@ -78,13 +96,13 @@ class MapGoogleImpl(
         map.setOnCameraMoveListener(listener)
     }
 
-    override fun setOnMarkerClickListener(listener: (ecMarker: ECMarker) -> Boolean) {
+    override fun setOnMarkerClickListener(listener: (mapMarker: MapMarker) -> Boolean) {
         map.setOnMarkerClickListener {
-            listener(it.tag as ECMarker)
+            listener(it.tag as MapMarker)
         }
     }
 
-    override fun setMyLocationMode(enabled: Boolean, context: Context) {
+    override fun setMyLocationMode(enabled: Boolean) {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
             == PackageManager.PERMISSION_GRANTED) {
             //map.isMyLocationEnabled = true

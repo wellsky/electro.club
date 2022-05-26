@@ -24,7 +24,7 @@ import club.electro.ui.settings.SETTINGS_MAP_VALUE_YANDEX
 import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
-import com.google.android.gms.maps.MapsInitializer
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -32,9 +32,26 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MapFragment : Fragment() {
     private val viewModel: MapViewModel by viewModels()
-    private var currentMarkerData: List<MapMarkerData> = emptyList()
 
+    /**
+     * Сохраняет последние полученные маркеры, чтобы потом сравнивать их с новыми
+     * Если новые те же самые, то пересоздавать не надо
+     */
+    private var currentMarkersList: List<MapMarkerData> = emptyList()
+
+    /**
+     * Маркер текущей позиции устройства
+     */
+    private var currentPositionMarker: MapMarker? = null
+
+    /**
+     * Строка из настроек
+     */
     private lateinit var mapProvider: String
+
+    /**
+     * Имплементация карты
+     */
     private lateinit var map: Map
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -54,36 +71,35 @@ class MapFragment : Fragment() {
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
         mapProvider = prefs.getString(SETTINGS_MAP_KEY, SETTINGS_MAP_VALUE_YANDEX) ?: SETTINGS_MAP_VALUE_YANDEX
-
-        //MapsInitializer.initialize(requireContext())
     }
 
-    private val markerClickListener: (it: ECMarker) -> Boolean = {
-        val markerData = it.data
-        println(markerData)
-        when (markerData.type) {
-            MARKER_TYPE_SOCKET -> {
-                findNavController().navigate(
-                    R.id.action_nav_map_to_socketFragment,
-                    Bundle().apply {
-                        socketId = markerData.id
-                    }
-                )
-            }
+    private val markerClickListener: (it: MapMarker) -> Boolean = {
+        it.data?.let { markerData ->
+            when (markerData.type) {
+                MARKER_TYPE_SOCKET -> {
+                    findNavController().navigate(
+                        R.id.action_nav_map_to_socketFragment,
+                        Bundle().apply {
+                            socketId = markerData.id
+                        }
+                    )
+                }
 
-            MARKER_TYPE_GROUP -> {
-                println("Click on group")
-                findNavController().navigate(
-                    R.id.action_nav_map_to_threadFragment,
-                    Bundle().apply {
-                        threadType = markerData.data!!.threadType!!
-                        threadId = markerData.data!!.threadId!!
-                        targetPostId = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD
-                    }
-                )
-            }
+                MARKER_TYPE_GROUP -> {
+                    println("Click on group")
+                    findNavController().navigate(
+                        R.id.action_nav_map_to_threadFragment,
+                        Bundle().apply {
+                            threadType = markerData.data!!.threadType!!
+                            threadId = markerData.data!!.threadId!!
+                            targetPostId = ThreadLoadTarget.TARGET_POSITION_FIRST_UNREAD
+                        }
+                    )
+                }
 
+            }
         }
+
         true
     }
 
@@ -95,20 +111,18 @@ class MapFragment : Fragment() {
 
         viewModel.markers.observe(viewLifecycleOwner) { markersList ->
             println("markers observed")
-            if (currentMarkerData != markersList) {
+            if (currentMarkersList != markersList) {
                 println("markers observed are different")
-                currentMarkerData = markersList
+                currentMarkersList = markersList
                 map.clear()
 
                 val socketIcon = R.drawable.map_socket
                 val groupIcon = R.drawable.map_group
 
-                val context = requireContext()
-
                 markersList.forEach { item ->
-                    val ecMarker = when (item.type) {
+                    val mapMarker = when (item.type) {
                         MARKER_TYPE_SOCKET -> map.addMarker(
-                            ECMarker(
+                            MapMarker(
                                 lat = item.lat,
                                 lng = item.lng,
                                 icon = socketIcon,
@@ -116,10 +130,9 @@ class MapFragment : Fragment() {
                                 iconUrl = item.icon
                             ),
                             clickListener = markerClickListener,
-                            context = context,
                         )
                         MARKER_TYPE_GROUP -> map.addMarker(
-                            ECMarker(
+                            MapMarker(
                                 lat = item.lat,
                                 lng = item.lng,
                                 icon = groupIcon,
@@ -127,18 +140,42 @@ class MapFragment : Fragment() {
                                 iconUrl = item.icon
                             ),
                             clickListener = markerClickListener,
-                            context = context,
                         )
                         else -> null
                     }
                 }
+
+                currentPositionMarker?.let {
+                    println("create cur position marker")
+                    createCurrentPositionMarker(
+                        lat = it.lat,
+                        lng = it.lng,
+                    )
+                }
             }
         }
+
+
+        viewModel.currentLocation.observe(viewLifecycleOwner) { location ->
+            currentPositionMarker?.let {
+                println("OBSERVE LOCATION CHANGE POSITION")
+
+                it.changePosition(location.latitude, location.longitude)
+            } ?: run{
+                println("OBSERVE LOCATION CREATE")
+
+                createCurrentPositionMarker(
+                    lat = location.latitude,
+                    lng = location.longitude,
+                )
+            }
+        }
+
 
         map.setOnCameraMoveListener {
             try {
                 viewModel.saveCameraState(
-                    ECCameraPosition(
+                    CameraPosition(
                         lat = map.cameraLat(),
                         lng = map.cameraLng(),
                         zoom = map.cameraZoom()
@@ -152,6 +189,30 @@ class MapFragment : Fragment() {
         map.setOnMarkerClickListener {
             markerClickListener(it)
         }
+    }
+
+    private fun createCurrentPositionMarker(lat: Double, lng: Double) {
+        currentPositionMarker = MapMarker(
+            lat = lat,
+            lng = lng,
+            icon = R.drawable.map_current_location
+        )
+
+        currentPositionMarker?.let {
+            map.addMarker(it)
+        }
+    }
+
+    private fun moveCameraToCurrentPositionMarker() {
+        currentPositionMarker?.let {
+            map.moveCamera(CameraPosition(it.lat, it.lng, 16f), true)
+        }
+    }
+
+    private fun MapMarker.changePosition(lat: Double, lng: Double) {
+        map.setMarkerPosition(this, lat, lng)
+        this.lat = lat
+        this.lng = lng
     }
 
     override fun onCreateView(
@@ -176,7 +237,8 @@ class MapFragment : Fragment() {
                 onFailure = { message ->
                     Snackbar.make(view, message, Snackbar.LENGTH_LONG)
                         .show()
-                }
+                },
+                context = requireContext(),
             )
 
             map.setView(requireView().findViewById(R.id.yandex_map))
@@ -186,7 +248,8 @@ class MapFragment : Fragment() {
                 onFailure = { message ->
                     Snackbar.make(view, message, Snackbar.LENGTH_LONG)
                         .show()
-                }
+                },
+                context = requireContext(),
             )
 
             map.init(
@@ -194,6 +257,10 @@ class MapFragment : Fragment() {
             )
         }
 
+        view.findViewById<FloatingActionButton>(R.id.map_to_my_location_button)
+            .setOnClickListener {
+                moveCameraToCurrentPositionMarker()
+            }
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -241,7 +308,7 @@ class MapFragment : Fragment() {
         super.onPause()
         viewModel.stopLocationListener()
         if (map.destroyObjectsOnPause()) {
-            currentMarkerData = emptyList()
+            currentMarkersList = emptyList()
         }
     }
 
