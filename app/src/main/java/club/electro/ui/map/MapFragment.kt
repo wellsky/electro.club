@@ -86,7 +86,6 @@ class MapFragment : Fragment() {
                 }
 
                 MARKER_TYPE_GROUP -> {
-                    println("Click on group")
                     findNavController().navigate(
                         R.id.action_nav_map_to_threadFragment,
                         Bundle().apply {
@@ -107,12 +106,8 @@ class MapFragment : Fragment() {
         val cameraPosition = viewModel.loadCameraState()
         map.moveCamera(cameraPosition)
 
-        println("callback running")
-
         viewModel.markers.observe(viewLifecycleOwner) { markersList ->
-            println("markers observed")
             if (currentMarkersList != markersList) {
-                println("markers observed are different")
                 currentMarkersList = markersList
                 map.clear()
 
@@ -146,7 +141,6 @@ class MapFragment : Fragment() {
                 }
 
                 currentPositionMarker?.let {
-                    println("create cur position marker")
                     createCurrentPositionMarker(
                         lat = it.lat,
                         lng = it.lng,
@@ -157,17 +151,15 @@ class MapFragment : Fragment() {
 
 
         viewModel.currentLocation.observe(viewLifecycleOwner) { location ->
-            currentPositionMarker?.let {
-                println("OBSERVE LOCATION CHANGE POSITION")
-
-                it.changePosition(location.latitude, location.longitude)
-            } ?: run{
-                println("OBSERVE LOCATION CREATE")
-
-                createCurrentPositionMarker(
-                    lat = location.latitude,
-                    lng = location.longitude,
-                )
+            if (location != null) {
+                currentPositionMarker?.let {
+                    it.changePosition(location.latitude, location.longitude)
+                } ?: run {
+                    createCurrentPositionMarker(
+                        lat = location.latitude,
+                        lng = location.longitude,
+                    )
+                }
             }
         }
 

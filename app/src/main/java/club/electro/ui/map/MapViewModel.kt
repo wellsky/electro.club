@@ -36,9 +36,11 @@ class MapViewModel @Inject constructor(
 
     init {
         val filterJson = prefs.getString(filterKey, "[" + MARKER_TYPE_GROUP + "]")
+
         markersFilter.addAll(
             Gson().fromJson<MutableList<Byte>>(filterJson, object : TypeToken<MutableList<Byte>>() {}.type)
         )
+
         repository.setMarkersFilter(markersFilter)
 
         startLocationListener()
@@ -48,6 +50,7 @@ class MapViewModel @Inject constructor(
         locationProvider.addSubscriber(CURRENT_LOCATION_LISTENER_NAME) {
             currentLocation.value = it
         }
+        currentLocation.value = locationProvider.getLastLocation()
     }
 
     fun stopLocationListener() {

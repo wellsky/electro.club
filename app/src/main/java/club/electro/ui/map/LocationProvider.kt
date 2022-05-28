@@ -40,6 +40,11 @@ class LocationProvider @Inject constructor (
      */
     private var updatesEnabled = false
 
+    /**
+     * Последняя полученная геопозиция
+     */
+    private var lastLocation: Location? = null
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     // globally declare LocationRequest
@@ -72,23 +77,21 @@ class LocationProvider @Inject constructor (
     {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
         locationRequest = LocationRequest()
-        locationRequest.interval = 500
-        locationRequest.fastestInterval = 500
-        locationRequest.smallestDisplacement = 170f // 170 m = 0.1 mile
-        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY //set according to your app function
+        locationRequest.interval = 500 // В миллисекундах
+        locationRequest.fastestInterval = 500 // В миллисекундах
+        locationRequest.smallestDisplacement = 1f // В метрах
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY // set according to your app function
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return
 
                 if (locationResult.locations.isNotEmpty()) {
-
                     val location = locationResult.lastLocation
+                    lastLocation = location
                     subscribers.forEach {
                         it.value.invoke(location)
                     }
                 }
-
-
             }
         }
     }
@@ -120,6 +123,10 @@ class LocationProvider @Inject constructor (
             locationCallback,
             null /* Looper */
         )
+    }
+
+    fun getLastLocation(): Location? {
+        return lastLocation
     }
 
     fun onPermissionsChanged() {

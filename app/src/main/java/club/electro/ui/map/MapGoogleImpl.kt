@@ -27,8 +27,9 @@ class MapGoogleImpl(
     val onFailure: (message: String) -> Unit,
     val context: Context,
 ): Map {
-    private lateinit var map: GoogleMap
     private val markers = mutableMapOf<String, Marker>()
+
+    private lateinit var map: GoogleMap
 
     private val callback = OnMapReadyCallback {
         map = it
@@ -165,7 +166,6 @@ fun Marker.loadIcon(context: Context, url: String?) {
                         true
                     } catch (e: Exception) {
                         // Маркер был удален с карты?
-                        println("Marker removed")
                         false
                     }
                 } ?: false

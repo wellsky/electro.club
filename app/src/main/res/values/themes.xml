@@ -40,7 +40,8 @@
     <style name="Theme.Electroclub.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.Electroclub.AppBarPopup" parent="ThemeOverlay.AppCompat.Light">
-        <item name="android:buttonTint">@color/grey_5</item>
+        <item name="android:buttonTint">@color/textPrimary</item>
+        <item name="android:textColor">@color/textPrimary</item>
     </style>
 
     <style name="OptionsButton" parent="Widget.AppCompat.CompoundButton.CheckBox">

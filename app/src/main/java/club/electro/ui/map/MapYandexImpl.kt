@@ -11,6 +11,8 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -29,6 +31,9 @@ class MapYandexImpl(
     val onFailure: (message: String) -> Unit,
     val context: Context,
 ): Map {
+    private val markers = mutableMapOf<String, PlacemarkMapObject>()
+
+
     private lateinit var mapView: MapView
 
     private lateinit var mapObjects: MapObjectCollection
@@ -73,6 +78,8 @@ class MapYandexImpl(
 
         mark.userData = mapMarker
 
+        markers[mapMarker.id] = mark
+
         if (mapMarker.iconUrl != null) {
             mark.loadIcon(context, mapMarker.iconUrl)
         }
@@ -86,11 +93,15 @@ class MapYandexImpl(
     }
 
     override fun setMarkerPosition(mapMarker: MapMarker, lat: Double, lng: Double) {
-        //TODO
+        val marker = markers.getOrDefault(mapMarker.id, null)
+        if (marker != null) {
+            // TODO по какой-то причине маркер на карте обновляет координаты только со второго вызова
+            marker.geometry = Point(mapMarker.lat, mapMarker.lng)
+        }
+
     }
 
     override fun setOnCameraMoveListener(listener: () -> Unit) {
-        println("asd")
         cameraMoveListener = CameraListener { p0, p1, p2, p3 -> listener.invoke() }
         mapView.map.addCameraListener(cameraMoveListener)
     }
@@ -167,7 +178,6 @@ fun PlacemarkMapObject.loadIcon(context: Context, url: String?) {
                         true
                     } catch (e: Exception) {
                         // Маркер был удален с карты?
-                        println("Marker removed")
                         false
                     }
                 } ?: false
