@@ -25,7 +25,6 @@ class PostRepositoryServerImpl @Inject constructor(
     private val dao : PostDao,
     private val apiService: ApiService,
     private val appAuth: AppAuth,
-    private val networkStatus: NetworkStatus,
     private val networkService: NetworkService,
     private val postsEntitiesPreparatorFactory: PostsEntitiesPreparator.Factory
 ): PostRepository {
@@ -151,27 +150,45 @@ class PostRepositoryServerImpl @Inject constructor(
 
     override suspend fun savePostWork(localId: Long) {
         dao.getByLocalId(localId)?.let { entity ->
-            try {
-                val response = apiService.savePost(
-                    threadType = entity.threadType,
-                    threadId = entity.threadId,
-                    postId = entity.id,
-                    postContent = entity.content,
-                    answerTo = entity.answerTo
-                )
-                if (!response.isSuccessful) {
-                    throw ApiError(response.code(), response.message())
+            networkService.safeApiCall(
+                apiCall = {
+                    apiService.savePost(
+                        threadType = entity.threadType,
+                        threadId = entity.threadId,
+                        postId = entity.id,
+                        postContent = entity.content,
+                        answerTo = entity.answerTo
+                    )
+                },
+
+                onSuccess = {
+                    val currentCached = dao.getByLocalId(localId)
+                    val newPost = PostEntity.fromDto(it.data.message).copy(localId = localId, fresh = (currentCached?.fresh ?: false))
+                    prepareAndSaveLocal(newPost)
                 }
-                val body = response.body() ?: throw ApiError(response.code(), response.message())
-                val currentCached = dao.getByLocalId(localId)
-                val newPost = PostEntity.fromDto(body.data.message).copy(localId = localId, fresh = (currentCached?.fresh ?: false))
-                prepareAndSaveLocal(newPost)
-                networkStatus.setStatus(NetworkStatus.Status.ONLINE)
-            } catch (e: IOException) {
-                networkStatus.setStatus(NetworkStatus.Status.ERROR)
-            } catch (e: Exception) {
-                throw UnknownError
-            }
+            )
+
+//            try {
+//                apiService.savePost(
+//                    threadType = entity.threadType,
+//                    threadId = entity.threadId,
+//                    postId = entity.id,
+//                    postContent = entity.content,
+//                    answerTo = entity.answerTo
+//                )
+//                if (!response.isSuccessful) {
+//                    throw ApiError(response.code(), response.message())
+//                }
+//                val body = response.body() ?: throw ApiError(response.code(), response.message())
+//                val currentCached = dao.getByLocalId(localId)
+//                val newPost = PostEntity.fromDto(body.data.message).copy(localId = localId, fresh = (currentCached?.fresh ?: false))
+//                prepareAndSaveLocal(newPost)
+//                networkStatus.setStatus(NetworkStatus.Status.ONLINE)
+//            } catch (e: IOException) {
+//                networkStatus.setStatus(NetworkStatus.Status.ERROR)
+//            } catch (e: Exception) {
+//                throw UnknownError
+//            }
         }
     }
 
@@ -185,23 +202,36 @@ class PostRepositoryServerImpl @Inject constructor(
 
         dao.insert(removingPost)
 
-        try {
-            val response = apiService.removePost(
-                threadType = post.threadType,
-                threadId = post.threadId,
-                postId = post.id
-            )
-
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
+        networkService.safeApiCall(
+            apiCall = {
+                apiService.removePost(
+                    threadType = post.threadType,
+                    threadId = post.threadId,
+                    postId = post.id
+                )
+            },
+            onSuccess = {
+                // TODO
             }
+        )
 
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
-        } catch (e: IOException) {
-            networkStatus.setStatus(NetworkStatus.Status.ERROR)
-        } catch (e: Exception) {
-            throw UnknownError
-        }
+//        try {
+//            val response = apiService.removePost(
+//                threadType = post.threadType,
+//                threadId = post.threadId,
+//                postId = post.id
+//            )
+//
+//            if (!response.isSuccessful) {
+//                throw ApiError(response.code(), response.message())
+//            }
+//
+//            val body = response.body() ?: throw ApiError(response.code(), response.message())
+//            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
+//        } catch (e: IOException) {
+//            networkStatus.setStatus(NetworkStatus.Status.ERROR)
+//        } catch (e: Exception) {
+//            throw UnknownError
+//        }
     }
 }

@@ -2,6 +2,7 @@ package club.electro.repository.transport
 
 import androidx.lifecycle.LiveData
 import club.electro.api.ApiService
+import club.electro.api.NetworkService
 import club.electro.dao.DiscussionDao
 import club.electro.dao.TransportDao
 import club.electro.dto.Discussion
@@ -20,7 +21,7 @@ class TransportRepositoryServerImpl @Inject constructor(
     private val transportDao: TransportDao,
     private val discussionDao: DiscussionDao,
     private val apiService: ApiService,
-    private val networkStatus: NetworkStatus,
+    private val networkService: NetworkService,
 ): TransportRepository {
 
     val targetList = MutableStateFlow(value = "")
@@ -30,22 +31,30 @@ class TransportRepositoryServerImpl @Inject constructor(
     }
 
     override suspend fun getPreviewList(filter: String) {
-        try {
-            val response = apiService.getTransportList(filter = filter)
-
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
+        networkService.safeApiCall(
+            apiCall = {
+                apiService.getTransportList(filter = filter)
+            },
+            onSuccess = {
+                transportDao.insert(it.data.list.toEntity())
             }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-
-            transportDao.insert(body.data.list.toEntity())
-
-            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
-        } catch (e: IOException) {
-            networkStatus.setStatus(NetworkStatus.Status.ERROR)
-        } catch (e: Exception) {
-            throw UnknownError
-        }
+        )
+//        try {
+//            val response = apiService.getTransportList(filter = filter)
+//
+//            if (!response.isSuccessful) {
+//                throw ApiError(response.code(), response.message())
+//            }
+//            val body = response.body() ?: throw ApiError(response.code(), response.message())
+//
+//            transportDao.insert(body.data.list.toEntity())
+//
+//            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
+//        } catch (e: IOException) {
+//            networkStatus.setStatus(NetworkStatus.Status.ERROR)
+//        } catch (e: Exception) {
+//            throw UnknownError
+//        }
     }
 
     override fun setPreviewListFilter(filter: String) {
@@ -57,27 +66,41 @@ class TransportRepositoryServerImpl @Inject constructor(
             emit(it.toDto())
         }
 
-        try {
-            val response = apiService.getTransport(
-                transportId = id
-            )
-
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
+        networkService.safeApiCall(
+            apiCall = {
+                apiService.getTransport(
+                    transportId = id
+                )
+            },
+            onSuccess = {
+                transportDao.insert(it.data.transport.toEntity())
+                it.data.discussions?.let {
+                    discussionDao.insert(it.toEntity())
+                }
             }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
+        )
 
-            transportDao.insert(body.data.transport.toEntity())
-            body.data.discussions?.let {
-                discussionDao.insert(it.toEntity())
-            }
-
-            emit(body.data.transport)
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
+//        try {
+//            val response = apiService.getTransport(
+//                transportId = id
+//            )
+//
+//            if (!response.isSuccessful) {
+//                throw ApiError(response.code(), response.message())
+//            }
+//            val body = response.body() ?: throw ApiError(response.code(), response.message())
+//
+//            transportDao.insert(body.data.transport.toEntity())
+//            body.data.discussions?.let {
+//                discussionDao.insert(it.toEntity())
+//            }
+//
+//            emit(body.data.transport)
+//        } catch (e: IOException) {
+//            throw NetworkError
+//        } catch (e: Exception) {
+//            throw UnknownError
+//        }
     }.flowOn(Dispatchers.Default)
 
     override fun getDiscussionsByTransportId(id: Long): Flow<List<Discussion>> = discussionDao.getByTransportId(id).map{ it.toDto() }

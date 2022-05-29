@@ -2,6 +2,7 @@ package club.electro.repository.subscriptions
 
 import androidx.room.withTransaction
 import club.electro.api.ApiService
+import club.electro.api.NetworkService
 import club.electro.auth.AppAuth
 import club.electro.dao.AreaDao
 import club.electro.db.AppDb
@@ -11,6 +12,7 @@ import club.electro.entity.toDto
 import club.electro.entity.toEntity
 import club.electro.error.*
 import club.electro.model.NetworkStatus
+import com.yandex.metrica.impl.ob.db
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -22,7 +24,7 @@ class SubscriptionsRepositoryServerImpl @Inject constructor(
     private val apiService: ApiService,
     private val db: AppDb,
     private val dao: AreaDao,
-    private val networkStatus: NetworkStatus
+    private val networkService: NetworkService
 ) : SubscriptionsRepository {
 
     //override val data: Flow<List<SubscriptionArea>> = dao.getAll().map(List<AreaEntity>::toDto).flowOn(Dispatchers.Default)
@@ -34,53 +36,79 @@ class SubscriptionsRepositoryServerImpl @Inject constructor(
         dao.getAll(group).map(List<AreaEntity>::toDto).flowOn(Dispatchers.Default)
 
     override suspend fun getAll(group: Byte) {
-        try {
-            val response = apiService.getSubscriptions(
-                group = group
-            )
-
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
+        networkService.safeApiCall(
+            apiCall = {
+                apiService.getSubscriptions(
+                    group = group
+                )
+            },
+            onSuccess = {
+                insertItems(it.data.items, group)
+                lastEventTime = it.data.lastEventTime
             }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
+        )
 
-            insertItems(body.data.items, group)
-
-            lastEventTime = body.data.lastEventTime
-            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
-        } catch (e: IOException) {
-            networkStatus.setStatus(NetworkStatus.Status.ERROR)
-        } catch (e: Exception) {
-            //throw UnknownError
-        }
+//        try {
+//            val response = apiService.getSubscriptions(
+//                group = group
+//            )
+//
+//            if (!response.isSuccessful) {
+//                throw ApiError(response.code(), response.message())
+//            }
+//            val body = response.body() ?: throw ApiError(response.code(), response.message())
+//
+//            insertItems(body.data.items, group)
+//
+//            lastEventTime = body.data.lastEventTime
+//            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
+//        } catch (e: IOException) {
+//            networkStatus.setStatus(NetworkStatus.Status.ERROR)
+//        } catch (e: Exception) {
+//            //throw UnknownError
+//        }
     }
 
     private suspend fun checkForUpdates(group: Byte) {
         while (true) {
             delay(2_000L)
-            try {
-                val response = apiService.getSubscriptions(
-                    group = group,
-                    lastEventTime = lastEventTime
-                )
-
-                if (!response.isSuccessful) {
-                    throw ApiError(response.code(), response.message())
-                }
-                val body = response.body() ?: throw ApiError(response.code(), response.message())
-
-                body.let {
+            networkService.safeApiCall(
+                apiCall = {
+                    apiService.getSubscriptions(
+                        group = group,
+                        lastEventTime = lastEventTime
+                    )
+                },
+                onSuccess = {
                     if (it.data.items.isNotEmpty()) {
-                        insertItems(body.data.items, group)
-                        lastEventTime = body.data.lastEventTime
+                        insertItems(it.data.items, group)
+                        lastEventTime = it.data.lastEventTime
                     }
-                    networkStatus.setStatus(NetworkStatus.Status.ONLINE)
                 }
-            } catch (e: IOException) {
-                networkStatus.setStatus(NetworkStatus.Status.ERROR)
-            } catch (e: Exception) {
-                // throw UnknownError
-            }
+            )
+//            try {
+//                val response = apiService.getSubscriptions(
+//                    group = group,
+//                    lastEventTime = lastEventTime
+//                )
+//
+//                if (!response.isSuccessful) {
+//                    throw ApiError(response.code(), response.message())
+//                }
+//                val body = response.body() ?: throw ApiError(response.code(), response.message())
+//
+//                body.let {
+//                    if (it.data.items.isNotEmpty()) {
+//                        insertItems(body.data.items, group)
+//                        lastEventTime = body.data.lastEventTime
+//                    }
+//                    networkStatus.setStatus(NetworkStatus.Status.ONLINE)
+//                }
+//            } catch (e: IOException) {
+//                networkStatus.setStatus(NetworkStatus.Status.ERROR)
+//            } catch (e: Exception) {
+//                // throw UnknownError
+//            }
         }
     }
 

@@ -1,6 +1,7 @@
 package club.electro.repository.user
 
 import club.electro.api.ApiService
+import club.electro.api.NetworkService
 import club.electro.auth.AppAuth
 import club.electro.dao.UserDao
 import club.electro.dto.*
@@ -17,8 +18,8 @@ import javax.inject.Inject
 class UserRepositoryServerImpl @Inject constructor(
     private val apiService: ApiService,
     private val dao: UserDao,
-    private val networkStatus: NetworkStatus,
-    private val appAuth: AppAuth
+    private val appAuth: AppAuth,
+    private val networkService: NetworkService
 ) : UserRepository {
 
     override suspend fun getLocalById(id: Long, onLoadedCallback:  (suspend () -> Unit)?): User? {
@@ -60,47 +61,72 @@ class UserRepositoryServerImpl @Inject constructor(
 
 
     override suspend fun getRemoteById(id: Long): User? {
-        try {
-            val response = apiService.getUserProfile(
-                userId = id
-            )
+        val result = networkService.safeApiCall(
+            apiCall = {
+                apiService.getUserProfile(
+                    userId = id
+                )
+            },
+            onSuccess = {
 
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
             }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
+        )
 
-            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
-            return body.data.user
-        } catch (e: IOException) {
-            networkStatus.setStatus(NetworkStatus.Status.ERROR)
-            return null
-            //throw UnknownError
-        } catch (e: Exception) {
-            return null
-            //throw UnknownError
-        }
+        return result?.data?.user
+//        try {
+//            val response = apiService.getUserProfile(
+//                userId = id
+//            )
+//
+//            if (!response.isSuccessful) {
+//                throw ApiError(response.code(), response.message())
+//            }
+//            val body = response.body() ?: throw ApiError(response.code(), response.message())
+//
+//            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
+//            return body.data.user
+//        } catch (e: IOException) {
+//            networkStatus.setStatus(NetworkStatus.Status.ERROR)
+//            return null
+//            //throw UnknownError
+//        } catch (e: Exception) {
+//            return null
+//            //throw UnknownError
+//        }
     }
 
     override suspend fun getChatWith(userId: Long): ThreadLink? {
         if (!appAuth.authorized()) return null
-        try {
-            val response = apiService.getChatWith(
-                userId = userId
-            )
 
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
+        val result = networkService.safeApiCall(
+            apiCall = {
+                apiService.getChatWith(
+                    userId = userId
+                )
+            },
+            onSuccess = {
+
             }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
+        )
 
-            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
-            return body.data
-        } catch (e: IOException) {
-            networkStatus.setStatus(NetworkStatus.Status.ERROR)
-            return null
-        } catch (e: Exception) {
-            return null
-        }
+        return result?.data
+//        try {
+//            val response = apiService.getChatWith(
+//                userId = userId
+//            )
+//
+//            if (!response.isSuccessful) {
+//                throw ApiError(response.code(), response.message())
+//            }
+//            val body = response.body() ?: throw ApiError(response.code(), response.message())
+//
+//            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
+//            return body.data
+//        } catch (e: IOException) {
+//            networkStatus.setStatus(NetworkStatus.Status.ERROR)
+//            return null
+//        } catch (e: Exception) {
+//            return null
+//        }
     }
 }

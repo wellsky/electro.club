@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.paging.*
 import androidx.room.withTransaction
 import club.electro.api.ApiService
+import club.electro.api.NetworkService
 import club.electro.auth.AppAuth
 import club.electro.dao.PostAttachmentDao
 import club.electro.dao.PostDao
@@ -37,7 +38,7 @@ class ThreadRepositoryServerImpl @Inject constructor(
     private val postAttachmentDao: PostAttachmentDao,
     private val appAuth: AppAuth,
     private val postRepository: PostRepository,
-    private val networkStatus: NetworkStatus
+    private val networkService: NetworkService,
 ) : ThreadRepository {
     override val lastUpdateTime: MutableLiveData<Long> = MutableLiveData(0L)
 
@@ -67,81 +68,126 @@ class ThreadRepositoryServerImpl @Inject constructor(
 
 
     override suspend fun getThread() {
-        try {
-            val response = apiService.getThread(
-                threadType = threadType,
-                threadId = threadId
-            )
+        networkService.safeApiCall(
+            apiCall = {
+                apiService.getThread(
+                    threadType = threadType,
+                    threadId = threadId
+                )
+            },
+            onSuccess = {
+                threadDao.insert(it.data.thread.toEntity())
 
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
-            }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-
-            threadDao.insert(body.data.thread.toEntity())
-
-            body.data.draftAttachments?.let {
-                db.withTransaction {
+                it.data.draftAttachments?.let {
+                    db.withTransaction {
+                        postAttachmentDao.removeUploadedDrafts(threadType, threadId)
+                        postAttachmentDao.insert(
+                            it.toEntity().map {
+                                it.copy(status = PostAttachment.STATUS_UPLOADED)
+                            }
+                        )
+                    }
+                } ?: run {
                     postAttachmentDao.removeUploadedDrafts(threadType, threadId)
-                    postAttachmentDao.insert(
-                        it.toEntity().map {
-                            it.copy(status = PostAttachment.STATUS_UPLOADED)
-                        }
-                    )
                 }
-            } ?: run {
-                postAttachmentDao.removeUploadedDrafts(threadType, threadId)
             }
+        )
 
-            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
-        } catch (e: IOException) {
-            networkStatus.setStatus(NetworkStatus.Status.ERROR)
-        } catch (e: Exception) {
-
-        }
+//        try {
+//            val response = apiService.getThread(
+//                threadType = threadType,
+//                threadId = threadId
+//            )
+//
+//            if (!response.isSuccessful) {
+//                throw ApiError(response.code(), response.message())
+//            }
+//            val body = response.body() ?: throw ApiError(response.code(), response.message())
+//
+//            threadDao.insert(body.data.thread.toEntity())
+//
+//            body.data.draftAttachments?.let {
+//                db.withTransaction {
+//                    postAttachmentDao.removeUploadedDrafts(threadType, threadId)
+//                    postAttachmentDao.insert(
+//                        it.toEntity().map {
+//                            it.copy(status = PostAttachment.STATUS_UPLOADED)
+//                        }
+//                    )
+//                }
+//            } ?: run {
+//                postAttachmentDao.removeUploadedDrafts(threadType, threadId)
+//            }
+//
+//            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
+//        } catch (e: IOException) {
+//            networkStatus.setStatus(NetworkStatus.Status.ERROR)
+//        } catch (e: Exception) {
+//
+//        }
     }
 
 
     override suspend fun setThreadVisit() {
-        try {
-            val response = apiService.setThreadVisit(
-                threadType = threadType,
-                threadId = threadId
-            )
-
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
-            }
-            //val body = response.body() ?: throw ApiError(response.code(), response.message())
-            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
-        } catch (e: IOException) {
-            networkStatus.setStatus(NetworkStatus.Status.ERROR)
-        } catch (e: Exception) {
-
-        }
+        networkService.safeApiCall(
+            apiCall = {
+                apiService.setThreadVisit(
+                    threadType = threadType,
+                    threadId = threadId
+                )
+            },
+        )
+//        try {
+//            val response = apiService.setThreadVisit(
+//                threadType = threadType,
+//                threadId = threadId
+//            )
+//
+//            if (!response.isSuccessful) {
+//                throw ApiError(response.code(), response.message())
+//            }
+//            //val body = response.body() ?: throw ApiError(response.code(), response.message())
+//            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
+//        } catch (e: IOException) {
+//            networkStatus.setStatus(NetworkStatus.Status.ERROR)
+//        } catch (e: Exception) {
+//
+//        }
     }
 
     override suspend fun changeSubscription(newStatus: Byte) {
         if (!appAuth.authorized()) return
 
-        try {
-            val response = apiService.changeSubscription(
-                threadType = threadType,
-                threadId = threadId,
-                status = newStatus
-            )
-
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
+        networkService.safeApiCall(
+            apiCall = {
+                apiService.changeSubscription(
+                    threadType = threadType,
+                    threadId = threadId,
+                    status = newStatus
+                )
+            },
+            onSuccess = {
+                threadDao.insert(it.data.thread.toEntity())
             }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            threadDao.insert(body.data.thread.toEntity())
-            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
-        } catch (e: IOException) {
-            networkStatus.setStatus(NetworkStatus.Status.ERROR)
-        } catch (e: Exception) {
-
-        }
+        )
+//        try {
+//            val response = apiService.changeSubscription(
+//                threadType = threadType,
+//                threadId = threadId,
+//                status = newStatus
+//            )
+//
+//            if (!response.isSuccessful) {
+//                throw ApiError(response.code(), response.message())
+//            }
+//            val body = response.body() ?: throw ApiError(response.code(), response.message())
+//            threadDao.insert(body.data.thread.toEntity())
+//            networkStatus.setStatus(NetworkStatus.Status.ONLINE)
+//        } catch (e: IOException) {
+//            networkStatus.setStatus(NetworkStatus.Status.ERROR)
+//        } catch (e: Exception) {
+//
+//        }
     }
 
     override suspend fun savePostToServer(post: Post) {
@@ -161,18 +207,15 @@ class ThreadRepositoryServerImpl @Inject constructor(
     override suspend fun checkThreadUpdates() {
         while (true) {
             delay(2_000L)
-            try {
-                val response = apiService.getAreaStatus(
-                    type = threadType,
-                    objectId = threadId
-                )
-                if (!response.isSuccessful) {
-                    throw ApiError(response.code(), response.message())
-                }
 
-                val body = response.body() //?: throw ApiError(response.code(), response.message())
-
-                body?.let {
+            networkService.safeApiCall(
+                apiCall = {
+                    apiService.getAreaStatus(
+                        type = threadType,
+                        objectId = threadId
+                    )
+                },
+                onSuccess = {
                     with (it.data) {
                         if (lastUpdateTime > threadStatus.value!!.lastUpdateTime) {
                             val newStatus = ThreadStatus(
@@ -183,13 +226,38 @@ class ThreadRepositoryServerImpl @Inject constructor(
                             threadStatus.postValue(newStatus)
                         }
                     }
-                    networkStatus.setStatus(NetworkStatus.Status.ONLINE)
                 }
-            }  catch (e: IOException) {
-                networkStatus.setStatus(NetworkStatus.Status.ERROR)
-            } catch (e: Exception) {
-                // throw UnknownError
-            }
+            )
+
+//            try {
+//                val response = apiService.getAreaStatus(
+//                    type = threadType,
+//                    objectId = threadId
+//                )
+//                if (!response.isSuccessful) {
+//                    throw ApiError(response.code(), response.message())
+//                }
+//
+//                val body = response.body() //?: throw ApiError(response.code(), response.message())
+//
+//                body?.let {
+//                    with (it.data) {
+//                        if (lastUpdateTime > threadStatus.value!!.lastUpdateTime) {
+//                            val newStatus = ThreadStatus(
+//                                lastUpdateTime = lastUpdateTime,
+//                                lastMessageTime = lastMessageTime,
+//                                messagesCount = messagesCount// TODO надо получать время последнего сообщения
+//                            )
+//                            threadStatus.postValue(newStatus)
+//                        }
+//                    }
+//                    networkStatus.setStatus(NetworkStatus.Status.ONLINE)
+//                }
+//            }  catch (e: IOException) {
+//                networkStatus.setStatus(NetworkStatus.Status.ERROR)
+//            } catch (e: Exception) {
+//                // throw UnknownError
+//            }
         }
     }
 
