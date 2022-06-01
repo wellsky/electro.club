@@ -83,9 +83,13 @@ class PostRepositoryServerImpl @Inject constructor(
         )
 
         return result?.let {
-            val post = it.data.messages.first()
-            // Может придти не тот пост, если нужный был удален или не существует и т.п.
-            if (post.id == id) post else null
+            if (it.data.messages.isNotEmpty()) {
+                val post = it.data.messages.first()
+                // Может придти не тот пост, если нужный был удален или не существует и т.п.
+                if (post.id == id) post else null
+            } else {
+                null
+            }
         }
     }
 

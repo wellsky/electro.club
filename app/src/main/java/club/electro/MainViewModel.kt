@@ -55,7 +55,6 @@ class MainViewModel @Inject constructor(
 
         val statusString = when (networkStatus) {
             NetworkStatus.Status.OFFLINE -> resources.getString(R.string.network_status_offline)
-            NetworkStatus.Status.ERROR -> resources.getString(R.string.network_status_error)
             else -> null
         }
 

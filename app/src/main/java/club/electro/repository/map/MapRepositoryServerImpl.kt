@@ -42,22 +42,16 @@ class MapRepositoryServerImpl @Inject constructor(
     }
 
     override suspend fun getAll() {
-        try {
-            val response = apiService.getMapObjects(
-                types = MARKER_TYPE_SOCKET.toString() + "+" + MARKER_TYPE_GROUP.toString()
-            )
-
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
+        networkService.safeApiCall(
+            apiCall = {
+                apiService.getMapObjects(
+                    types = "$MARKER_TYPE_SOCKET+$MARKER_TYPE_GROUP"
+                )
+            },
+            onSuccess = {
+                markerDao.reset(it.data.map_objects.toEntity())
             }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-
-            markerDao.reset(body.data.map_objects.toEntity())
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
+        )
     }
 
     override fun observeSocket(id: Long): Flow<Socket?> = socketDao.observe(id)

@@ -112,15 +112,16 @@ class MapFragment : Fragment() {
                 map.clear()
 
                 val socketIcon = R.drawable.map_socket
+                val socketOffIcon = R.drawable.map_socket_grey
                 val groupIcon = R.drawable.map_group
 
                 markersList.forEach { item ->
-                    val mapMarker = when (item.type) {
+                    when (item.type) {
                         MARKER_TYPE_SOCKET -> map.addMarker(
                             MapMarker(
                                 lat = item.lat,
                                 lng = item.lng,
-                                icon = socketIcon,
+                                icon = item.data?.off?.let { socketOffIcon } ?: socketIcon,
                                 data = item,
                                 iconUrl = item.icon
                             ),

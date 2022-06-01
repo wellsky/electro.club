@@ -13,7 +13,9 @@ data class MapMarkerData (
 
 data class MarkerCustomData (
     @SerializedName("thread_type") val threadType: Byte? = null,
-    @SerializedName("thread_id") val threadId: Long? = null
+    @SerializedName("thread_id") val threadId: Long? = null,
+
+    @SerializedName("off") val off: Byte? = null,
 )
 
 const val MARKER_TYPE_SOCKET: Byte = 6

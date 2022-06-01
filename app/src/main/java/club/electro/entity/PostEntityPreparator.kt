@@ -75,7 +75,10 @@ class PostEntityContentPreparator @AssistedInject constructor(
         ): PostEntityContentPreparator
     }
 
-    val ANSWERTO_MAX_TEXT_LENGTH = 128
+    companion object {
+        private const val PRIMARY_URL = "https://electro.club"
+        private const val ANSWERTO_MAX_TEXT_LENGTH = 128
+    }
 
     var text = postEntity.content
 
@@ -85,10 +88,16 @@ class PostEntityContentPreparator @AssistedInject constructor(
 
     suspend fun prepareAll(): PostEntityContentPreparator {
         prepareLegacyQuotes()
+        prepareSpoilers()
+        prepareMessageInSpoiler()
         prepareLegacyUrls()
         prepareEmojies()
         prepareImagesOnNewLine()
+
         prepareBasicTags()
+        prepareTableTags()
+
+
         prepareRelativeUrls()
         prepareAppVersionTag()
 
@@ -108,6 +117,47 @@ class PostEntityContentPreparator @AssistedInject constructor(
         //newText = newText.replace("</p>", "<br>")
 
         text = newText
+        return this
+    }
+
+    private fun prepareTableTags(): PostEntityContentPreparator {
+        var newText = text
+        newText = newText.replace("<tr>", "<br>")
+        newText = newText.replace("</td><td>", " : ")
+
+        text = newText
+        return this
+    }
+
+    private fun prepareSpoilers(): PostEntityContentPreparator {
+        val pattern1= """\[spoiler="(.*?)"\](.*?)\[\/spoiler\]"""
+
+        val result1 = Regex(pattern1).replace(text) {
+            runBlocking {
+                val (spoilerTitle, spoilerContent) = it.destructured
+                "<strong>$spoilerTitle</strong><br>$spoilerContent<br>"
+            }
+        }
+
+        val pattern2= """\[spoiler\](.*?)\[\/spoiler\]"""
+        val result2 = Regex(pattern2).replace(result1) {
+            val (spoilerContent) = it.destructured
+            "$spoilerContent<br>"
+        }
+
+        text = result2
+        return this
+    }
+
+    private fun prepareMessageInSpoiler(): PostEntityContentPreparator {
+        val pattern= """\[message=(.*?)\ spoiler="(.*?)"]"""
+
+        val result = Regex(pattern).replace(text) {
+            val (messageId, spoilerTitle) = it.destructured
+            "<a href=\"$PRIMARY_URL/m/$messageId\">$spoilerTitle</a>"
+        }
+
+        text = result
         return this
     }
 
@@ -161,7 +211,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
      */
     private fun prepareRelativeUrls(): PostEntityContentPreparator {
         var newText = text
-        newText = newText.replace("src=\"/data/", "src=\"https://electro.club/data/")
+        newText = newText.replace("src=\"/data/", "src=\"$PRIMARY_URL/data/")
 
         text = newText
         return this
@@ -203,7 +253,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
             runBlocking {
                 val (userId) = it.destructured
                 val author: User? = userRepository.getLocalById(userId.toLong(), onLoadedCallback = onEveryDataUpdate)
-                "<a href=\"https://electro.club/users/$userId\">@${author?.name ?: "user" + userId}</a>"
+                "<a href=\"$PRIMARY_URL/users/$userId\">@${author?.name ?: "user" + userId}</a>"
             }
         }
 
