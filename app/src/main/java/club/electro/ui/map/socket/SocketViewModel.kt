@@ -23,7 +23,7 @@ class SocketViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repository.updateSocket(socketId)
+            repository.getSocketDetails(socketId)
         }
     }
 

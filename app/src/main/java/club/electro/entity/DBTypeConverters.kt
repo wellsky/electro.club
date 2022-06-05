@@ -79,6 +79,18 @@ class DBTypeConverters {
     }
 
     @TypeConverter
+    fun fromThreadHeaderMessage(primary: ThreadHeaderMessage?): String? {
+        val type = object : TypeToken<ThreadHeaderMessage>() {}.type
+        return Gson().toJson(primary, type)
+    }
+
+    @TypeConverter
+    fun toThreadHeaderMessage(primaryString: String?): ThreadHeaderMessage? {
+        val type = object : TypeToken<ThreadHeaderMessage>() {}.type
+        return Gson().fromJson<ThreadHeaderMessage>(primaryString, type)
+    }
+
+    @TypeConverter
     fun toSocketStatus(value: String) = enumValueOf<SocketStatus>(value)
 
     @TypeConverter

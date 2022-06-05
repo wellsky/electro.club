@@ -114,4 +114,5 @@
     <string name="settings_theme_dark">Темная</string>
     <string name="settings_map_google">Google</string>
     <string name="settings_map_yandex">Yandex</string>
+    <string name="go_to_pinned_message">Перейти к закрепленному сообщению</string>
 </resources>

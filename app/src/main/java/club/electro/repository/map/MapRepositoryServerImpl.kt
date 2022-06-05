@@ -56,7 +56,7 @@ class MapRepositoryServerImpl @Inject constructor(
 
     override fun observeSocket(id: Long): Flow<Socket?> = socketDao.observe(id)
 
-    override suspend fun updateSocket(id: Long) {
+    override suspend fun getSocketDetails(id: Long) {
         networkService.safeApiCall(
             apiCall = {
                 apiService.getSocketDetails(
@@ -79,6 +79,7 @@ class MapRepositoryServerImpl @Inject constructor(
             },
             onSuccess = {
                 socketDao.insert(it.data.socket.toEntity())
+                getAll()
             }
         )
     }

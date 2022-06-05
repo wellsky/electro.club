@@ -113,7 +113,7 @@
         android:id="@+id/panelLine"
         android:layout_width="wrap_content"
         android:layout_height="1dp"
-        android:background="@color/divider"
+        android:background="@color/divider1"
         app:layout_constraintTop_toBottomOf="@id/transportImage"
         app:layout_constraintStart_toStartOf="@id/transportImage"
         android:layout_marginTop="8dp"

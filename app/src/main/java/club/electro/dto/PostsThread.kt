@@ -11,9 +11,16 @@ data class PostsThread (
     val name: String,
     val image: String,
     val messages: Long,
+    @SerializedName("header_message") val headerMessage: ThreadHeaderMessage? = null,
     @SerializedName("subscribers_count")  val subscribersCount: Long,
     @SerializedName("subscription_status")  val subscriptionStatus: Byte,
     @SerializedName("can_post")  val canPost: Boolean = false,
+)
+
+data class ThreadHeaderMessage (
+    val id: Long,
+    val url: String,
+    val text: String,
 )
 
 enum class ThreadType(val value: Byte) {
@@ -40,5 +47,5 @@ val threadTypeSerializer = object : TypeAdapter<ThreadType>() {
 
 const val SUBSCRIPTION_STATUS_NONE: Byte = 0;
 const val SUBSCRIPTION_STATUS_SUBSCRIBED: Byte = 1;
-const val SUBSCRIPTION_STATUS_IGONRING: Byte = 2;
+const val SUBSCRIPTION_STATUS_IGNORING: Byte = 2;
 const val SUBSCRIPTION_STATUS_MUTED: Byte = 3;

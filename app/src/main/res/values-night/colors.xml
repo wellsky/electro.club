@@ -42,7 +42,8 @@
     <color name="iconTint1">#93a1c3</color>
     <color name="iconTint2">#606d8b</color>
     <color name="link">#d37018</color>
-    <color name="divider">#1f2b48</color>
+    <color name="divider1">#1f2b48</color>
+    <color name="divider2">#394157</color>
 
     <color name="backgroundLight">#606d8b</color>
 

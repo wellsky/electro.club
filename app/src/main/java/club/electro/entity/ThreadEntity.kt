@@ -3,6 +3,7 @@ package club.electro.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import club.electro.dto.PostsThread
+import club.electro.dto.ThreadHeaderMessage
 import club.electro.dto.ThreadType
 import club.electro.dto.User
 import com.google.gson.annotations.SerializedName
@@ -15,6 +16,7 @@ data class ThreadEntity(
     val name: String,
     val image: String,
     val messages: Long,
+    val headerMessage: ThreadHeaderMessage?,
     val subscribersCount: Long,
     val subscriptionStatus: Byte,
     val canPost: Boolean = false,
@@ -25,6 +27,7 @@ data class ThreadEntity(
         name = name,
         image = image,
         messages = messages,
+        headerMessage = headerMessage,
         subscribersCount = subscribersCount,
         subscriptionStatus = subscriptionStatus,
         canPost = canPost,
@@ -38,6 +41,7 @@ data class ThreadEntity(
                 name = dto.name,
                 image = dto.image,
                 messages = dto.messages,
+                headerMessage = dto.headerMessage,
                 subscribersCount = dto.subscribersCount,
                 subscriptionStatus = dto.subscriptionStatus,
                 canPost = dto.canPost

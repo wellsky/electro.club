@@ -11,7 +11,7 @@ interface MapRepository {
     suspend fun getAll()
 
     fun observeSocket(id: Long): Flow<Socket?>
-    suspend fun updateSocket(id: Long)
+    suspend fun getSocketDetails(id: Long)
 
     fun setMarkersFilter(list: List<Byte>)
     suspend fun setSocketStatus(socketId: Long, status: SocketStatus)

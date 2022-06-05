@@ -34,6 +34,7 @@ import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION
 import club.electro.utils.*
 import com.squareup.picasso.Picasso
 import com.stfalcon.imageviewer.StfalconImageViewer
+import com.yandex.metrica.impl.ob.uf
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -66,7 +67,7 @@ class ThreadFragment: Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         requireActivity().run {
-            val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+            val mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
             viewModel.thread.observe(viewLifecycleOwner) {
                 it?.let {
                     mainViewModel.updateActionBarConfig(ToolBarConfig(
@@ -221,36 +222,7 @@ class ThreadFragment: Fragment() {
             }
 
             override fun onUrlClicked(url: String) {
-                if (url.isImageUrl()) {
-                    StfalconImageViewer.Builder(context, listOf(url)) { view, image ->
-                        Picasso.get().load(image).into(view)
-                    }.show()
-                } else {
-                    val action = object : UrlHandlerAction(findNavController(), requireContext()) {
-                        override fun openThread(data: UrlDataResult.Thread) {
-                            if ((data.threadType.value == threadType) && (data.threadId == threadId)) {
-                                Snackbar.make(
-                                    binding.root,
-                                    getString(R.string.you_are_viewing_this_thread),
-                                    Snackbar.LENGTH_LONG
-                                )
-                                    .show()
-                            } else {
-                                super.openThread(data)
-                            }
-                        }
-
-                        override fun openMessageInThread(data: UrlDataResult.MessageInThread) {
-                            if ((data.threadType.value == threadType) && (data.threadId == threadId)) {
-                                viewModel.reloadPosts(ThreadLoadTarget(data.postId))
-                            } else {
-                                super.openMessageInThread(data)
-                            }
-                        }
-                    }
-
-                    urlHandlerFactory.create(action).setUrl(url).open()
-                }
+                openUrl(url)
             }
         }, lifecycleScope)
 
@@ -303,7 +275,6 @@ class ThreadFragment: Fragment() {
             }
         })
 
-        println("Set content: " + viewModel.getEditorPostContent())
         binding.editorPostContent.setText(viewModel.getEditorPostContent())
 
         // Обновляет видимые посты, если увеличилось время последнего изменения на сервере подписок
@@ -349,10 +320,11 @@ class ThreadFragment: Fragment() {
         viewModel.thread.observe(viewLifecycleOwner) {
             requireActivity().invalidateOptionsMenu()
             invalidateBottomPanel()
+            invalidatePinnedMessage()
         }
 
         viewModel.editorAttachments.observe(viewLifecycleOwner) {
-            if (it.size > 0) {
+            if (it.isNotEmpty()) {
                 val uploaded = it.count { it.status == PostAttachment.STATUS_UPLOADED }
                 if (uploaded == it.size) {
                     binding.attachmentsCount.text = it.size.toString()
@@ -473,7 +445,50 @@ class ThreadFragment: Fragment() {
         return root
     }
 
-    fun invalidateBottomPanel() {
+    private fun openUrl(url: String) {
+        if (url.isImageUrl()) {
+            StfalconImageViewer.Builder(context, listOf(url)) { view, image ->
+                Picasso.get().load(image).into(view)
+            }.show()
+        } else {
+            val action = object : UrlHandlerAction(findNavController(), requireContext()) {
+                override fun openThread(data: UrlDataResult.Thread) {
+                    if ((data.threadType.value == threadType) && (data.threadId == threadId)) {
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.you_are_viewing_this_thread),
+                            Snackbar.LENGTH_LONG
+                        )
+                            .show()
+                    } else {
+                        super.openThread(data)
+                    }
+                }
+
+                override fun openMessageInThread(data: UrlDataResult.MessageInThread) {
+                    if ((data.threadType.value == threadType) && (data.threadId == threadId)) {
+                        viewModel.reloadPosts(ThreadLoadTarget(data.postId))
+                    } else {
+                        super.openMessageInThread(data)
+                    }
+                }
+            }
+
+            urlHandlerFactory.create(action).setUrl(url).open()
+        }
+    }
+
+    private fun invalidatePinnedMessage() {
+        binding.pinnedMessage.isVisible = false
+        viewModel.thread.value?.headerMessage?.let { pinnedMessage ->
+            binding.pinnedMessage.isVisible = true
+            binding.pinnedMessage.setOnClickListener {
+                openUrl(pinnedMessage.url)
+            }
+        }
+    }
+
+    private fun invalidateBottomPanel() {
         binding.bottomPanel.isVisible = false
         viewModel.thread.value?.let {
             if (viewModel.appAuth.authorized()) {

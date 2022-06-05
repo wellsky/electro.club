@@ -44,7 +44,8 @@
     <color name="iconTint1">#555555</color>
     <color name="iconTint2">#aaaaaa</color>
     <color name="link">#db7511</color>
-    <color name="divider">#f6f6f6</color>
+    <color name="divider1">#f6f6f6</color>
+    <color name="divider2">#c6c6c6</color>
 
     <color name="backgroundLight">#ABABAB</color>
 
