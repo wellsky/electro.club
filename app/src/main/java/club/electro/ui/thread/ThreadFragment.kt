@@ -482,6 +482,7 @@ class ThreadFragment: Fragment() {
         binding.pinnedMessage.isVisible = false
         viewModel.thread.value?.headerMessage?.let { pinnedMessage ->
             binding.pinnedMessage.isVisible = true
+            binding.pinnedMessageText.text = pinnedMessage.text.removeHtml().trim()
             binding.pinnedMessage.setOnClickListener {
                 openUrl(pinnedMessage.url)
             }
@@ -492,7 +493,8 @@ class ThreadFragment: Fragment() {
         binding.bottomPanel.isVisible = false
         viewModel.thread.value?.let {
             if (viewModel.appAuth.authorized()) {
-                if (it.subscriptionStatus.equals(SUBSCRIPTION_STATUS_SUBSCRIBED) || it.subscriptionStatus.equals(SUBSCRIPTION_STATUS_MUTED)) {
+                if (it.subscriptionStatus == SUBSCRIPTION_STATUS_SUBSCRIBED
+                || it.subscriptionStatus == SUBSCRIPTION_STATUS_MUTED) {
                     if (it.canPost) {
                         binding.bottomPanel.isVisible = true
                         binding.bottomPanelEditor.isVisible = true
@@ -514,7 +516,6 @@ class ThreadFragment: Fragment() {
 
     override fun onPause() {
         super.onPause()
-        println("Set viewModel content: " + binding.editorPostContent.text.toString())
         viewModel.setEditorPostContent(binding.editorPostContent.text.toString())
     }
 
@@ -530,7 +531,7 @@ class ThreadFragment: Fragment() {
      * а потом начнет уползать вверх из-за подгружаемых ниже изображений, вместо того чтобы нижние сообщения ползли вниз.
      * И дойдет даже до того, что начнут грузится все новые и новые страницы.
      */
-    fun setGravityTop() {
+    private fun setGravityTop() {
         val linearLayoutManager = LinearLayoutManager(this.context)
         linearLayoutManager.reverseLayout = true
         linearLayoutManager.stackFromEnd = true

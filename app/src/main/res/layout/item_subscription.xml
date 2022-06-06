@@ -48,7 +48,6 @@
         app:layout_constraintStart_toEndOf="@id/areaName"
         android:layout_marginStart="@dimen/fab_margin"
         android:textColor="@color/textLight2"
-        android:textFontWeight="700"
         tools:text="12:12"
         >
     </TextView>
