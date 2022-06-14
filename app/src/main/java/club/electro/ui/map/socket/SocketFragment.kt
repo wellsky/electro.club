@@ -15,7 +15,6 @@ import club.electro.dto.Socket
 import club.electro.dto.SocketStatus
 import club.electro.ui.user.UserProfileFragment.Companion.userId
 import club.electro.utils.LongArg
-import club.electro.utils.htmlToText
 import club.electro.utils.load
 import club.electro.utils.loadCircleCrop
 import com.squareup.picasso.Picasso
@@ -42,7 +41,7 @@ class SocketFragment : Fragment() {
             if (socket != null) {
                 with(binding) {
                     authorName.text = socket.authorName
-                    socketDescription.text = htmlToText(socket.text)
+                    socketDescription.text = socket.text
                     authorAvatar.loadCircleCrop(socket.authorAvatar)
 
                     val createdTime = java.util.Date(socket.created * 1000)

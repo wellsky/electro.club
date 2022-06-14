@@ -3,6 +3,7 @@ package club.electro.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import club.electro.dto.SubscriptionArea
+import club.electro.utils.toPlainText
 
 @Entity
 data class AreaEntity(
@@ -45,7 +46,7 @@ data class AreaEntity(
                 image = dto.image,
                 name = dto.name,
                 lastName = dto.lastName,
-                lastText = dto.lastText,
+                lastText = dto.lastText.toPlainText(),
                 lastTime = dto.lastTime,
                 count = dto.count,
                 mute = dto.mute,

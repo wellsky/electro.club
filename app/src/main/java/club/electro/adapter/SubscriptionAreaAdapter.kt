@@ -10,8 +10,8 @@ import club.electro.R
 import club.electro.databinding.ItemSubscriptionBinding
 import club.electro.dto.SubscriptionArea
 import club.electro.utils.areaLastActivityTime
-import club.electro.utils.htmlToText
 import club.electro.utils.loadCircleCrop
+import club.electro.utils.removeHtml
 
 interface SubscriptionAreaInteractionListener {
     fun onClick(area: SubscriptionArea) {}
@@ -39,7 +39,7 @@ class SubscriptionAreaViewHolder(
     fun bind(area: SubscriptionArea) {
         binding.apply {
             areaName.text = area.name
-            areaLastMessage.text = htmlToText(area.lastText)
+            areaLastMessage.text = area.lastText
 
             if (area.lastName.isNotBlank()) {
                 areaLastName.text = area.lastName + ": "

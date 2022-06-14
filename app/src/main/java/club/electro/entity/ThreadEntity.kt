@@ -6,6 +6,7 @@ import club.electro.dto.PostsThread
 import club.electro.dto.ThreadHeaderMessage
 import club.electro.dto.ThreadType
 import club.electro.dto.User
+import club.electro.utils.toPlainText
 import com.google.gson.annotations.SerializedName
 
 @Entity
@@ -41,7 +42,7 @@ data class ThreadEntity(
                 name = dto.name,
                 image = dto.image,
                 messages = dto.messages,
-                headerMessage = dto.headerMessage,
+                headerMessage = dto.headerMessage?.fromDto(),
                 subscribersCount = dto.subscribersCount,
                 subscriptionStatus = dto.subscriptionStatus,
                 canPost = dto.canPost
@@ -52,3 +53,8 @@ data class ThreadEntity(
 fun List<ThreadEntity>.toDto(): List<PostsThread> = map(ThreadEntity::toDto)
 fun List<PostsThread>.toEntity(): List<ThreadEntity> = map(ThreadEntity::fromDto)
 fun PostsThread.toEntity(): ThreadEntity = ThreadEntity.fromDto(this)
+
+private fun ThreadHeaderMessage.fromDto() : ThreadHeaderMessage =
+    this.copy(
+        text = this.text.toPlainText()
+    )

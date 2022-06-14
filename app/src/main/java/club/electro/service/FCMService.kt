@@ -19,7 +19,7 @@ import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.utils.GetCircleBitmap
-import club.electro.utils.htmlToText
+import club.electro.utils.toPlainText
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -118,18 +118,18 @@ class FCMService : FirebaseMessagingService() {
                 if (action.equals(ACTION_PERSONAL_MESSAGE)) {
                     notificationBuilder
                         .setContentTitle(
-                            htmlToText(getString(R.string.notification_personal_message, data.authorName))
+                            getString(R.string.notification_personal_message, data.authorName.toPlainText())
                         )
-                        .setContentText(htmlToText(data.postContent))
+                        .setContentText(data.postContent.toPlainText())
                         .setStyle(NotificationCompat.BigTextStyle()
-                            .bigText(htmlToText(data.postContent))
+                            .bigText(data.postContent.toPlainText())
                         )
                 }
 
                 if (action.equals(ACTION_THREAD_POST)) {
-                    val text = data.authorName + ": " + htmlToText(data.postContent)
+                    val text = data.authorName + ": " + data.postContent.toPlainText()
                     notificationBuilder
-                        .setContentTitle(htmlToText(data.threadName))
+                        .setContentTitle(data.threadName.toPlainText())
                         .setContentText(text)
                         .setStyle(NotificationCompat.BigTextStyle()
                             .bigText(text)
@@ -137,9 +137,9 @@ class FCMService : FirebaseMessagingService() {
                 }
 
                 if (action.equals(ACTION_ANSWER)) {
-                    val text = getString(R.string.notification_answer, data.authorName) + ": " + htmlToText(data.postContent)
+                    val text = getString(R.string.notification_answer, data.authorName) + ": " + data.postContent.toPlainText()
                     notificationBuilder
-                        .setContentTitle(htmlToText(data.threadName))
+                        .setContentTitle(data.threadName.toPlainText())
                         .setContentText(text)
                         .setStyle(NotificationCompat.BigTextStyle()
                             .bigText(text)
@@ -147,9 +147,9 @@ class FCMService : FirebaseMessagingService() {
                 }
 
                 if (action.equals(ACTION_QUOTE)) {
-                    val text = getString(R.string.notification_quoted, data.authorName) + ": " + htmlToText(data.postContent)
+                    val text = getString(R.string.notification_quoted, data.authorName) + ": " + data.postContent.toPlainText()
                     notificationBuilder
-                        .setContentTitle(htmlToText(data.threadName))
+                        .setContentTitle(data.threadName.toPlainText())
                         .setContentText(text)
                         .setStyle(NotificationCompat.BigTextStyle()
                             .bigText(text)
@@ -157,9 +157,9 @@ class FCMService : FirebaseMessagingService() {
                 }
 
                 if (action.equals(ACTION_MENTION)) {
-                    val text = getString(R.string.notification_mention, data.authorName) + ": " + htmlToText(data.postContent)
+                    val text = getString(R.string.notification_mention, data.authorName) + ": " + data.postContent.toPlainText()
                     notificationBuilder
-                        .setContentTitle(htmlToText(data.threadName))
+                        .setContentTitle(data.threadName.toPlainText())
                         .setContentText(text)
                         .setStyle(NotificationCompat.BigTextStyle()
                             .bigText(text)
@@ -190,7 +190,7 @@ class FCMService : FirebaseMessagingService() {
         }
     }
 
-    fun applyImageUrl(
+    private fun applyImageUrl(
         builder: NotificationCompat.Builder,
         imageUrl: String
     ) = runBlocking {

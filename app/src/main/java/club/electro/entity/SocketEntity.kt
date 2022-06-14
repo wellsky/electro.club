@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 import club.electro.dto.Post
 import club.electro.dto.Socket
 import club.electro.dto.SocketStatus
+import club.electro.utils.toPlainText
 
 @Entity
 data class SocketEntity(
@@ -38,8 +39,8 @@ data class SocketEntity(
         fun fromDto(dto: Socket) =
             SocketEntity(
                 id = dto.id,
-                name = dto.name,
-                text = dto.text,
+                name = dto.name.toPlainText(),
+                text = dto.text.toPlainText(),
                 status = dto.status,
                 created = dto.created,
                 modified = dto.modified,

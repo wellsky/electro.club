@@ -292,7 +292,7 @@ class ThreadFragment: Fragment() {
         viewModel.editedPost.observe(viewLifecycleOwner) {
             if (it.id != 0L) {
                 binding.editedPostGroup.visibility = View.VISIBLE
-                binding.editedPostContent.text = htmlToText(it.content)
+                binding.editedPostContent.text = it.content.removeHtml()
 
                 with (binding.editorPostContent) {
                     setText(it.content)
@@ -306,7 +306,7 @@ class ThreadFragment: Fragment() {
         viewModel.answerToPost.observe(viewLifecycleOwner) {
             if (it.id != 0L) {
                 binding.answerPostGroup.visibility = View.VISIBLE
-                binding.answerToContent.text = htmlToText(it.content)
+                binding.answerToContent.text = it.content.removeHtml()
             } else {
                 binding.answerPostGroup.visibility = View.GONE
             }
