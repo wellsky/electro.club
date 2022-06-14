@@ -1,7 +1,6 @@
 package club.electro.adapter
 
 import ImageGetter
-import QuoteSpanClass
 import android.content.res.Resources
 import android.graphics.Paint
 import android.text.Spannable
@@ -286,7 +285,7 @@ class PostViewHolder(
                     // strip width
                     10F, 30F
                 ),
-                start, end, flags
+                start, end, flags,
             )
         }
     }

@@ -14,6 +14,7 @@ data class Post (
     @SerializedName("content") val content: String = "",
     @SerializedName("published") val published: Long,
     @SerializedName("answer_to") val answerTo: Long? = null,
+    @SerializedName("url") val url: String? = null,
     @SerializedName("views") val views: Int? = null,
     @SerializedName("comments") val comments: Int? = null,
     @SerializedName("can_edit") val canEdit: Boolean = false,

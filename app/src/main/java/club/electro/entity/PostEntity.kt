@@ -21,6 +21,7 @@ data class PostEntity(
     val preparedContent: String? = content,
     val published: Long,
     val answerTo: Long?,
+    val url: String?,
     val views: Int? = null,
     val comments: Int? = null,
 
@@ -44,6 +45,7 @@ data class PostEntity(
         preparedContent = preparedContent,
         published = published,
         answerTo = answerTo,
+        url = url,
         views = views,
         comments = comments,
         canEdit = canEdit,
@@ -66,6 +68,7 @@ data class PostEntity(
                 preparedContent = dto.preparedContent,
                 published = dto.published,
                 answerTo = dto.answerTo,
+                url = dto.url,
                 views = dto.views,
                 comments = dto.comments,
                 canEdit = dto.canEdit,

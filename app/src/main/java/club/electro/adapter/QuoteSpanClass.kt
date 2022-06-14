@@ -1,3 +1,5 @@
+package club.electro.adapter
+
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.text.Layout

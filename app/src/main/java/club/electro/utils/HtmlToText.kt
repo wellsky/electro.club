@@ -1,6 +1,9 @@
 package club.electro.utils
 
 import androidx.core.text.HtmlCompat
+import club.electro.adapter.PostEntityContentPreparator
+import club.electro.dto.Post
+import club.electro.dto.User
 import kotlinx.coroutines.runBlocking
 
 // TODO надо объединить с PostEntityPreparator, вынести в отдельный модуль
@@ -20,6 +23,8 @@ fun String.removeTags(): String {
         .removeTransportTags()
         .removeSpoilerTags()
         .removeMessageInSpoilerTags()
+        .removeUsersTags()
+        .removeQuotesTags()
 }
 
 private fun String.removeSpoilerTags(): String {
@@ -72,4 +77,26 @@ private fun String.removeTransportTags(): String {
     }
 
     return newText
+}
+
+private fun String.removeUsersTags(): String {
+    val pattern = """\[user=(\d+?)\]"""
+
+    val result = Regex(pattern).replace(this) {
+        runBlocking {
+            val (userId) = it.destructured
+            "\uD83D\uDC64"
+        }
+    }
+
+    return result
+}
+
+private fun String.removeQuotesTags(): String {
+    val pattern = """\[quote message=(\d+?)\](.*?)\[\/quote\]"""
+    val result = Regex(pattern).replace(this) {
+        "\uD83D\uDCCB"
+    }
+
+    return result
 }

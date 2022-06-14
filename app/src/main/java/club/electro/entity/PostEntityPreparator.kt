@@ -8,6 +8,7 @@ import club.electro.dto.User
 import club.electro.entity.PostEntity
 import club.electro.repository.post.PostRepository
 import club.electro.repository.user.UserRepository
+import club.electro.utils.toPlainText
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -130,7 +131,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
     }
 
     private fun prepareSpoilers(): PostEntityContentPreparator {
-        val pattern1= """\[spoiler="(.*?)"\](.*?)\[\/spoiler\]"""
+        val pattern1 = """\[spoiler="(.*?)"\](.*?)\[\/spoiler\]"""
 
         val result1 = Regex(pattern1).replace(text) {
             runBlocking {
@@ -139,7 +140,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
             }
         }
 
-        val pattern2= """\[spoiler\](.*?)\[\/spoiler\]"""
+        val pattern2 = """\[spoiler\](.*?)\[\/spoiler\]"""
         val result2 = Regex(pattern2).replace(result1) {
             val (spoilerContent) = it.destructured
             "$spoilerContent<br>"
@@ -150,7 +151,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
     }
 
     private fun prepareMessageInSpoiler(): PostEntityContentPreparator {
-        val pattern= """\[message=(.*?)\ spoiler="(.*?)"]"""
+        val pattern = """\[message=(.*?)\ spoiler="(.*?)"]"""
 
         val result = Regex(pattern).replace(text) {
             val (messageId, spoilerTitle) = it.destructured
@@ -172,15 +173,19 @@ class PostEntityContentPreparator @AssistedInject constructor(
             }
         }
 
-        postEntity?.answerTo?.let {
+        postEntity.answerTo?.let {
             val sourceMessage: Post? = postRepository.getLocalById(
                 postEntity.threadType,
                 postEntity.threadId,
                 it,
                 onEveryDataUpdate
             )
-            val answerText = sourceMessage?.let {
-                "<blockquote><strong>Ответ ${sourceMessage.authorName} </strong>: ${shortTextPreview(sourceMessage.content)}</blockquote>"
+            val answerText = sourceMessage?.let { source ->
+                "<blockquote>" +
+                        "<strong>Ответ ${source.authorName?.toPlainText()} </strong>" +
+                        ": ${shortTextPreview(source.content.toPlainText())} " +
+                        "<br><a href=\"${source.url}\">Исходное сообщение</a>" +
+                        "</blockquote>"
             } ?: "<blockquote><strong>Ответ на сообщение $it</strong></blockquote>"
             text = answerText + text
         }
@@ -221,7 +226,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
      * Заменяет тэги [quote messge=<id>]<text>[/quote] на цитату
      */
     private suspend fun prepareQuotes(): PostEntityContentPreparator {
-        postEntity?.let { post ->
+        postEntity.let { post ->
             val pattern = """\[quote message=(\d+?)\](.*?)\[\/quote\]"""
             val result = Regex(pattern).replace(text) {
                 runBlocking {
@@ -232,13 +237,20 @@ class PostEntityContentPreparator @AssistedInject constructor(
                         quotedMessageId.toLong(),
                         onEveryDataUpdate
                     )
+
+                    val quoteLink = sourceMessage?.let {
+                        "<br><a href=\"${it.url}\">Исходное сообщение</a>"
+                    } ?: ""
+
                     val author = "<strong>${sourceMessage?.authorName ?: "?"}</strong>:"
-                    "<blockquote>$author $quoteText</blockquote>"
+
+                    "<blockquote>$author $quoteText $quoteLink</blockquote>"
                 }
             }
 
             text = result
         }
+
         return this
     }
 
@@ -252,7 +264,10 @@ class PostEntityContentPreparator @AssistedInject constructor(
         val result = Regex(pattern).replace(text) {
             runBlocking {
                 val (userId) = it.destructured
-                val author: User? = userRepository.getLocalById(userId.toLong(), onLoadedCallback = onEveryDataUpdate)
+                val author: User? = userRepository.getLocalById(
+                    userId.toLong(),
+                    onLoadedCallback = onEveryDataUpdate
+                )
                 "<a href=\"$PRIMARY_URL/users/$userId\">@${author?.name ?: "user" + userId}</a>"
             }
         }
@@ -265,7 +280,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
      * Заменяет тэги [quote="<authorName>"]<text>[/quote] и [quote ]<text>[/quote] на цитату
      */
     private fun prepareLegacyQuotes(): PostEntityContentPreparator {
-        val pattern1= """\[quote="(.*?)"\](.*?)\[\/quote\]"""
+        val pattern1 = """\[quote="(.*?)"\](.*?)\[\/quote\]"""
 
         val result1 = Regex(pattern1).replace(text) {
             runBlocking {
@@ -275,7 +290,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
             }
         }
 
-        val pattern2= """\[quote\](.*?)\[\/quote\]"""
+        val pattern2 = """\[quote\](.*?)\[\/quote\]"""
         val result2 = Regex(pattern2).replace(result1) {
             val (quoteText) = it.destructured
             val author = "<strong>Цитата: </strong>:"
@@ -287,7 +302,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
     }
 
     private fun prepareLegacyUrls(): PostEntityContentPreparator {
-        val pattern= """\[url=(.*?)\](.*?)\[\/url\]"""
+        val pattern = """\[url=(.*?)\](.*?)\[\/url\]"""
 
         val result = Regex(pattern).replace(text) {
             val (url, anchor) = it.destructured
@@ -314,7 +329,7 @@ class PostEntityContentPreparator @AssistedInject constructor(
     }
 
 
-    private fun prepareImagesOnNewLine() : PostEntityContentPreparator {
+    private fun prepareImagesOnNewLine(): PostEntityContentPreparator {
         var newText = text
         newText = newText.replace("<img", "<br><img")
 
