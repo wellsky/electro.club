@@ -36,7 +36,7 @@ interface PostInteractionListener {
     fun onEditClicked(post: Post) {}
     fun onRemoveClicked(post: Post) {}
     fun onAvatarClicked(post: Post) {}
-    fun onUrlClicked(url: String) {}
+    fun onUrlClicked(url: String, sourcePost: Post) {}
     fun onAttachmentsClicked(post: Post) {}
     fun onOpenClicked(post: Post) {}
 }
@@ -235,12 +235,12 @@ class PostViewHolder(
                 }, start, end, flags)
             }
 
-            setTextViewHTML(content, newSpan)
+            setTextViewHTML(content, newSpan, post)
         }
     }
 
 
-    private fun makeLinkClickable(strBuilder: SpannableStringBuilder, span: URLSpan?) {
+    private fun makeLinkClickable(strBuilder: SpannableStringBuilder, span: URLSpan?, sourcePost: Post) {
         val start = strBuilder.getSpanStart(span)
         val end = strBuilder.getSpanEnd(span)
         val flags = strBuilder.getSpanFlags(span)
@@ -248,19 +248,19 @@ class PostViewHolder(
             override fun onClick(view: View) {
                 // Do something with span.getURL() to handle the link click...
                 if (span != null)
-                    onInteractionListener.onUrlClicked(span.url)
+                    onInteractionListener.onUrlClicked(span.url, sourcePost)
             }
         }
         strBuilder.setSpan(clickable, start, end, flags)
         strBuilder.removeSpan(span)
     }
 
-    private fun setTextViewHTML(text: TextView, html: CharSequence) {
+    private fun setTextViewHTML(text: TextView, html: CharSequence, sourcePost: Post) {
         val sequence = html
         val strBuilder = SpannableStringBuilder(sequence)
         val urls = strBuilder.getSpans(0, sequence.length, URLSpan::class.java)
         for (span in urls) {
-            makeLinkClickable(strBuilder, span)
+            makeLinkClickable(strBuilder, span, sourcePost)
         }
         text.text = strBuilder
         text.movementMethod = LinkMovementMethod.getInstance()

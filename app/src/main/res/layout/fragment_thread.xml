@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surface2"
-    >
+    android:background="@color/surface2">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/pinnedMessage"
         android:layout_width="match_parent"
         android:layout_height="52dp"
-        app:layout_constraintTop_toTopOf="parent"
         android:background="@color/postBackground"
+        app:layout_constraintTop_toTopOf="parent"
 
         >
 
@@ -21,16 +19,15 @@
             android:id="@+id/pinnedMessageIcon"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:contentDescription="@string/avatar_description"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginStart="12dp"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
-            android:layout_marginStart="12dp"
+            android:contentDescription="@string/avatar_description"
             android:src="@drawable/ic_baseline_push_pin_24"
-            app:tint="@color/iconTint1"
-            />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/iconTint1" />
 
         <TextView
             android:id="@+id/pinnedMessageTitle"
@@ -39,14 +36,13 @@
             android:layout_marginStart="8dp"
             android:ellipsize="end"
             android:singleLine="true"
-            app:layout_constraintStart_toEndOf="@id/pinnedMessageIcon"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/pinnedMessageText"
-            app:layout_constraintVertical_chainStyle="packed"
-            android:textStyle="bold"
             android:text="@string/pinned_message"
             android:textColor="@color/textLight1"
-            />
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/pinnedMessageText"
+            app:layout_constraintStart_toEndOf="@id/pinnedMessageIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
 
         <TextView
             android:id="@+id/pinnedMessageText"
@@ -55,141 +51,167 @@
             android:layout_marginStart="8dp"
             android:ellipsize="end"
             android:singleLine="true"
-            app:layout_constraintStart_toEndOf="@id/pinnedMessageIcon"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/pinnedMessageTitle"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:textColor="@color/textLight2"
-            tools:text= "Pinned message long text big content bla bla hello world tratatum"
-            />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/pinnedMessageIcon"
+            app:layout_constraintTop_toBottomOf="@+id/pinnedMessageTitle"
+            tools:text="Pinned message long text big content bla bla hello world tratatum" />
 
         <View
             android:id="@+id/headerLine"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/divider2"
-            app:layout_constraintBottom_toBottomOf="@id/pinnedMessage"
-            />
+            app:layout_constraintBottom_toBottomOf="@id/pinnedMessage" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/swiperefresh"
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/pinnedMessage"
         app:layout_constraintBottom_toTopOf="@id/bottomPanel"
-        >
+        app:layout_constraintTop_toBottomOf="@id/pinnedMessage">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id = "@+id/postsList"
+            android:id="@+id/postsList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:reverseLayout="true"
+            app:layout_constraintBottom_toBottomOf="parent"
 
-            app:layout_constraintBottom_toBottomOf = "parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:listitem="@layout/item_post"
-            >
-        </androidx.recyclerview.widget.RecyclerView>
+            app:reverseLayout="true"
+            tools:listitem="@layout/item_post"></androidx.recyclerview.widget.RecyclerView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <ImageButton
         android:id="@+id/buttonScrollToBegin"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_rounded_gray"
+        android:visibility="gone"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pinnedMessage"
+        app:srcCompat="@drawable/ic_baseline_keyboard_arrow_up_24" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/scrollBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/buttonScrollToEnd"
+        app:layout_constraintRight_toRightOf="parent"
         android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/bg_rounded_gray"
-        app:srcCompat="@drawable/ic_baseline_keyboard_arrow_up_24"
+        android:layout_marginBottom="16dp"
         android:visibility="gone"
-        />
+        >
+
+        <ImageButton
+            android:id="@+id/buttonScrollBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="4dp"
+            android:background="@drawable/bg_rounded_gray"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/ic_baseline_subdirectory_arrow_left_24">
+
+        </ImageButton>
+
+        <TextView
+            android:id="@+id/backScrollCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/editor_attachments_count_bg"
+            android:minWidth="24dp"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="12"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageButton
         android:id="@+id/buttonScrollToEnd"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/swiperefresh"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/bg_rounded_gray"
+        app:layout_constraintBottom_toBottomOf="@id/swiperefresh"
+        app:layout_constraintRight_toRightOf="parent"
         app:srcCompat="@drawable/ic_baseline_keyboard_arrow_down_24"
         android:visibility="gone"
         />
 
     <Button
         android:id="@+id/testButton"
-        android:visibility="gone"
         android:layout_width="100dp"
         android:layout_height="60dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="Test"
-        />
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/panelLine"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/iconTint2"
-        app:layout_constraintBottom_toTopOf="@id/bottomPanel"
-        />
+        app:layout_constraintBottom_toTopOf="@id/bottomPanel" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:background="@color/surface1"
         android:paddingBottom="1dp"
         android:visibility="gone"
-        >
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <TextView
             android:id="@+id/bottomPanelSubscrube"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:gravity="center"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:text="@string/subscribe_and_start_chatting"
-            android:textSize="18sp"
-            android:textColor="@color/textPrimary"
             android:background="@color/surface1"
+            android:gravity="center"
+            android:text="@string/subscribe_and_start_chatting"
+            android:textColor="@color/textPrimary"
+            android:textSize="18sp"
             android:visibility="gone"
-        />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/bottomPanelEditor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:textColor="@color/textPrimary"
             android:background="@color/surface1"
-            >
+            android:textColor="@color/textPrimary"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <ImageView
                 android:id="@+id/editedImage"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:contentDescription="@string/avatar_description"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/editorPostContent"
+                android:layout_marginStart="12dp"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="12dp"
-                android:layout_marginStart="12dp"
+                android:contentDescription="@string/avatar_description"
                 android:src="@drawable/ic_baseline_edit_24"
-                app:tint="@color/iconTint1"
-                />
+                app:layout_constraintBottom_toTopOf="@id/editorPostContent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/iconTint1" />
 
             <TextView
                 android:id="@+id/editedPostContent"
@@ -199,49 +221,45 @@
                 android:layout_marginEnd="16dp"
                 android:ellipsize="end"
                 android:singleLine="true"
-                app:layout_constraintStart_toEndOf="@id/editedImage"
-                app:layout_constraintLeft_toRightOf="@id/editedImage"
-                app:layout_constraintEnd_toStartOf="@id/cancelEdit"
-                app:layout_constraintTop_toTopOf="@id/editedImage"
                 app:layout_constraintBottom_toBottomOf="@id/editedImage"
-                tools:text="Edited message"
-            />
+                app:layout_constraintEnd_toStartOf="@id/cancelEdit"
+                app:layout_constraintLeft_toRightOf="@id/editedImage"
+                app:layout_constraintStart_toEndOf="@id/editedImage"
+                app:layout_constraintTop_toTopOf="@id/editedImage"
+                tools:text="Edited message" />
 
             <ImageButton
                 android:id="@+id/cancelEdit"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_margin="16dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/editedImage"
                 app:layout_constraintBottom_toBottomOf="@id/editedImage"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/editedPostContent"
+                app:layout_constraintTop_toTopOf="@id/editedImage"
                 app:srcCompat="@drawable/ic_baseline_cancel_24"
-                app:tint="@color/iconTint1"
-                />
+                app:tint="@color/iconTint1" />
 
             <androidx.constraintlayout.widget.Group
                 android:id="@+id/editedPostGroup"
-                android:layout_height="match_parent"
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:visibility="gone"
-                app:constraint_referenced_ids="editedImage, editedPostContent, cancelEdit"
-                />
+                app:constraint_referenced_ids="editedImage, editedPostContent, cancelEdit" />
 
             <ImageView
                 android:id="@+id/answerToImage"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:contentDescription="@string/avatar_description"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/editorPostContent"
+                android:layout_marginStart="12dp"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="12dp"
-                android:layout_marginStart="12dp"
+                android:contentDescription="@string/avatar_description"
                 android:src="@drawable/ic_baseline_reply_24"
-                app:tint="@color/iconTint1"
-                />
+                app:layout_constraintBottom_toTopOf="@id/editorPostContent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/iconTint1" />
 
             <TextView
                 android:id="@+id/answerToContent"
@@ -251,51 +269,47 @@
                 android:layout_marginEnd="16dp"
                 android:ellipsize="end"
                 android:singleLine="true"
-                app:layout_constraintStart_toEndOf="@id/answerToImage"
-                app:layout_constraintLeft_toRightOf="@id/answerToImage"
-                app:layout_constraintEnd_toStartOf="@id/cancelAnswer"
-                app:layout_constraintTop_toTopOf="@id/answerToImage"
                 app:layout_constraintBottom_toBottomOf="@id/answerToImage"
-                tools:text="Answer to message"
-                />
+                app:layout_constraintEnd_toStartOf="@id/cancelAnswer"
+                app:layout_constraintLeft_toRightOf="@id/answerToImage"
+                app:layout_constraintStart_toEndOf="@id/answerToImage"
+                app:layout_constraintTop_toTopOf="@id/answerToImage"
+                tools:text="Answer to message" />
 
             <ImageButton
                 android:id="@+id/cancelAnswer"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_margin="16dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/answerToImage"
                 app:layout_constraintBottom_toBottomOf="@id/answerToImage"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/answerToContent"
+                app:layout_constraintTop_toTopOf="@id/answerToImage"
                 app:srcCompat="@drawable/ic_baseline_cancel_24"
-                app:tint="@color/iconTint1"
-                />
+                app:tint="@color/iconTint1" />
 
             <androidx.constraintlayout.widget.Group
                 android:id="@+id/answerPostGroup"
-                android:layout_height="match_parent"
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:visibility="gone"
-                app:constraint_referenced_ids="answerToImage, answerToContent, cancelAnswer"
-                />
+                app:constraint_referenced_ids="answerToImage, answerToContent, cancelAnswer" />
 
             <EditText
                 android:id="@+id/editorPostContent"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:background="@null"
                 android:hint="@string/message_text"
                 android:importantForAutofill="no"
                 android:inputType="textMultiLine|textCapSentences"
                 android:maxLines="6"
                 android:padding="12dp"
-                android:background="@null"
+                android:textColor="@color/textPrimary"
                 android:textCursorDrawable="@null"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/editorAttachments"
-                app:layout_constraintStart_toStartOf="parent"
-                android:textColor="@color/textPrimary"
-                />
+                app:layout_constraintStart_toStartOf="parent" />
 
             <ImageButton
                 android:id="@+id/editorAttachments"
@@ -309,8 +323,7 @@
                 app:layout_constraintStart_toEndOf="@id/editorPostContent"
                 app:layout_constraintTop_toTopOf="@+id/editorPostContent"
                 app:srcCompat="@drawable/ic_baseline_attach_file_24"
-                app:tint="@color/iconTint1"
-                />
+                app:tint="@color/iconTint1" />
 
             <ImageButton
                 android:id="@+id/editorPostSave"
@@ -325,26 +338,23 @@
                 app:layout_constraintStart_toEndOf="@id/editorAttachments"
                 app:layout_constraintTop_toTopOf="@+id/editorPostContent"
                 app:srcCompat="@drawable/ic_baseline_send_24"
-                app:tint="@color/iconTint1"
-                />
+                app:tint="@color/iconTint1" />
 
             <TextView
                 android:id="@+id/attachmentsCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                app:layout_constraintStart_toStartOf="@id/editorAttachments"
-                app:layout_constraintTop_toTopOf="@id/editorAttachments"
-                app:layout_constraintBottom_toBottomOf="@id/editorAttachments"
-                android:textColor="@color/white"
                 android:background="@drawable/editor_attachments_count_bg"
                 android:minWidth="24dp"
-                android:textStyle="bold"
                 android:textAlignment="center"
-                tools:text="12"
+                android:textColor="@color/white"
+                android:textStyle="bold"
                 android:visibility="gone"
-                >
-            </TextView>
+                app:layout_constraintBottom_toBottomOf="@id/editorAttachments"
+                app:layout_constraintStart_toStartOf="@id/editorAttachments"
+                app:layout_constraintTop_toTopOf="@id/editorAttachments"
+                tools:text="12"></TextView>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

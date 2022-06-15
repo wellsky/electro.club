@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ThreadViewModel @Inject constructor(
-    val state : SavedStateHandle,
+    val state: SavedStateHandle,
     val repository: ThreadRepository,
     val attachmentsRepository: AttachmentsRepository,
     val appAuth: AppAuth
@@ -50,9 +50,11 @@ class ThreadViewModel @Inject constructor(
         repository.posts(refreshTarget)
     }.cachedIn(viewModelScope)
 
-    val editorPost = MutableLiveData(emptyPost) // Пост, который в данный момент в текстовом редакторе
+    val editorPost =
+        MutableLiveData(emptyPost) // Пост, который в данный момент в текстовом редакторе
     val draftPost = MutableLiveData(emptyPost) // Пост-черновик текущей группы
-    val editedPost = MutableLiveData(emptyPost) // Опубликованный пост, который в данный момент редактируется в текстовом редакторе
+    val editedPost =
+        MutableLiveData(emptyPost) // Опубликованный пост, который в данный момент редактируется в текстовом редакторе
     val answerToPost = MutableLiveData(emptyPost) // Пост, на который в данный момент пишется ответ
 
     // Текущее состояние группы. Время последнего изменения, количество сообщений.
@@ -67,15 +69,21 @@ class ThreadViewModel @Inject constructor(
     val incomingChangesStatus
         get() = _incomingChangesStatus
 
-    //val lastUpdateTime = MutableLiveData(0L)
+    /**
+     * Стэк сообщений с которых был переход к другим сообщениям в группе
+     * Для возврата к предыдущим сообщениям
+     */
+    private val _backScrollStack = MutableLiveData<List<Post>>(emptyList())
+    val backScrollStack: LiveData<List<Post>>
+        get() = _backScrollStack
 
     init {
         viewModelScope.launch {
-            repository.threadStatus.asFlow().collectLatest { newStatus->
+            repository.threadStatus.asFlow().collectLatest { newStatus ->
                 println("Repository thread status changed")
                 if (newStatus.lastUpdateTime > 0) { // Не инициализация переменной в репозитории
                     println("Repository status not empty")
-                    _threadStatus.value?.let { currentStatus-> // Не первые полученные данные
+                    _threadStatus.value?.let { currentStatus -> // Не первые полученные данные
                         if (currentStatus.lastUpdateTime > 0) {
                             println("Viewmodel thread status changed")
                             if (newStatus.messagesCount > currentStatus.messagesCount) {
@@ -97,6 +105,18 @@ class ThreadViewModel @Inject constructor(
             delay(2_000L)
             repository.setThreadVisit()
         }
+    }
+
+    fun addToBackScrollStack(post: Post) {
+        val stack = backScrollStack.value ?: emptyList()
+        _backScrollStack.value = stack + post
+    }
+
+    fun getFromBackScrollStack(): Post? {
+        val result = _backScrollStack.value?.lastOrNull()
+        val stack = backScrollStack.value ?: emptyList()
+        _backScrollStack.value = stack.dropLast(1)
+        return result
     }
 
     fun setIncomingChangesStatus(status: IncomingChangesStatus?) {
@@ -180,7 +200,7 @@ class ThreadViewModel @Inject constructor(
         mutableAttachments.value = 0L
     }
 
-    fun editedPostId():Long = editedPost.value?.id ?: 0L
+    fun editedPostId(): Long = editedPost.value?.id ?: 0L
 
     fun startAnswerPost(post: Post) {
         answerToPost.value = post
@@ -192,8 +212,14 @@ class ThreadViewModel @Inject constructor(
         editorPost.value = editorPost.value?.copy(answerTo = null)
     }
 
-    fun queueAttachment(name:String, path: String) = viewModelScope.launch {
-        attachmentsRepository.queuePostDraftAttachment(threadType, threadId, editedPostId, name, path)
+    fun queueAttachment(name: String, path: String) = viewModelScope.launch {
+        attachmentsRepository.queuePostDraftAttachment(
+            threadType,
+            threadId,
+            editedPostId,
+            name,
+            path
+        )
     }
 
     fun removeAttachment(attachment: PostAttachment) = viewModelScope.launch {

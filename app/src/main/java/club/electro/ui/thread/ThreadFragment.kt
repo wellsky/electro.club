@@ -221,8 +221,8 @@ class ThreadFragment: Fragment() {
                 }
             }
 
-            override fun onUrlClicked(url: String) {
-                openUrl(url)
+            override fun onUrlClicked(url: String, sourcePost: Post) {
+                openUrl(url, sourcePost)
             }
         }, lifecycleScope)
 
@@ -339,6 +339,22 @@ class ThreadFragment: Fragment() {
             }
         }
 
+        viewModel.backScrollStack.observe(viewLifecycleOwner) {
+            if (!it.isNullOrEmpty()) {
+                binding.scrollBack.isVisible = true
+                binding.backScrollCount.text = it.size.toString()
+            } else {
+                binding.scrollBack.isVisible = false
+            }
+        }
+
+        binding.buttonScrollBack.setOnClickListener {
+            println("SCROLL BACK")
+            viewModel.getFromBackScrollStack()?.url?.let {
+                openUrl(it)
+            }
+        }
+
         binding.postsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -445,7 +461,7 @@ class ThreadFragment: Fragment() {
         return root
     }
 
-    private fun openUrl(url: String) {
+    private fun openUrl(url: String, sourcePost: Post? = null) {
         if (url.isImageUrl()) {
             StfalconImageViewer.Builder(context, listOf(url)) { view, image ->
                 Picasso.get().load(image).into(view)
@@ -467,6 +483,9 @@ class ThreadFragment: Fragment() {
 
                 override fun openMessageInThread(data: UrlDataResult.MessageInThread) {
                     if ((data.threadType.value == threadType) && (data.threadId == threadId)) {
+                        if (sourcePost != null) {
+                            viewModel.addToBackScrollStack(sourcePost)
+                        }
                         viewModel.reloadPosts(ThreadLoadTarget(data.postId))
                     } else {
                         super.openMessageInThread(data)
