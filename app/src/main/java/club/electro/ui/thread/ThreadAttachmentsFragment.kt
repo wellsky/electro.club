@@ -32,15 +32,17 @@ class ThreadAttachmentsFragment: Fragment(R.layout.fragment_thread_attachments) 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         requireActivity().run {
-            val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-            mainViewModel.updateActionBarConfig(ToolBarConfig(
-                title = requireContext().getString(
-                    R.string.attachments,
-                    viewModel.editorAttachments.value?.size ?: "0"
-                ),
-                subtitle = "",
-                onClick = {}
-            ))
+            val mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+            viewModel.editorAttachments.observe(viewLifecycleOwner) {
+                mainViewModel.updateActionBarConfig(ToolBarConfig(
+                    title = requireContext().getString(
+                        R.string.attachments,
+                        viewModel.editorAttachments.value?.size ?: "0"
+                    ),
+                    subtitle = "",
+                    onClick = {}
+                ))
+            }
         }
     }
 
