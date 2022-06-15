@@ -34,6 +34,10 @@ class ThreadAttachmentsFragment: Fragment(R.layout.fragment_thread_attachments) 
         requireActivity().run {
             val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
             mainViewModel.updateActionBarConfig(ToolBarConfig(
+                title = requireContext().getString(
+                    R.string.attachments,
+                    viewModel.editorAttachments.value?.size ?: "0"
+                ),
                 subtitle = "",
                 onClick = {}
             ))

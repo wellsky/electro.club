@@ -27,14 +27,9 @@ import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST
 import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_FIRST_UNREAD
 import club.electro.repository.thread.ThreadLoadTarget.Companion.TARGET_POSITION_LAST
-//import club.electro.ui.thread.PostAttachmentsFragment.Companion.attachmentsThreadId
-//import club.electro.ui.thread.PostAttachmentsFragment.Companion.attachmentsThreadType
-//import club.electro.ui.thread.ThreadInfoFragment.Companion.threadInfoId
-//import club.electro.ui.thread.ThreadInfoFragment.Companion.threadInfoType
 import club.electro.utils.*
 import com.squareup.picasso.Picasso
 import com.stfalcon.imageviewer.StfalconImageViewer
-import com.yandex.metrica.impl.ob.uf
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -349,7 +344,6 @@ class ThreadFragment: Fragment() {
         }
 
         binding.buttonScrollBack.setOnClickListener {
-            println("SCROLL BACK")
             viewModel.getFromBackScrollStack()?.url?.let {
                 openUrl(it)
             }
