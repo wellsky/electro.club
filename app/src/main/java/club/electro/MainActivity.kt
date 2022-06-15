@@ -41,7 +41,7 @@ import club.electro.utils.loadCircleCrop
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
-import com.yandex.mapkit.MapKitFactory
+//import com.yandex.mapkit.MapKitFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -161,7 +161,7 @@ class MainActivity: AppCompatActivity() {
         }
 
         // TODO нормально ли инициализировать карту здесь или надо во фрагменте?
-        MapKitFactory.initialize(this)
+        // MapKitFactory.initialize(this)
 
         //https://stackoverflow.com/questions/47495534/how-to-enable-night-mode-programmatically
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)

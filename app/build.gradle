@@ -92,7 +92,11 @@ dependencies {
     implementation 'id.zelory:compressor:3.0.1'
     implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'com.yandex.android:mobmetricalib:4.1.1'
-    implementation 'com.yandex.android:maps.mobile:4.1.0-lite'
+
+
+    implementation 'com.google.android.gms:play-services-location:20.0.0'
+    //implementation 'com.yandex.android:maps.mobile:4.1.0-lite'
+
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

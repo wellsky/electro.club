@@ -82,14 +82,14 @@ class LocationProvider @Inject constructor (
         locationRequest.smallestDisplacement = 1f // В метрах
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY // set according to your app function
         locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult?) {
-                locationResult ?: return
-
+            override fun onLocationResult(locationResult: LocationResult) {
                 if (locationResult.locations.isNotEmpty()) {
                     val location = locationResult.lastLocation
                     lastLocation = location
-                    subscribers.forEach {
-                        it.value.invoke(location)
+                    if (location != null) {
+                        subscribers.forEach {
+                            it.value.invoke(location)
+                        }
                     }
                 }
             }

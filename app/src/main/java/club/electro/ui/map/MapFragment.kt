@@ -215,27 +215,28 @@ class MapFragment : Fragment() {
     ): View? {
         setHasOptionsMenu(true)
 
-        return when (mapProvider) {
-            SETTINGS_MAP_VALUE_YANDEX -> inflater.inflate(R.layout.fragment_map_yandex, container, false)
-            else -> inflater.inflate(R.layout.fragment_map_google, container, false)
-        }
+        return inflater.inflate(R.layout.fragment_map_google, container, false)
+//        return when (mapProvider) {
+//            SETTINGS_MAP_VALUE_YANDEX -> inflater.inflate(R.layout.fragment_map_yandex, container, false)
+//            else -> inflater.inflate(R.layout.fragment_map_google, container, false)
+//        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (mapProvider == SETTINGS_MAP_VALUE_YANDEX) {
-            map = MapYandexImpl(
-                onMapReady = { mapReadyCallback(map) },
-                onFailure = { message ->
-                    Snackbar.make(view, message, Snackbar.LENGTH_LONG)
-                        .show()
-                },
-                context = requireContext(),
-            )
-
-            map.setView(requireView().findViewById(R.id.yandex_map))
-        } else {
+//        if (mapProvider == SETTINGS_MAP_VALUE_YANDEX) {
+//            map = MapYandexImpl(
+//                onMapReady = { mapReadyCallback(map) },
+//                onFailure = { message ->
+//                    Snackbar.make(view, message, Snackbar.LENGTH_LONG)
+//                        .show()
+//                },
+//                context = requireContext(),
+//            )
+//
+//            map.setView(requireView().findViewById(R.id.yandex_map))
+//        } else {
             map = MapGoogleImpl(
                 onMapReady = { mapReadyCallback(map) },
                 onFailure = { message ->
@@ -248,7 +249,7 @@ class MapFragment : Fragment() {
             map.init(
                 view = childFragmentManager.findFragmentById(R.id.google_map),
             )
-        }
+        //}
 
         view.findViewById<FloatingActionButton>(R.id.map_to_my_location_button)
             .setOnClickListener {

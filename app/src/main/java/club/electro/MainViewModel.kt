@@ -10,7 +10,6 @@ import club.electro.auth.AppAuth
 import club.electro.model.NetworkStatus
 import club.electro.repository.attachments.AttachmentsRepository
 import club.electro.ui.map.LocationProvider
-import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
