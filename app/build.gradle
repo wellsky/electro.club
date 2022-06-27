@@ -10,14 +10,22 @@ if (project.file('google-services.json').exists()) {
 }
 
 android {
+    signingConfigs {
+        release {
+        storeFile file('D:\\data\\key_ec_app\\electro.club.jks')
+            storePassword 'futurama'
+            keyPassword 'futurama'
+            keyAlias 'electro.club'
+        }
+    }
     compileSdk 31
 
     defaultConfig {
         applicationId "club.electro"
         minSdk 21
         targetSdk 30
-        versionCode 4
-        versionName "0.04"
+        versionCode 5
+        versionName "0.05"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -25,6 +33,7 @@ android {
             // This will strip all non-supported ABI sets from the final APK file.
             abiFilters 'x86', 'x86_64', 'arm64-v8a', 'armeabi-v7a'
         }
+        signingConfig signingConfigs.release
     }
 
     buildTypes {

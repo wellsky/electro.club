@@ -3,6 +3,7 @@ package club.electro.service
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent.ACTION_ANSWER
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
@@ -31,11 +32,13 @@ import kotlin.random.Random
 
 @AndroidEntryPoint
 class FCMService : FirebaseMessagingService() {
-    private val ACTION_THREAD_POST = "newThreadPost"
-    private val ACTION_ANSWER = "newAnswer"
-    private val ACTION_QUOTE = "newQuote"
-    private val ACTION_MENTION = "newMention"
-    private val ACTION_PERSONAL_MESSAGE = "newPersonalMessage"
+    companion object {
+        private const val ACTION_THREAD_POST = "newThreadPost"
+        private const val ACTION_ANSWER = "newAnswer"
+        private const val ACTION_QUOTE = "newQuote"
+        private const val ACTION_MENTION = "newMention"
+        private const val ACTION_PERSONAL_MESSAGE = "newPersonalMessage"
+    }
 
     private val recipientId = "recipientId"
     private val action = "action"
@@ -66,11 +69,11 @@ class FCMService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        val recipient = message.data.get(recipientId)
-        val currenUserId = appAuth.myId()
+        val recipient = message.data[recipientId]
+        val currentUserId = appAuth.myId()
 
         recipient?.let {
-            if (it.toLong() == currenUserId) {
+            if (it.toLong() == currentUserId) {
                 try {
                     handleNewMessage(message)
                 } catch (e: Exception) {
@@ -87,10 +90,7 @@ class FCMService : FirebaseMessagingService() {
     }
 
     private fun handleNewMessage(message: RemoteMessage) {
-        val action = message.data.get(action)
-
-
-        when (action) {
+        when (message.data[action]) {
             ACTION_PERSONAL_MESSAGE, ACTION_THREAD_POST, ACTION_ANSWER, ACTION_MENTION, ACTION_QUOTE -> {
                 val data = gson.fromJson(message.data[content], PostNotification::class.java)
                 val groupTitle = "new messages"
@@ -115,18 +115,27 @@ class FCMService : FirebaseMessagingService() {
                     .setAutoCancel(true)
                     .setGroup(groupKey)
 
-                if (action.equals(ACTION_PERSONAL_MESSAGE)) {
+                if (action == ACTION_PERSONAL_MESSAGE) {
+//                    notificationBuilder
+//                        .setContentTitle(
+//                            getString(R.string.notification_personal_message, data.authorName.toPlainText())
+//                        )
+//                        .setContentText(data.postContent.toPlainText())
+//                        .setStyle(NotificationCompat.BigTextStyle()
+//                            .bigText(data.postContent.toPlainText())
+//                        )
+
                     notificationBuilder
-                        .setContentTitle(
-                            getString(R.string.notification_personal_message, data.authorName.toPlainText())
-                        )
-                        .setContentText(data.postContent.toPlainText())
-                        .setStyle(NotificationCompat.BigTextStyle()
-                            .bigText(data.postContent.toPlainText())
-                        )
+                        .setStyle(NotificationCompat.MessagingStyle("Me")
+                            .setConversationTitle("Team lunch")
+                            .addMessage("Hi", data.published, data.authorName) // Pass in null for user.
+                            .addMessage("What's up?", data.published, data.authorName)
+                            .addMessage("Not much", data.published, data.authorName)
+                            .addMessage("How about lunch?", data.published, data.authorName))
+                        .build()
                 }
 
-                if (action.equals(ACTION_THREAD_POST)) {
+                if (action == ACTION_THREAD_POST) {
                     val text = data.authorName + ": " + data.postContent.toPlainText()
                     notificationBuilder
                         .setContentTitle(data.threadName.toPlainText())
@@ -136,7 +145,7 @@ class FCMService : FirebaseMessagingService() {
                         )
                 }
 
-                if (action.equals(ACTION_ANSWER)) {
+                if (action == ACTION_ANSWER) {
                     val text = getString(R.string.notification_answer, data.authorName) + ": " + data.postContent.toPlainText()
                     notificationBuilder
                         .setContentTitle(data.threadName.toPlainText())
@@ -146,7 +155,7 @@ class FCMService : FirebaseMessagingService() {
                         )
                 }
 
-                if (action.equals(ACTION_QUOTE)) {
+                if (action == ACTION_QUOTE) {
                     val text = getString(R.string.notification_quoted, data.authorName) + ": " + data.postContent.toPlainText()
                     notificationBuilder
                         .setContentTitle(data.threadName.toPlainText())
@@ -156,7 +165,7 @@ class FCMService : FirebaseMessagingService() {
                         )
                 }
 
-                if (action.equals(ACTION_MENTION)) {
+                if (action == ACTION_MENTION) {
                     val text = getString(R.string.notification_mention, data.authorName) + ": " + data.postContent.toPlainText()
                     notificationBuilder
                         .setContentTitle(data.threadName.toPlainText())
@@ -216,6 +225,7 @@ data class PostNotification (
     val threadImage: String,
     val authorName: String,
     val postContent: String,
+    val published: Long,
     val threadType: Byte,
     val threadId: Long,
     val postId: Long
