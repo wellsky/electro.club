@@ -1,14 +1,15 @@
 package club.electro.service
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Intent.ACTION_ANSWER
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.Person
 import androidx.navigation.NavDeepLinkBuilder
 import club.electro.MainActivity
 import club.electro.R
@@ -22,6 +23,7 @@ import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.utils.GetCircleBitmap
 import club.electro.utils.toPlainText
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -40,15 +42,18 @@ class FCMService : FirebaseMessagingService() {
         private const val ACTION_PERSONAL_MESSAGE = "newPersonalMessage"
     }
 
-    private val recipientId = "recipientId"
-    private val action = "action"
-    private val content = "content"
-    private val channelId = "remote"
+    private val recipientIdKey = "recipientId"
+    private val actionKey = "action"
+    private val contentKey = "content"
+    private val channelIdKey = "remote"
 
     private val gson = Gson()
 
     @Inject
     lateinit var appAuth: AppAuth
+
+    @Inject
+    @ApplicationContext lateinit var context: Context
 
     override fun onCreate() {
         super.onCreate()
@@ -56,7 +61,7 @@ class FCMService : FirebaseMessagingService() {
             val name = getString(R.string.channel_remote_name)
             val descriptionText = getString(R.string.channel_remote_description)
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(channelId, name, importance).apply {
+            val channel = NotificationChannel(channelIdKey, name, importance).apply {
                 description = descriptionText
             }
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -69,7 +74,7 @@ class FCMService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        val recipient = message.data[recipientId]
+        val recipient = message.data[recipientIdKey]
         val currentUserId = appAuth.myId()
 
         recipient?.let {
@@ -85,14 +90,56 @@ class FCMService : FirebaseMessagingService() {
         }
     }
 
-    override fun onDeletedMessages() {
-        super.onDeletedMessages()
+    private fun findActiveNotification(notificationId: Int): Notification? {
+        return (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+            .activeNotifications.find { it.id == notificationId }?.notification
+    }
+
+    // https://medium.com/@sidorovroman3/android-how-to-use-messagingstyle-for-notifications-without-caching-messages-c414ef2b816c
+    private fun addReply(message: CharSequence, notificationId: Int) {
+        // Find notification that you want to update.
+        val activeNotification = findActiveNotification(notificationId) ?: return
+
+        // Extract MessagingStyle object from the active notification.
+        val activeStyle = NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(activeNotification)
+
+        // Recover builder from the active notification.
+        val recoveredBuilder = Notification.Builder.recoverBuilder(context, activeNotification)
+
+        // The recoveredBuilder is Notification.Builder whereas the activeStyle is NotificationCompat.MessagingStyle.
+        // It means you need to recreate the style as Notification.MessagingStyle to make it compatible with the builder.
+        val newStyle = Notification.MessagingStyle("you")
+        newStyle.conversationTitle = activeStyle?.conversationTitle
+        activeStyle?.messages?.forEach {
+            newStyle.addMessage(Notification.MessagingStyle.Message(it.text, it.timestamp, it.sender))
+        }
+        // Add your reply to the new style.
+        newStyle.addMessage(Notification.MessagingStyle.Message(message, System.currentTimeMillis(), "you"))
+
+        // Set the new style to the recovered builder.
+        recoveredBuilder.setStyle(newStyle)
+
+        // Update the active notification.
+        NotificationManagerCompat.from(context).notify(notificationId, recoveredBuilder.build())
+    }
+
+    private fun createMessagingStyle(message: RemoteMessage): NotificationCompat.MessagingStyle {
+        val data = gson.fromJson(message.data[contentKey], PostNotification::class.java)
+
+        val person: Person = Person.Builder().setName(data.authorName).build()
+
+        return NotificationCompat.MessagingStyle(person)
+            .setConversationTitle("Team lunch")
+            .addMessage("Hi", data.published, person)
     }
 
     private fun handleNewMessage(message: RemoteMessage) {
-        when (message.data[action]) {
+        val notificationId = 123123
+        val action = message.data[actionKey]
+
+        when (action) {
             ACTION_PERSONAL_MESSAGE, ACTION_THREAD_POST, ACTION_ANSWER, ACTION_MENTION, ACTION_QUOTE -> {
-                val data = gson.fromJson(message.data[content], PostNotification::class.java)
+                val data = gson.fromJson(message.data[contentKey], PostNotification::class.java)
                 val groupTitle = "new messages"
                 val groupKey = "electro.club" //"THREAD-" + data.threadType + "-" + data.threadId
 
@@ -108,7 +155,7 @@ class FCMService : FirebaseMessagingService() {
                     })
                     .createPendingIntent()
 
-                val notificationBuilder = NotificationCompat.Builder(this, channelId)
+                val notificationBuilder = NotificationCompat.Builder(this, channelIdKey)
                     .setSmallIcon(R.drawable.electro_club_icon_grey_64)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setContentIntent(resultPendingIntent)
@@ -116,22 +163,14 @@ class FCMService : FirebaseMessagingService() {
                     .setGroup(groupKey)
 
                 if (action == ACTION_PERSONAL_MESSAGE) {
-//                    notificationBuilder
-//                        .setContentTitle(
-//                            getString(R.string.notification_personal_message, data.authorName.toPlainText())
-//                        )
-//                        .setContentText(data.postContent.toPlainText())
-//                        .setStyle(NotificationCompat.BigTextStyle()
-//                            .bigText(data.postContent.toPlainText())
-//                        )
+                    findActiveNotification(notificationId)?.let {
+                        println("NOTIF EXISTS")
+                        addReply(data.postContent, notificationId)
+                        return
+                    }
 
                     notificationBuilder
-                        .setStyle(NotificationCompat.MessagingStyle("Me")
-                            .setConversationTitle("Team lunch")
-                            .addMessage("Hi", data.published, data.authorName) // Pass in null for user.
-                            .addMessage("What's up?", data.published, data.authorName)
-                            .addMessage("Not much", data.published, data.authorName)
-                            .addMessage("How about lunch?", data.published, data.authorName))
+                        .setStyle(createMessagingStyle(message))
                         .build()
                 }
 
@@ -182,19 +221,19 @@ class FCMService : FirebaseMessagingService() {
                 val notification = notificationBuilder.build()
 
                 NotificationManagerCompat.from(this)
-                    .notify(Random.nextInt(100_000), notification)
+                    .notify(notificationId, notification)
 
-                val summaryNotification = NotificationCompat.Builder(this, channelId)
-                    .setSilent(true)
-                    .setContentText(groupTitle)
-                    .setSubText(groupTitle)
-                    .setSmallIcon(R.drawable.electro_club_icon_grey_64)
-                    .setGroup(groupKey)
-                    .setGroupSummary(true)
-                    .build()
-
-                NotificationManagerCompat.from(this)
-                    .notify(1, summaryNotification)
+//                val summaryNotification = NotificationCompat.Builder(this, channelIdKey)
+//                    .setSilent(true)
+//                    .setContentText(groupTitle)
+//                    .setSubText(groupTitle)
+//                    .setSmallIcon(R.drawable.electro_club_icon_grey_64)
+//                    .setGroup(groupKey)
+//                    .setGroupSummary(true)
+//                    .build()
+//
+//                NotificationManagerCompat.from(this)
+//                    .notify(1, summaryNotification)
             }
         }
     }
