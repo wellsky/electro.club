@@ -31,5 +31,7 @@ object DaoModule {
     fun provideDiscussionDao(db: AppDb): DiscussionDao = db.discussionDao()
     @Provides
     fun providePostDraftAttachmentDao(db: AppDb): PostAttachmentDao = db.postDraftAttachmentDao()
+    @Provides
+    fun provideNotificationDao(db: AppDb): NotificationDao = db.notificationDao()
 
 }

@@ -17,6 +17,9 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import club.electro.auth.AppAuth
+import club.electro.dao.NotificationDao
+import club.electro.entity.NotificationEntity
+import club.electro.repository.notifications.NotificationsRepository
 import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
@@ -24,7 +27,10 @@ import club.electro.utils.GetCircleBitmap
 import club.electro.utils.toPlainText
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -51,6 +57,9 @@ class FCMService : FirebaseMessagingService() {
 
     @Inject
     lateinit var appAuth: AppAuth
+
+    @Inject
+    lateinit var notificationsRepository: NotificationsRepository
 
     @Inject
     @ApplicationContext lateinit var context: Context
@@ -134,14 +143,13 @@ class FCMService : FirebaseMessagingService() {
     }
 
     private fun handleNewMessage(message: RemoteMessage) {
-        val notificationId = 123123
         val action = message.data[actionKey]
 
         when (action) {
             ACTION_PERSONAL_MESSAGE, ACTION_THREAD_POST, ACTION_ANSWER, ACTION_MENTION, ACTION_QUOTE -> {
                 val data = gson.fromJson(message.data[contentKey], PostNotification::class.java)
                 val groupTitle = "new messages"
-                val groupKey = "electro.club" //"THREAD-" + data.threadType + "-" + data.threadId
+                val groupKey = "electro.club" // Нотификашки группируются все в одну по этому ключу
 
                 // https://stackoverflow.com/questions/26608627/how-to-open-fragment-page-when-pressed-a-notification-in-android
                 val resultPendingIntent = NavDeepLinkBuilder(this)
@@ -159,14 +167,19 @@ class FCMService : FirebaseMessagingService() {
                     .setSmallIcon(R.drawable.electro_club_icon_grey_64)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setContentIntent(resultPendingIntent)
-                    .setAutoCancel(true)
                     .setGroup(groupKey)
 
                 if (action == ACTION_PERSONAL_MESSAGE) {
-                    findActiveNotification(notificationId)?.let {
-                        println("NOTIF EXISTS")
-                        addReply(data.postContent, notificationId)
-                        return
+                    val existsId = notificationsRepository.getByThread(data.threadType, data.threadId)
+                    println("EXISTS")
+                    println(existsId)
+                    if (existsId != null) {
+                        if (findActiveNotification(existsId) != null) {
+                            addReply(data.postContent, existsId)
+                            return
+                        } else {
+                            notificationsRepository.clearByThread(data.threadType, data.threadId)
+                        }
                     }
 
                     notificationBuilder
@@ -220,20 +233,29 @@ class FCMService : FirebaseMessagingService() {
                 applyImageUrl(notificationBuilder, data.threadImage)
                 val notification = notificationBuilder.build()
 
+                val notificationId = Random.nextInt(100_000)
+
                 NotificationManagerCompat.from(this)
                     .notify(notificationId, notification)
 
-//                val summaryNotification = NotificationCompat.Builder(this, channelIdKey)
-//                    .setSilent(true)
-//                    .setContentText(groupTitle)
-//                    .setSubText(groupTitle)
-//                    .setSmallIcon(R.drawable.electro_club_icon_grey_64)
-//                    .setGroup(groupKey)
-//                    .setGroupSummary(true)
-//                    .build()
-//
-//                NotificationManagerCompat.from(this)
-//                    .notify(1, summaryNotification)
+                notificationsRepository.insert(
+                    notificationId = notificationId,
+                    threadType = data.threadType,
+                    threadId = data.threadId
+                )
+
+                // Нотификашка, которая помещает в себя все остальные нотификашки по ключу groupKey
+                val summaryNotification = NotificationCompat.Builder(this, channelIdKey)
+                    .setSilent(true)
+                    .setContentText(groupTitle)
+                    .setSubText(groupTitle)
+                    .setSmallIcon(R.drawable.electro_club_icon_grey_64)
+                    .setGroup(groupKey)
+                    .setGroupSummary(true)
+                    .build()
+
+                NotificationManagerCompat.from(this)
+                    .notify(1, summaryNotification)
             }
         }
     }

@@ -4,13 +4,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class NotificationMessageEntity(
+data class NotificationEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long,
-    val notificationId: Long,
+    val id: Long = 0,
+    val notificationId: Int,
     val threadType: Byte,
     val threadId: Long,
-    val authorName: String?,
-    val authorImage: String?,
-    val text: String?
 )

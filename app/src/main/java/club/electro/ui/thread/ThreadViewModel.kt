@@ -6,10 +6,12 @@ import club.electro.auth.AppAuth
 import club.electro.dto.Post
 import club.electro.dto.PostAttachment
 import club.electro.repository.attachments.AttachmentsRepository
+import club.electro.repository.notifications.NotificationsRepository
 import club.electro.repository.thread.ThreadLoadTarget
 import club.electro.repository.thread.ThreadRepository
 import club.electro.repository.thread.ThreadStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +26,7 @@ class ThreadViewModel @Inject constructor(
     val state: SavedStateHandle,
     val repository: ThreadRepository,
     val attachmentsRepository: AttachmentsRepository,
+    private val notificationsRepository: NotificationsRepository,
     val appAuth: AppAuth
 ) : ViewModel() {
     val threadType: Byte = state.get("threadType") ?: 0
@@ -104,6 +107,10 @@ class ThreadViewModel @Inject constructor(
         viewModelScope.launch {
             delay(2_000L)
             repository.setThreadVisit()
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            notificationsRepository.clearByThread(threadType, threadId)
         }
     }
 
