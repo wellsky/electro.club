@@ -45,7 +45,7 @@ data class TransportEntity(
                 type = dto.type,
                 name = dto.name,
                 image = dto.image,
-                fullImage = dto.image,
+                fullImage = dto.fullImage,
                 users = dto.users,
                 rating = dto.rating,
                 specs = dto.specs,

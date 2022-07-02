@@ -19,7 +19,7 @@ class TransportViewModel @Inject constructor(
 ) : ViewModel() {
 
     companion object {
-        private val TRANSPORT_KEY = "transportId"
+        private const val TRANSPORT_KEY = "transportId"
     }
 
     val transportId: Long = state.get(TRANSPORT_KEY) ?: 0L

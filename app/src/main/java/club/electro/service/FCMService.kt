@@ -1,13 +1,11 @@
 package club.electro.service
 
 import android.app.Notification
-import android.app.Notification.Builder.recoverBuilder
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import androidx.core.app.NotificationCompat
@@ -27,21 +25,12 @@ import club.electro.ui.thread.ThreadFragment.Companion.targetPostId
 import club.electro.ui.thread.ThreadFragment.Companion.threadId
 import club.electro.ui.thread.ThreadFragment.Companion.threadType
 import club.electro.utils.GetCircleBitmap
+import club.electro.utils.loadCircleImageBlocking
 import club.electro.utils.toPlainText
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.target.Target
-import com.bumptech.glide.request.transition.Transition
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.net.URL
@@ -126,7 +115,6 @@ class FCMService : FirebaseMessagingService() {
         postNotification: PostNotification,
     ) {
         val text = postNotification.postContent.toPlainText()
-        val userName = postNotification.authorName
 
         // Find notification that you want to update.
         val activeNotification = findActiveNotification(notificationId) ?: return
@@ -140,13 +128,15 @@ class FCMService : FirebaseMessagingService() {
         val thread: Person = Person
             .Builder()
             .setName(postNotification.threadName)
-            //.setIcon(IconCompat.createWithContentUri(postNotification.threadImage))
+            .setIcon(IconCompat.createWithBitmap(loadCircleImageBlocking(postNotification.threadImage)))
             .build()
 
         // The recoveredBuilder is Notification.Builder whereas the activeStyle is NotificationCompat.MessagingStyle.
         // It means you need to recreate the style as Notification.MessagingStyle to make it compatible with the builder.
         val newStyle = NotificationCompat.MessagingStyle(thread)
         newStyle.conversationTitle = activeStyle?.conversationTitle
+        newStyle.isGroupConversation = activeStyle?.isGroupConversation ?: false
+
         activeStyle?.messages?.forEach {
             newStyle.addMessage(NotificationCompat.MessagingStyle.Message(it.text, it.timestamp, it.person))
         }
@@ -156,7 +146,7 @@ class FCMService : FirebaseMessagingService() {
         val author: Person = Person
             .Builder()
             .setName(postNotification.authorName)
-            .setIcon(IconCompat.createWithBitmap(loadUrl(postNotification.authorImage)))
+            .setIcon(IconCompat.createWithBitmap(loadCircleImageBlocking(postNotification.authorImage)))
             .build()
 
         // Add your reply to the new style.
@@ -165,8 +155,8 @@ class FCMService : FirebaseMessagingService() {
         // Set the new style to the recovered builder.
         recoveredBuilder.setStyle(newStyle)
 
-        // TODO удалить когда будет реализована подгрузка иконок через setIcon()
-        // applyImageUrl(recoveredBuilder, postNotification.threadImage)
+        // TODO не понятно надо это или нет. Иконки группы не отображаются.
+        applyImageUrl(recoveredBuilder, postNotification.threadImage)
 
         // Update the active notification.
         NotificationManagerCompat.from(context).notify(notificationId, recoveredBuilder.build())
@@ -214,13 +204,13 @@ class FCMService : FirebaseMessagingService() {
         val thread: Person = Person
             .Builder()
             .setName(data.threadName)
-            .setIcon(IconCompat.createWithBitmap(loadUrl(data.threadImage)))
+            .setIcon(IconCompat.createWithBitmap(loadCircleImageBlocking(data.threadImage)))
             .build()
 
         val author: Person = Person
             .Builder()
             .setName(data.authorName)
-            .setIcon(IconCompat.createWithBitmap(loadUrl(data.authorImage)))
+            .setIcon(IconCompat.createWithBitmap(loadCircleImageBlocking(data.authorImage)))
             .build()
 
         val style = NotificationCompat.MessagingStyle(thread)
@@ -233,7 +223,7 @@ class FCMService : FirebaseMessagingService() {
 
         this.setStyle(style)
 
-        //applyImageUrl(this, data.threadImage)
+        applyImageUrl(this, data.threadImage)
 
         return this
     }
@@ -311,44 +301,6 @@ class FCMService : FirebaseMessagingService() {
         }
     }
 }
-
-private fun loadUrl(
-    imageUrl: String
-): Bitmap? = runBlocking {
-    val url = URL(imageUrl)
-
-    withContext(Dispatchers.IO) {
-        try {
-            val input = url.openStream()
-            BitmapFactory.decodeStream(input)
-        } catch (e: IOException) {
-            null
-        }
-    }?.let { bitmap ->
-        GetCircleBitmap.make(bitmap)
-    }
-}
-
-
-@OptIn(ExperimentalCoroutinesApi::class)
-suspend fun Context.loadImageFromUrl(path: String): Bitmap =
-    suspendCancellableCoroutine { continuation ->
-        Glide
-        .with(this)
-        .asBitmap()
-        .timeout(6000000)
-        .load(path)
-        .into(object : CustomTarget<Bitmap>() {
-            override fun onResourceReady(resource: Bitmap, x: Transition<in Bitmap>?) {
-                continuation.resume(resource){}
-            }
-
-            override fun onLoadCleared(placeholder: Drawable?) {
-                TODO("Not yet implemented")
-            }
-        })
-    }
-
 
 data class PostNotification(
     val recipientId: Long,

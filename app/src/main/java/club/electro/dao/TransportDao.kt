@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TransportDao {
     @Query("SELECT * FROM TransportEntity WHERE id = :id")
-    fun getTransportById(id: Long): TransportEntity
+    fun getTransportById(id: Long): TransportEntity?
 
     @Query("SELECT * FROM TransportEntity WHERE name LIKE '%' || :filter || '%' ORDER BY rating DESC LIMIT 100")
     fun getFilteredList(filter: String): Flow<List<TransportEntity>>

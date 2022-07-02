@@ -37,7 +37,7 @@ class TransportFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         requireActivity().run {
-            val mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+            val mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
             viewModel.currentTransport.observe(viewLifecycleOwner) {
                 it?.let {
                     mainViewModel.updateActionBarConfig(ToolBarConfig(
@@ -63,24 +63,22 @@ class TransportFragment : Fragment() {
             binding.transportName.text = transport.name
             binding.transportRatingValue.text = transport.rating.toString()
 
-            transport.specs?.let {
-                binding.weightValue.text = it.weight.toString()
-                binding.powerValue.text = it.power.toString()
+            with (transport.specs) {
+                binding.weightValue.text = weight.toString()
+                binding.powerValue.text = power.toString()
             }
-
+            
             transport.fullImage?.let {
                 binding.transportImageContent.load(it)
             }
         }
 
         viewModel.transportDiscussions(transportId).observe(viewLifecycleOwner) {
-            println("Discussions observed " + it.size)
-            if (it.size > 0) {
+            if (it.isNotEmpty()) {
                 binding.discussionTitle.isVisible = true
                 binding.discussionItem.root.isVisible = true
-                val discussion = it[0]
+                val discussion = it.first()
                 with (binding.discussionItem) {
-                    println("Root is visible")
                     root.isVisible = true
                     discussionName.text = discussion.title
                     discussionMessagesCount.text = discussion.messages.toString()

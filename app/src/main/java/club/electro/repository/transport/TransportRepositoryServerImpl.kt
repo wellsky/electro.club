@@ -24,7 +24,7 @@ class TransportRepositoryServerImpl @Inject constructor(
     private val networkService: NetworkService,
 ): TransportRepository {
 
-    val targetList = MutableStateFlow(value = "")
+    private val targetList = MutableStateFlow(value = "")
 
     override val list = targetList.flatMapLatest { filter->
         transportDao.getFilteredList(filter).map(List<TransportEntity>::toPreviewDto).flowOn(Dispatchers.Default)
@@ -72,35 +72,14 @@ class TransportRepositoryServerImpl @Inject constructor(
                     transportId = id
                 )
             },
-            onSuccess = {
-                transportDao.insert(it.data.transport.toEntity())
-                it.data.discussions?.let {
+            onSuccess = { response ->
+                transportDao.insert(response.data.transport.toEntity())
+                response.data.discussions?.let {
                     discussionDao.insert(it.toEntity())
                 }
+                emit(response.data.transport)
             }
         )
-
-//        try {
-//            val response = apiService.getTransport(
-//                transportId = id
-//            )
-//
-//            if (!response.isSuccessful) {
-//                throw ApiError(response.code(), response.message())
-//            }
-//            val body = response.body() ?: throw ApiError(response.code(), response.message())
-//
-//            transportDao.insert(body.data.transport.toEntity())
-//            body.data.discussions?.let {
-//                discussionDao.insert(it.toEntity())
-//            }
-//
-//            emit(body.data.transport)
-//        } catch (e: IOException) {
-//            throw NetworkError
-//        } catch (e: Exception) {
-//            throw UnknownError
-//        }
     }.flowOn(Dispatchers.Default)
 
     override fun getDiscussionsByTransportId(id: Long): Flow<List<Discussion>> = discussionDao.getByTransportId(id).map{ it.toDto() }
