@@ -16,4 +16,7 @@ interface NotificationDao {
 
     @Query("DELETE FROM NotificationEntity WHERE threadType = :threadType AND threadId = :threadId")
     fun clearByThread(threadType: Byte, threadId: Long)
+
+    @Query("DELETE FROM NotificationEntity")
+    fun clearAllConversations()
 }

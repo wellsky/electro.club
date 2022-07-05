@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import club.electro.MainViewModel
 import club.electro.R
 import club.electro.ToolBarConfig
@@ -28,6 +29,8 @@ class SubscriptionsTabFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var currentGroup: Byte = 0
+
+    private var scrolledToTop: Boolean = true
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -90,7 +93,18 @@ class SubscriptionsTabFragment : Fragment() {
 
             adapter.submitList(items)
             binding.swiperefresh.isRefreshing = false
+
+            if (scrolledToTop) {
+                binding.subscriptionsList.smoothScrollToPosition(0);
+            }
         }
+
+        binding.subscriptionsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                scrolledToTop = !recyclerView.canScrollVertically(-1)
+            }
+        })
 
         binding.swiperefresh.setOnRefreshListener {
             viewModel.loadSubscriptions(currentGroup)

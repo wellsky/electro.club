@@ -4,7 +4,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
@@ -110,7 +109,7 @@ class FCMService : FirebaseMessagingService() {
     }
 
     // https://medium.com/@sidorovroman3/android-how-to-use-messagingstyle-for-notifications-without-caching-messages-c414ef2b816c
-    private suspend fun addReplyToNotification(
+    private fun addReplyToNotification(
         notificationId: Int,
         postNotification: PostNotification,
     ) {
@@ -125,20 +124,20 @@ class FCMService : FirebaseMessagingService() {
         // Recover builder from the active notification.
         val recoveredBuilder = NotificationCompat.Builder(context, activeNotification)
 
-        val thread: Person = Person
+        val you: Person = Person
             .Builder()
-            .setName(postNotification.threadName)
-            .setIcon(IconCompat.createWithBitmap(loadCircleImageBlocking(postNotification.threadImage)))
+            .setName("You")
             .build()
 
         // The recoveredBuilder is Notification.Builder whereas the activeStyle is NotificationCompat.MessagingStyle.
         // It means you need to recreate the style as Notification.MessagingStyle to make it compatible with the builder.
-        val newStyle = NotificationCompat.MessagingStyle(thread)
+        val newStyle = NotificationCompat.MessagingStyle(you)
+
         newStyle.conversationTitle = activeStyle?.conversationTitle
         newStyle.isGroupConversation = activeStyle?.isGroupConversation ?: false
 
         activeStyle?.messages?.forEach {
-            newStyle.addMessage(NotificationCompat.MessagingStyle.Message(it.text, it.timestamp, it.person))
+            newStyle.addMessage(NotificationCompat.MessagingStyle.Message(it.text, it.timestamp * 1000, it.person))
         }
 
         //val authorIcon = loadUrl(postNotification.authorName)
@@ -155,18 +154,60 @@ class FCMService : FirebaseMessagingService() {
         // Set the new style to the recovered builder.
         recoveredBuilder.setStyle(newStyle)
 
+
+        recoveredBuilder.setWhen(postNotification.published * 1000)
+        recoveredBuilder.setShowWhen(true)
         // TODO не понятно надо это или нет. Иконки группы не отображаются.
-        applyImageUrl(recoveredBuilder, postNotification.threadImage)
+        // applyImageUrl(recoveredBuilder, postNotification.threadImage)
 
         // Update the active notification.
         NotificationManagerCompat.from(context).notify(notificationId, recoveredBuilder.build())
     }
 
-    private fun defaultNotificationBuilder(): NotificationCompat.Builder {
-        return NotificationCompat.Builder(this, channelIdKey)
-            .setSmallIcon(R.drawable.electro_club_icon_grey_64)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setGroup(groupKey)
+    private fun NotificationCompat.Builder.createConversation(
+        postNotification: PostNotification
+    ): NotificationCompat.Builder {
+        // https://stackoverflow.com/questions/26608627/how-to-open-fragment-page-when-pressed-a-notification-in-android
+        val resultPendingIntent = NavDeepLinkBuilder(context)
+            .setComponentName(MainActivity::class.java)
+            .setGraph(R.navigation.mobile_navigation)
+            .setDestination(R.id.threadFragment)
+            .setArguments(Bundle().apply {
+                threadType = postNotification.threadType
+                threadId = postNotification.threadId
+                targetPostId = postNotification.postId
+            })
+            .createPendingIntent()
+
+        this.setContentIntent(resultPendingIntent)
+
+        this.setWhen(postNotification.published * 1000)
+        this.setShowWhen(true)
+
+        val you: Person = Person
+            .Builder()
+            .setName("You")
+            .build()
+
+        val author: Person = Person
+            .Builder()
+            .setName(postNotification.authorName)
+            .setIcon(IconCompat.createWithBitmap(loadCircleImageBlocking(postNotification.authorImage)))
+            .build()
+
+        val style = NotificationCompat.MessagingStyle(you)
+            .setConversationTitle(postNotification.threadName)
+            .addMessage(postNotification.postContent.toPlainText(), postNotification.published * 1000, author)
+
+        if (postNotification.threadType != ThreadType.THREAD_TYPE_PERSONAL_CHAT.value) {
+            style.isGroupConversation = true
+        }
+
+        this.setStyle(style)
+
+        //applyImageUrl(this, data.threadImage)
+
+        return this
     }
 
     private fun getExistingConversation(
@@ -183,52 +224,14 @@ class FCMService : FirebaseMessagingService() {
         return null
     }
 
-    private fun NotificationCompat.Builder.createConversation(
-        data: PostNotification
-    ): NotificationCompat.Builder {
-        // https://stackoverflow.com/questions/26608627/how-to-open-fragment-page-when-pressed-a-notification-in-android
-        val resultPendingIntent = NavDeepLinkBuilder(context)
-            .setComponentName(MainActivity::class.java)
-            .setGraph(R.navigation.mobile_navigation)
-            .setDestination(R.id.threadFragment)
-            .setArguments(Bundle().apply {
-                threadType = data.threadType
-                threadId = data.threadId
-                targetPostId = data.postId
-            })
-            .createPendingIntent()
-
-        this.setContentIntent(resultPendingIntent)
-
-
-        val thread: Person = Person
-            .Builder()
-            .setName(data.threadName)
-            .setIcon(IconCompat.createWithBitmap(loadCircleImageBlocking(data.threadImage)))
-            .build()
-
-        val author: Person = Person
-            .Builder()
-            .setName(data.authorName)
-            .setIcon(IconCompat.createWithBitmap(loadCircleImageBlocking(data.authorImage)))
-            .build()
-
-        val style = NotificationCompat.MessagingStyle(thread)
-            .setConversationTitle(data.threadName)
-            .addMessage(data.postContent.toPlainText(), data.published, author)
-
-        if (data.threadType != ThreadType.THREAD_TYPE_PERSONAL_CHAT.value) {
-            style.isGroupConversation = true
-        }
-
-        this.setStyle(style)
-
-        applyImageUrl(this, data.threadImage)
-
-        return this
+    private fun defaultNotificationBuilder(): NotificationCompat.Builder {
+        return NotificationCompat.Builder(this, channelIdKey)
+            .setSmallIcon(R.drawable.electro_club_icon_grey_64)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setGroup(groupKey)
     }
 
-    private suspend fun handleNewMessage(message: RemoteMessage) {
+    private fun handleNewMessage(message: RemoteMessage) {
         val action = message.data[actionKey]
 
         when (action) {
@@ -242,27 +245,28 @@ class FCMService : FirebaseMessagingService() {
                         notificationId = it,
                         postNotification = postNotification,
                     )
-                    return@handleNewMessage
+
+                    addGroupNotification()
+                } ?: run{
+                    notificationsRepository.clearByThread(postNotification.threadType, postNotification.threadId)
+
+                    notificationBuilder.createConversation(postNotification)
+
+                    val notification = notificationBuilder.build()
+
+                    val notificationId = Random.nextInt(100_000)
+
+                    NotificationManagerCompat.from(this)
+                        .notify(notificationId, notification)
+
+                    notificationsRepository.insert(
+                        notificationId = notificationId,
+                        threadType = postNotification.threadType,
+                        threadId = postNotification.threadId
+                    )
+
+                    addGroupNotification()
                 }
-
-                notificationsRepository.clearByThread(postNotification.threadType, postNotification.threadId)
-
-                notificationBuilder.createConversation(postNotification)
-
-                val notification = notificationBuilder.build()
-
-                val notificationId = Random.nextInt(100_000)
-
-                NotificationManagerCompat.from(this)
-                    .notify(notificationId, notification)
-
-                notificationsRepository.insert(
-                    notificationId = notificationId,
-                    threadType = postNotification.threadType,
-                    threadId = postNotification.threadId
-                )
-
-                addGroupNotification()
             }
         }
     }
@@ -279,7 +283,7 @@ class FCMService : FirebaseMessagingService() {
             .build()
 
         NotificationManagerCompat.from(this)
-            .notify(1, summaryNotification)
+            .notify(notificationsRepository.groupNotificationId, summaryNotification)
     }
 
     private fun applyImageUrl(

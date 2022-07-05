@@ -3,6 +3,7 @@ package club.electro.repository.account
 import club.electro.api.ApiService
 import club.electro.auth.AppAuth
 import club.electro.dao.AreaDao
+import club.electro.dao.NotificationDao
 import club.electro.dao.PostDao
 import club.electro.error.ApiError
 import javax.inject.Inject
@@ -13,7 +14,7 @@ class AccountRepositoryServerImpl @Inject constructor(
     private val apiService: ApiService,
     private val appAuth : AppAuth,
     private val postDao : PostDao,
-    private val areaDao : AreaDao
+    private val areaDao : AreaDao,
 ): AccountRepository {
     override suspend fun signIn(login: String, password: String): Boolean {
         val response = apiService.signIn(

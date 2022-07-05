@@ -11,6 +11,12 @@ if (project.file('google-services.json').exists()) {
 
 android {
     signingConfigs {
+        debug {
+            storeFile file('D:\\data\\key_ec_app\\electro.club.jks')
+            keyAlias 'electro.club'
+            storePassword 'futurama'
+            keyPassword 'futurama'
+        }
         release {
         storeFile file('D:\\data\\key_ec_app\\electro.club.jks')
             storePassword 'futurama'
@@ -40,6 +46,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.debug
         }
     }
 

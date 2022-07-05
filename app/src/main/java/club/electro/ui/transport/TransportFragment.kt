@@ -67,7 +67,7 @@ class TransportFragment : Fragment() {
                 binding.weightValue.text = weight.toString()
                 binding.powerValue.text = power.toString()
             }
-            
+
             transport.fullImage?.let {
                 binding.transportImageContent.load(it)
             }

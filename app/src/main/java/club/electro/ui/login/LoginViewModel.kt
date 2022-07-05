@@ -3,7 +3,11 @@ package ru.netology.nmedia.viewmodel
 import androidx.lifecycle.*
 import club.electro.auth.AppAuth
 import club.electro.repository.account.AccountRepository
+import club.electro.repository.notifications.NotificationsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -14,7 +18,8 @@ enum class LoginFormState {
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     val appAuth: AppAuth,
-    val repository: AccountRepository,
+    private val repository: AccountRepository,
+    private val notificationsRepository: NotificationsRepository,
 ) : ViewModel() {
     private val _state = MutableLiveData<LoginFormState>()
 
@@ -33,6 +38,8 @@ class LoginViewModel @Inject constructor(
         try {
             repository.signIn(login, password)
             _state.value = LoginFormState.SUCCESS
+
+            notificationsRepository.clearAllConversations()
         } catch (e: Exception) {
             _state.value = LoginFormState.ERROR
         }
@@ -42,5 +49,7 @@ class LoginViewModel @Inject constructor(
         appAuth.removeAuth()
         repository.signOut()
         _state.value = LoginFormState.NOT_LOGGED
+
+        notificationsRepository.clearAllConversations()
     }
 }

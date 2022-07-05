@@ -3,10 +3,12 @@ package club.electro.ui.feed
 import android.os.Bundle
 import android.view.*
 import androidx.core.os.ConfigurationCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import club.electro.MainViewModel
 import club.electro.R
 import club.electro.ToolBarConfig
@@ -24,6 +26,8 @@ class FeedTabFragment : Fragment() {
 
     private var _binding: FragmentFeedTabBinding? = null
     private val binding get() = _binding!!
+
+    private var scrolledToTop: Boolean = true
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -63,14 +67,25 @@ class FeedTabFragment : Fragment() {
 
         binding.feedPostsList.adapter = adapter
 
-        feedViewModel.data.observe(viewLifecycleOwner, { posts ->
+        feedViewModel.data.observe(viewLifecycleOwner) { posts ->
             adapter.submitList(posts)
-            binding.swiperefresh.setRefreshing(false)
-        })
+            binding.swiperefresh.isRefreshing = false
+
+            if (scrolledToTop) {
+                binding.feedPostsList.smoothScrollToPosition(0);
+            }
+        }
 
         binding.swiperefresh.setOnRefreshListener {
             feedViewModel.getFeedPosts()
         }
+
+        binding.feedPostsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                scrolledToTop = !recyclerView.canScrollVertically(-1)
+            }
+        })
 
         feedViewModel.getFeedPosts()
 

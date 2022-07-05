@@ -8,6 +8,9 @@ import androidx.core.app.NotificationManagerCompat
 import club.electro.dao.NotificationDao
 import club.electro.entity.NotificationEntity
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -15,6 +18,9 @@ class NotificationsRepositoryImpl @Inject constructor(
     private val notificationDao: NotificationDao,
     @ApplicationContext private val context: Context
 ): NotificationsRepository {
+
+    override val groupNotificationId = 1
+
     override fun insert(notificationId: Int, threadType: Byte, threadId: Long) {
         notificationDao.insert(
             NotificationEntity(
@@ -39,6 +45,13 @@ class NotificationsRepositoryImpl @Inject constructor(
         clearAllIfLast()
     }
 
+    override suspend fun clearAllConversations() {
+        CoroutineScope(Dispatchers.IO).launch {
+            NotificationManagerCompat.from(context).cancelAll()
+            notificationDao.clearAllConversations()
+        }
+    }
+
     /**
      * Надо удалить последнюю нотификашку, чтобы не оставалась пустая summary notification
      */
@@ -49,7 +62,7 @@ class NotificationsRepositoryImpl @Inject constructor(
             .activeNotifications
 
         if (activeNotifications.size == 1) {
-            NotificationManagerCompat.from(context).cancelAll()
+            NotificationManagerCompat.from(context).cancel(groupNotificationId)
         }
     }
 }
